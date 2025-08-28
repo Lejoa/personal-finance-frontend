@@ -1,11 +1,22 @@
-# PersonalFinanceFrontend
+# Personal Finance Frontend
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
+## Start Compose Watch
 
-## Development server
+Run the following command from the project root to start the container in watch mode
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+`docker compose watch angular-dev`
 
+To verify that Compose Watch is working correctly:
+
+1. Open the src/app/app.component.html file in your text editor.
+2. Locate the following line: `<h1>Docker Angular Sample Application</h1>`
+3. Change it to: `<h1>Hello from Docker Compose Watch</h1>`
+4. Save to file
+5. Open your browser at http://localhost:4200.
+
+## Run the tests
+`docker compose run --rm angular-test`
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.

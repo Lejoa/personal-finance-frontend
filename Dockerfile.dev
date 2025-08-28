@@ -20,6 +20,22 @@ COPY package.json package-lock.json ./
 # Install dependencies using npm with caching to speed up subsequent builds
 RUN --mount=type=cache,target=/root/.npm npm install
 
+# =========================================
+# 🔹 Install Chromium (for Angular tests)
+# =========================================
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Tell Karma where to find Chrome/Chromium
+ENV CHROME_BIN=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 # Copy all application source files into the container
 COPY . .
 
