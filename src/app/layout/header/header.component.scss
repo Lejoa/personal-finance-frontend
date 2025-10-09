@@ -1,0 +1,27 @@
+.app-header {
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.left-icon, .right-icon {
+  cursor: pointer;
+  color: #333;
+}
+
+.left-icon:hover, .right-icon:hover {
+  color: #007bff;
+}
