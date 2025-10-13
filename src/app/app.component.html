@@ -2,21 +2,16 @@
 
 <main class="main-content">
   <div class="main-blocks">
-    <div class="block block--transactions">
-      <div class="transactions-container">
-        <h2>{{ activeTab }}</h2>
-        <app-transaction-card></app-transaction-card>
-        <app-transaction-card></app-transaction-card>
-        <app-transaction-card></app-transaction-card>
-      </div>  
-    </div>
+    <app-transaction-history></app-transaction-history>
     
-    <div class="block">
+    <div class="button-container">
       <button class="register-btn">Register</button>
     </div>
+
+    <app-financial-literacy></app-financial-literacy>
   </div>
 </main>
 
-<app-footer-tabs (tabChange)="onTabChange($event)"></app-footer-tabs>
+<app-footer-tabs></app-footer-tabs>
 
 <router-outlet />

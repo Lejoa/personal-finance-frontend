@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './layout/header/header.component';
-import { FooterTabsComponent } from './layout/footer-tabs/footer-tabs.component';
-import { TransactionCardComponent } from './shared/components/transaction-card/transaction-card.component';
+import { HeaderComponent } from './shared/components/header/header.component';
+import { FooterTabsComponent } from './shared/components/footer-tabs/footer-tabs.component';
+import { TransactionHistoryComponent } from './shared/components/transaction-history/transaction-history.component';
+import { FinancialLiteracyComponent } from './shared/components/financial-literacy/financial-literacy.component';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,8 @@ import { TransactionCardComponent } from './shared/components/transaction-card/t
     RouterOutlet, 
     HeaderComponent, 
     FooterTabsComponent,
-    TransactionCardComponent
+    TransactionHistoryComponent,
+    FinancialLiteracyComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

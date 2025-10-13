@@ -1,0 +1,55 @@
+.transaction-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    
+    /*Visual design*/
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    
+    /*Measures */
+    max-width: none;
+    min-height: 70px;
+    padding: 0.75rem 1rem;
+    margin: 8px 0;
+    
+    /*Visual efects to hover*/
+    transition: transform 0.2s ease, box-shadow 0.2 ease;
+
+    &:hover {
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+}
+
+.transaction-header,
+.transaction-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transaction-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.transaction-amount {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #007bff
+}
+
+/*Secondary information*/
+.transaction-date, .transaction-category {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+:host {
+    display: block;
+    width: 100%;
+}

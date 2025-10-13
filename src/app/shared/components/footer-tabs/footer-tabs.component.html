@@ -1,0 +1,77 @@
+<footer class="footer-tabs">
+  <button
+    *ngFor="let tab of tabs"
+    (click)="onTabChange(tab.name)"
+    [class.active]="activeTab === tab.name"
+    type="button"
+  >
+    <div class="tab-icon">
+      <svg
+        *ngIf="tab.icon === 'home'"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle cx="12" cy="12" r="10" fill="currentColor" />
+        <path
+          d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"
+          fill="white"
+        />
+      </svg>
+      <svg
+        *ngIf="tab.icon === 'track_changes'"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle cx="12" cy="12" r="10" fill="currentColor" />
+        <path
+          d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"
+          fill="white"
+        />
+      </svg>
+      <svg
+        *ngIf="tab.icon === 'add'"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle cx="12" cy="12" r="10" fill="currentColor" />
+        <path
+          d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"
+          fill="white"
+        />
+      </svg>
+      <svg
+        *ngIf="tab.icon === 'account_balance_wallet'"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle cx="12" cy="12" r="10" fill="currentColor" />
+        <path
+          d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"
+          fill="white"
+        />
+      </svg>
+      <svg
+        *ngIf="tab.icon === 'learning'"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle cx="12" cy="12" r="10" fill="currentColor" />
+        <path
+          d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"
+          fill="white"
+        />
+      </svg>
+    </div>
+    <span class="tab-label">{{ tab.name }}</span>
+  </button>
+</footer>
