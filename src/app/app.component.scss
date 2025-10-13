@@ -1,28 +1,28 @@
 /* ============================================================
-   ESTRUCTURA PRINCIPAL DE LA APLICACIÓN
-   - Define el layout general (header, contenido, footer)
-   ============================================================ */
+    ESTRUCTURA PRINCIPAL DE LA APLICACIÓN
+    - Define el layout general (header, contenido, footer)
+    ============================================================ */
 .main-content {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* el contenido inicia desde arriba */
-  height: calc(100vh - 120px); /* resta header y footer */
+  align-items: flex-start;
+  height: calc(100vh - (60px + 60px)); /* resta header y footer usando variables */
   margin-top: 60px; /* altura del header */
   margin-bottom: 60px; /* altura del footer */
-  padding: 0 1rem; /* pequeño margen lateral */
+  padding: 0 1rem; /* pequeño margen lateral usando variable */
   box-sizing: border-box;
 }
 
 /* ============================================================
-   BLOQUES PRINCIPALES
-   - Contiene los tres elementos: transaction-history,
-     el botón central y financial-literacy
-   ============================================================ */
+    BLOQUES PRINCIPALES
+    - Contiene los tres elementos: transaction-history,
+      el botón central y financial-literacy
+    ============================================================ */
 .main-blocks {
   display: flex;
-  flex-direction: column; /* apila los bloques verticalmente */
+  flex-direction: column;
   align-items: stretch; /* cada bloque ocupa todo el ancho */
-  gap: 1.5rem; /* separación entre bloques */
+  gap: 1.5rem; /* separación entre bloques usando variable */
   width: 100%;
   max-width: 1000px; /* ancho máximo centrado */
   margin: 0 auto; /* centra horizontalmente */
@@ -30,62 +30,86 @@
 }
 
 /* ============================================================
-   BLOQUES GENÉRICOS
-   - Estilos compartidos para los componentes dentro de main-blocks
-   ============================================================ */
+    BLOQUES GENÉRICOS
+    - Estilos compartidos para los componentes dentro de main-blocks
+    ============================================================ */
 .block {
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 1rem; /* espacio interno estándar */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  padding: 1rem; /* espacio interno estándar usando variable */
   text-align: left;
   width: 100%;
   box-sizing: border-box;
 }
 
 /* ============================================================
-   BOTÓN CENTRAL
-   - Contenedor y estilos del botón “Register”
-   ============================================================ */
+    BOTÓN CENTRAL
+    - Contenedor y estilos del botón "Register"
+    ============================================================ */
 .button-container {
   display: flex;
-  justify-content: center; /* centra el botón horizontalmente */
-  align-items: center; /* centra verticalmente dentro del contenedor */
+  justify-content: center;
+  align-items: center;
   padding: 1rem 0;
   width: 100%;
   box-sizing: border-box;
 }
 
 .register-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
+  display: inline-block;
+  font-weight: 400;
+  color: #212529;
+  text-align: center;
+  vertical-align: middle;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+  padding: 0.375rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease, transform 0.1s ease-in-out;
 
   &:hover {
+    color: #fff;
     background-color: #0056b3;
+    border-color: #0056b3;
     transform: scale(1.05);
+  }
+
+  &:focus {
+    color: #fff;
+    background-color: #0056b3;
+    border-color: #0056b3;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+  }
+
+  &:disabled {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
   }
 }
 
 /* ============================================================
-   CONTENEDOR DE TRANSACCIONES
-   - Controla la disposición de las tarjetas dentro del bloque
-   ============================================================ */
-.transaction-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-}
-
-/* ============================================================
-   RESPONSIVE DESIGN (TABLET / DESKTOP)
-   ============================================================ */
+    RESPONSIVE DESIGN (TABLET / DESKTOP)
+    ============================================================ */
 @media (min-width: 768px) {
   .main-content {
     align-items: center; /* centra verticalmente el contenido */

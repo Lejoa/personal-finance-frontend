@@ -1,55 +1,60 @@
 .transaction-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    
-    /*Visual design*/
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    
-    /*Measures */
-    max-width: none;
-    min-height: 70px;
-    padding: 0.75rem 1rem;
-    margin: 8px 0;
-    
-    /*Visual efects to hover*/
-    transition: transform 0.2s ease, box-shadow 0.2 ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
-    &:hover {
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
-    }
-}
+  /* Measures */
+  max-width: none;
+  min-height: 70px;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem 0;
 
-.transaction-header,
-.transaction-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  /* Visual effects on hover */
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    transform: translateY(-2px);
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
 }
 
 .transaction-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: #333;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #343a40;
+  margin: 0;
 }
 
 .transaction-amount {
-    font-weight: 700;
-    font-size: 1rem;
-    color: #007bff
+  font-weight: 700;
+  font-size: 1rem;
+  color: #007bff;
+  margin: 0;
 }
 
-/*Secondary information*/
-.transaction-date, .transaction-category {
-    font-size: 0.8rem;
-    color: #666;
+/* Secondary information */
+.transaction-date,
+.transaction-category {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin: 0;
 }
 
 :host {
-    display: block;
-    width: 100%;
+  display: block;
+  width: 100%;
 }

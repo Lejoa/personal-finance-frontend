@@ -1,23 +1,23 @@
 <div class="block block--transactions">
-    <h2>{{ activeTab$ | async}}</h2>
-    <div class="transactions-list">
+  <h2 class="block-title">{{ activeTab$ | async }}</h2>
+  <div class="transactions-list">
     <app-transaction-card
-        name="Almuerzo con amigos"
-        [amount]="1000"
-        date="01-10-25"
-        category="Comida">
+      name="Almuerzo con amigos"
+      [amount]="1000"
+      date="01-10-25"
+      category="Comida">
     </app-transaction-card>
     <app-transaction-card
-        name="Transporte al trabajo"
-        [amount]="500"
-        date="02-10-25"
-        category="Transporte">
+      name="Transporte al trabajo"
+      [amount]="500"
+      date="02-10-25"
+      category="Transporte">
     </app-transaction-card>
     <app-transaction-card
-        name="Transporte al trabajo"
-        [amount]="600"
-        date="02-10-25"
-        category="Transporte">
+      name="Transporte al trabajo"
+      [amount]="600"
+      date="02-10-25"
+      category="Transporte">
     </app-transaction-card>
-    </div>  
+  </div>
 </div>

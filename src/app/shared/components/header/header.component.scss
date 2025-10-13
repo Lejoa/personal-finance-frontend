@@ -1,12 +1,13 @@
 .app-header {
   background-color: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #dee2e6;
   padding: 1rem;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 1030;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075);
 }
 
 .header-content {
@@ -19,9 +20,18 @@
 
 .left-icon, .right-icon {
   cursor: pointer;
-  color: #333;
-}
+  color: #495057;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.15s ease-in-out;
 
-.left-icon:hover, .right-icon:hover {
-  color: #007bff;
+  &:hover {
+    color: #007bff;
+    background-color: #f8f9fa;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
 }
