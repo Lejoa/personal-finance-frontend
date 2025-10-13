@@ -13,10 +13,10 @@ export class FooterTabsComponent {
 
   tabs = [
     { name: 'Home', icon: 'home'},
-    { name: 'Follow-up', icon: 'track_changes' },
-    { name: 'Register', icon: 'add'},
-    { name: 'Transactions', icon: 'account_balance_wallet' },
-    { name: 'Learning', icon: 'learning'}
+    { name: 'Tracking', icon: 'track_changes' },
+    { name: 'Create', icon: 'add'},
+    { name: 'Budgets', icon: 'account_balance_wallet' },
+    { name: 'Learning', icon: 'school'}
   ];
 
   activeTab = 'Home';
@@ -24,6 +24,7 @@ export class FooterTabsComponent {
   constructor(private tabService: TabService) {}
 
   onTabChange(tab: string): void {
+    this.activeTab = tab;
     this.tabService.setActiveTab(tab);
   }
 }
