@@ -32,6 +32,13 @@
   }
 }
 
+.transaction-header,
+.transaction-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .transaction-name {
   font-weight: 600;
   font-size: 0.95rem;
