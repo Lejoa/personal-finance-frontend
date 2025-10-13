@@ -4,6 +4,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterTabsComponent } from './shared/components/footer-tabs/footer-tabs.component';
 import { TransactionHistoryComponent } from './shared/components/transaction-history/transaction-history.component';
 import { FinancialLiteracyComponent } from './shared/components/financial-literacy/financial-literacy.component';
+import { RegisterButtonComponent } from './shared/components/register-button/register-button.component';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,8 @@ import { FinancialLiteracyComponent } from './shared/components/financial-litera
     HeaderComponent, 
     FooterTabsComponent,
     TransactionHistoryComponent,
-    FinancialLiteracyComponent
+    FinancialLiteracyComponent,
+    RegisterButtonComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
