@@ -5,6 +5,7 @@ import { FooterTabsComponent } from './shared/components/footer-tabs/footer-tabs
 import { TransactionHistoryComponent } from './shared/components/transaction-history/transaction-history.component';
 import { FinancialLiteracyComponent } from './shared/components/financial-literacy/financial-literacy.component';
 import { RegisterButtonComponent } from './shared/components/register-button/register-button.component';
+import { SynchronizationCardComponent } from './shared/components/synchronization-card/synchronization-card.component';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,8 @@ import { RegisterButtonComponent } from './shared/components/register-button/reg
     FooterTabsComponent,
     TransactionHistoryComponent,
     FinancialLiteracyComponent,
-    RegisterButtonComponent
+    RegisterButtonComponent,
+    SynchronizationCardComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
