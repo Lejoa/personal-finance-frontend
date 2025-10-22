@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter,OnInit, OnDestroy, Output } from '@angular/core';
 import { TabService } from '../../../core/services/tab/tab.service';
 import { NgIf, NgFor } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-footer-tabs',
@@ -9,7 +10,7 @@ import { NgIf, NgFor } from '@angular/common';
   templateUrl: './footer-tabs.component.html',
   styleUrl: './footer-tabs.component.scss'
 })
-export class FooterTabsComponent {
+export class FooterTabsComponent implements OnInit, OnDestroy {
 
   tabs = [
     { name: 'Home', icon: 'home'},
@@ -20,8 +21,19 @@ export class FooterTabsComponent {
   ];
 
   activeTab = 'Home';
+  private tabSubscription: Subscription = new Subscription();
 
   constructor(private tabService: TabService) {}
+  
+  ngOnInit(): void {
+    this.tabSubscription = this.tabService.activeTab$.subscribe( tab => {
+      this.activeTab = tab;
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.tabSubscription.unsubscribe();
+  }
 
   onTabChange(tab: string): void {
     this.activeTab = tab;

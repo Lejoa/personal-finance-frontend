@@ -6,18 +6,24 @@ import { TransactionHistoryComponent } from './shared/components/transaction-his
 import { FinancialLiteracyComponent } from './shared/components/financial-literacy/financial-literacy.component';
 import { RegisterButtonComponent } from './shared/components/register-button/register-button.component';
 import { SynchronizationCardComponent } from './shared/components/synchronization-card/synchronization-card.component';
+import { TrackingContentComponent } from './shared/components/tracking-content/tracking-content.component';
+import { Subscription } from 'rxjs';
+import { TabService } from './core/services/tab/tab.service';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet, 
-    HeaderComponent, 
+    NgIf,
+    RouterOutlet,
+    HeaderComponent,
     FooterTabsComponent,
     TransactionHistoryComponent,
     FinancialLiteracyComponent,
     RegisterButtonComponent,
-    SynchronizationCardComponent
+    SynchronizationCardComponent,
+    TrackingContentComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -25,9 +31,21 @@ import { SynchronizationCardComponent } from './shared/components/synchronizatio
 export class AppComponent {
   title = 'personal finance frontend';
   activeTab: string = 'Home';
+  private tabSubscription: Subscription = new Subscription();
+
+  constructor(private tabService: TabService) {}
+
+  ngOnInit() {
+    this.tabSubscription = this.tabService.activeTab$.subscribe(
+      tab => { this.activeTab = tab });
+  }
 
   onTabChange(tab: string) {
     this.activeTab = tab;
+  }
+
+  ngOnDestroy() {
+    this.tabSubscription.unsubscribe();
   }
 }
 

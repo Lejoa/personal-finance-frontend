@@ -1,16 +1,21 @@
 <app-header></app-header>
 
 <main class="main-content">
-  <div class="main-blocks">
-    <app-transaction-history></app-transaction-history>
-    <app-register-button></app-register-button>
-    <app-synchronization-card
-      name="Paseo"
-      [amount]="100000"
-      date="01-10-25"
-      category="Viajes">
-    </app-synchronization-card>
-    <app-financial-literacy></app-financial-literacy>
+    <div class="main-blocks">
+      <div *ngIf="activeTab === 'Home'">
+      <app-transaction-history></app-transaction-history>
+      <app-register-button></app-register-button>
+      <app-synchronization-card
+        name="Paseo"
+        [amount]="100000"
+        date="01-10-25"
+        category="Viajes">
+      </app-synchronization-card>
+      <app-financial-literacy></app-financial-literacy>
+    </div>
+    <div *ngIf="activeTab == 'Tracking'">
+      <app-tracking-content></app-tracking-content>
+    </div>
   </div>
 </main>
 
