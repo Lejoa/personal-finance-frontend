@@ -7,20 +7,8 @@ import { ChartConfiguration, ChartType } from 'chart.js';
   selector: 'app-pie-chart',
   standalone: true,
   imports: [BaseChartDirective],
-  template: `
-    <canvas
-      baseChart
-      [data]="chartData"
-      [options]="chartOptions"
-      [type]="chartType">
-    </canvas>
-  `,
-  styles: [`
-    canvas {
-      width: 100% !important;
-      height: 300px !important;
-    }
-  `]
+  templateUrl: './pie-chart.component.html',
+  styleUrl: './pie-chart.component.scss'
 })
 export class PieChartComponent {
   chartType: ChartType = 'pie';
