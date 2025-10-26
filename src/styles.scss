@@ -1,3 +1,7 @@
+/*
+  Configuration for Angular Material is pending
+*/
+
 @use '@angular/material' as mat;
 
 $theme: mat.define-theme(
@@ -73,7 +77,7 @@ $grid-breakpoints: (
 
 /* ============================================================
     MIXINS
-    ============================================================ */
+   ============================================================ */
 
 // Button styles
 @mixin button-base {
@@ -109,7 +113,7 @@ $grid-breakpoints: (
 
 /* ============================================================
     GLOBAL STYLES
-    ============================================================ */
+   ============================================================ */
 
 *,
 *::before,
@@ -170,40 +174,4 @@ textarea {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
-}
-
-// Images
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-// Tables
-table {
-  border-collapse: collapse;
-}
-
-// Utility classes
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.text-center {
-  text-align: center !important;
-}
-
-.text-left {
-  text-align: left !important;
-}
-
-.text-right {
-  text-align: right !important;
 }
