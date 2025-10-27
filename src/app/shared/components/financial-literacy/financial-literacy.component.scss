@@ -1,11 +1,5 @@
 .block--financial-literacy {
   width: 100%;
-  padding: 0 0.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  box-sizing: border-box;
 }
 
 .block-title {
@@ -36,29 +30,35 @@
 
 .financial-tips-list {
   display: flex;
-  flex-direction: row;  // ← Mantener horizontal (fila)
-  flex-wrap: wrap;      // ← Permitir múltiples filas si es necesario
-  gap: 1rem;           // ← Aumentar el gap para mejor separación
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 1rem;
   width: 100%;
-  justify-content: flex-start;  // ← Alinear a la izquierda
+  justify-content: flex-start;
   
-  // Ajustar los elementos hijos
   > * {
-    flex: 1 1 calc(33.333% - 1rem);  // 3 elementos por fila con gap
-    min-width: 280px;  // Ancho mínimo
-    max-width: calc(33.333% - 1rem); // Ancho máximo
+    flex: 1 1 calc(33.333% - 1rem);
   }
 }
 
 // Media queries para responsive
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   .financial-tips-list {
-    flex-direction: column;  // Volver a columna en móviles
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     
     > * {
-      flex: 1 1 100%;  // Ancho completo en móviles
-      min-width: unset;
-      max-width: unset;
+      flex: 1 1 calc(33.333% - 0.75rem);
+      min-width: 280px;
+      max-width: 350px;
     }
+  }
+}
+
+@media (min-width: 1200px) {
+  .financial-tips-list > * {
+    min-width: 300px;
+    max-width: 380px;
   }
 }

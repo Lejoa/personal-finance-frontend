@@ -14,22 +14,6 @@
 }
 
 /* ============================================================
-    BLOQUES PRINCIPALES
-    - Contiene los tres elementos: transaction-history,
-      el botón central y financial-literacy
-    ============================================================ */
-.main-blocks {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch; /* cada bloque ocupa todo el ancho */
-  gap: 1.5rem; /* separación entre bloques usando variable */
-  width: 100%;
-  max-width: 1000px; /* ancho máximo centrado */
-  margin: 0 auto; /* centra horizontalmente */
-  box-sizing: border-box;
-}
-
-/* ============================================================
     BLOQUES GENÉRICOS
     - Estilos compartidos para los componentes dentro de main-blocks
     ============================================================ */
@@ -68,11 +52,5 @@
 
   .block {
     flex: 1; /* cada bloque ocupa la misma proporción */
-  }
-
-  .button-container {
-    align-self: center; /* mantiene el botón centrado en fila */
-    width: auto; /* evita que ocupe todo el ancho horizontal */
-    padding: 0;
   }
 }
