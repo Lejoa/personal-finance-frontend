@@ -1,33 +1,53 @@
+// Importar variables globales
+@import 'styles.scss';
+
+/* ============================================================
+    HEADER
+    ============================================================ */
 .app-header {
   background-color: #fff;
-  border-bottom: 1px solid #dee2e6;
-  padding: 1rem;
+  border-bottom: 1px solid $gray-300;
+  padding: $spacer;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  height: $header-height;
   z-index: 1030;
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075);
+  box-shadow: $box-shadow-md;
+  
+  // Centrar contenido verticalmente
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* ============================================================
+    CONTENIDO DEL HEADER
+    ============================================================ */
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
 
+/* ============================================================
+    ICONOS
+    ============================================================ */
 .left-icon, .right-icon {
   cursor: pointer;
-  color: #495057;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-  transition: all 0.15s ease-in-out;
+  color: $gray-700;
+  padding: $spacer-xs;
+  border-radius: $border-radius-sm;
+  transition: $transition-base;
+  flex-shrink: 0;
 
   &:hover {
-    color: #007bff;
-    background-color: #f8f9fa;
+    color: $primary-color;
+    background-color: $gray-100;
   }
 
   &:focus {

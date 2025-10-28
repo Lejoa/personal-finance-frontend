@@ -1,3 +1,9 @@
+/* ========================================
+   app.component.scss
+   ======================================== */
+
+@import 'styles.scss';
+
 /* ============================================================
     ESTRUCTURA PRINCIPAL DE LA APLICACIÓN
     - Define el layout general (header, contenido, footer)
@@ -6,7 +12,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  height: calc(100vh - (60px + 60px)); /* resta header y footer usando variables */
+  height: calc(100vh - ($header-height + $footer-height));
   margin-top: 60px; /* altura del header */
   margin-bottom: 60px; /* altura del footer */
   padding: 0 1rem; /* pequeño margen lateral usando variable */
@@ -14,39 +20,56 @@
 }
 
 /* ============================================================
-    BLOQUES GENÉRICOS
-    - Estilos compartidos para los componentes dentro de main-blocks
-    ============================================================ */
-.block {
-  position: relative;
+    CONTENEDOR DE BLOQUES
+   ============================================================= */
+.main-blocks {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  word-wrap: break-word;
-  background-color: #fff;
-  background-clip: border-box;
-  border: 1px solid #dee2e6;
-  border-radius: 0.375rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  padding: 1rem; /* espacio interno estándar usando variable */
-  text-align: left;
+  align-items: stretch;
   width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
   box-sizing: border-box;
+}
+
+// .block {
+//   position: relative;
+//   display: flex;
+//   flex-direction: column;
+//   min-width: 0;
+//   word-wrap: break-word;
+//   background-color: #fff;
+//   background-clip: border-box;
+//   border: 1px solid #dee2e6;
+//   border-radius: 0.375rem;
+//   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+//   padding: 1rem; /* espacio interno estándar usando variable */
+//   text-align: left;
+//   width: 100%;
+//   box-sizing: border-box;
+// }
+
+/* ============================================================
+    CONTENIDO DE TABS
+    ============================================================ */
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* ← Este gap da separación entre componentes */
+  width: 100%;
 }
 
 
 /* ============================================================
     RESPONSIVE DESIGN (TABLET / DESKTOP)
     ============================================================ */
-@media (min-width: 768px) {
+@media (min-width: $breakpoint-md) {
   .main-content {
     align-items: center; /* centra verticalmente el contenido */
   }
 
   .main-blocks {
-    flex-direction: row; /* coloca los bloques en una fila */
-    justify-content: center;
-    align-items: stretch;
     max-width: 1200px;
   }
 

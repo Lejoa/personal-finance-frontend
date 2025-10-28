@@ -1,16 +1,21 @@
+// Importar variables globales
+@import 'styles.scss';
+
+/* ============================================================
+    BLOQUE PRINCIPAL
+    - Hereda .block del global
+    ============================================================ */
 .block--transactions {
-  width: 100%;
-  padding: 0 0.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  box-sizing: border-box;
+  // No redefinir propiedades innecesarias
+  // .block ya maneja display, padding, width, etc.
 }
 
+/* ============================================================
+    LISTA DE TRANSACCIONES
+    ============================================================ */
 .transactions-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: $spacer-sm;
   width: 100%;
 }
