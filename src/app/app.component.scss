@@ -32,35 +32,6 @@
   box-sizing: border-box;
 }
 
-// .block {
-//   position: relative;
-//   display: flex;
-//   flex-direction: column;
-//   min-width: 0;
-//   word-wrap: break-word;
-//   background-color: #fff;
-//   background-clip: border-box;
-//   border: 1px solid #dee2e6;
-//   border-radius: 0.375rem;
-//   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-//   padding: 1rem; /* espacio interno estándar usando variable */
-//   text-align: left;
-//   width: 100%;
-//   box-sizing: border-box;
-// }
-
-/* ============================================================
-    CONTENIDO DE TABS
-    ============================================================ */
-
-.tab-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; /* ← Este gap da separación entre componentes */
-  width: 100%;
-}
-
-
 /* ============================================================
     RESPONSIVE DESIGN (TABLET / DESKTOP)
     ============================================================ */

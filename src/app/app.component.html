@@ -2,7 +2,7 @@
 
 <main class="main-content">
     <div class="main-blocks">
-      <div class="tab-content" *ngIf="activeTab === 'Home'">
+      <section class="gap-content" *ngIf="activeTab === 'Home'">
         <app-transaction-history></app-transaction-history>
         <app-register-button></app-register-button>
         <app-synchronization-card
@@ -12,13 +12,12 @@
           category="Viajes">
         </app-synchronization-card>
         <app-financial-literacy></app-financial-literacy>
-      </div>
-      <div class="tab-content" *ngIf="activeTab === 'Tracking'">
-        <app-transaction-history></app-transaction-history>
-    </div>
+      </section>
+      <section class="gap-content" *ngIf="activeTab === 'Tracking'">
+        <app-tracking-content></app-tracking-content>
+    </section>
   </div>
 </main>
 
 <app-footer-tabs></app-footer-tabs>
-
 <router-outlet />

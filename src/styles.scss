@@ -237,3 +237,13 @@ textarea {
   margin-bottom: $spacer;
   text-align: center;
 }
+
+.gap-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-md;
+  
+  @media (min-width: $breakpoint-md) {
+    gap: $spacer-lg;
+  }
+}
