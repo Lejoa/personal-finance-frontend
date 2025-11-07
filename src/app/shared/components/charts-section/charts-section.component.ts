@@ -4,6 +4,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
+import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
 
 @Component({
   selector: 'app-charts-section',
@@ -62,16 +63,19 @@ export class ChartsSectionComponent {
     end: new FormControl<Date>(this.defaultEndDate),
   });
 
+  constructor(private trackingExpensesService: TrackingExpensesService) {}
+
   toggleChartData(type: string): void {
     if (type === 'expenses') {
       this.chartData.labels = this.foo.labels;
       this.chartData.datasets[0].data = this.foo.data;
       this.chartData.datasets[0].backgroundColor = this.foo.backgroundColor;
-
+      this.trackingExpensesService.setTransactionType('expenses');
     } else {
       this.chartData.labels = this.foo2.labels;
       this.chartData.datasets[0].data = this.foo2.data;
       this.chartData.datasets[0].backgroundColor = this.foo2.backgroundColor;
+      this.trackingExpensesService.setTransactionType('income');
     }
     this.chart?.update();
   }

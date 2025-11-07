@@ -1,22 +1,11 @@
 <div class="block block--transactions">
   <div class="transactions-list">
-    <app-transaction-card
-      name="Almuerzo con amigos"
-      [amount]="1000"
-      date="01-10-25"
-      category="Comida">
-    </app-transaction-card>
-    <app-transaction-card
-      name="Transporte al trabajo"
-      [amount]="500"
-      date="02-10-25"
-      category="Transporte">
-    </app-transaction-card>
-    <app-transaction-card
-      name="Transporte al trabajo"
-      [amount]="600"
-      date="02-10-25"
-      category="Transporte">
+    <app-transaction-card 
+      *ngFor="let transaction of transactions"
+      [name]="transaction.name"
+      [amount]="transaction.amount"
+      [date]="transaction.date"
+      [category]="transaction.category">
     </app-transaction-card>
   </div>
 </div>
