@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { NgFor } from '@angular/common';
 import { TransactionCardComponent } from '../transaction-card/transaction-card.component';
-import { TrackingExpensesService, Transaction, TransactionType } from '../../../core/services/tracking-expenses/tracking-expenses.service';
+import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
+import { Transaction, TransactionType, DateRange } from '../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -20,6 +21,8 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
 
   transactions: Transaction[] = [];
   private subscription: Subscription = new Subscription();
+  private currentType: TransactionType = 'expenses';
+  private currentDateRange: DateRange = { start: null, end: null };
 
   constructor(private TrackingExpensesService: TrackingExpensesService) { }
 
@@ -32,15 +35,32 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
   }
 
   private intializeTrackingMode(): void {
-    this.subscription = 
+    this.subscription.add(
       this.TrackingExpensesService.transactionType$
-        .subscribe((type: TransactionType) => {
-          this.transactions = this.TrackingExpensesService.getTransactionsByType(type)
-        });
+        .subscribe( type => {
+          this.currentType = type;
+          this.updateTransactions();
+        })
+    );
+
+    this.subscription.add(
+      this.TrackingExpensesService.dateRange$
+        .subscribe(
+          dateRange => {
+            this.currentDateRange = dateRange;
+            this.updateTransactions();
+          }
+      )
+    );
+  }
+
+  private updateTransactions(): void {
+    this.transactions = 
+      this.TrackingExpensesService.getTransactionsByType(this.currentType, this.currentDateRange);
   }
 
   private initializeHomeMode(): void {
-    //TODO: Fetch only the last 3 transactions from database    this.transactions = 
+    //TODO: Fetch only the last 3 transactions from database  
     this.transactions = this.TrackingExpensesService
         .getTransactionsByType('expenses')
         .slice(0, 3);

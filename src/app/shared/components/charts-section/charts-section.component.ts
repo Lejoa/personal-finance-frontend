@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
+import { DateRange } from '../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
 
 @Component({
   selector: 'app-charts-section',
@@ -31,7 +32,7 @@ export class ChartsSectionComponent {
   };
 
   foo2 = {
-      labels: ['Salario', 'Asesoría', 'Freelannce', 'Inversiones'],
+      labels: ['Salario', 'Asesoría', 'Freelance', 'Inversiones'],
       data: [800, 300, 200, 100],
       backgroundColor: ['#FF9F40', '#9966FF', '#FF6384', '#36A2EB']
   };
@@ -58,7 +59,7 @@ export class ChartsSectionComponent {
   readonly defaultStartDate = new Date(this.today.getFullYear(), this.today.getMonth() - 1, 1);
   readonly defaultEndDate = new Date(this.today.getFullYear(), this.today.getMonth(), 0);
   
-  readonly range = new FormGroup({
+  range = new FormGroup({
     start: new FormControl<Date>(this.defaultStartDate),
     end: new FormControl<Date>(this.defaultEndDate),
   });
@@ -78,5 +79,24 @@ export class ChartsSectionComponent {
       this.trackingExpensesService.setTransactionType('income');
     }
     this.chart?.update();
+  }
+
+  onDateRangeSelected(): void {
+    const startValue = this.range.get('start')?.value;
+    const endValue = this.range.get('end')?.value;
+
+    console.log('[DatePicker] Range selected:', { start: startValue, end: endValue });
+
+    if (startValue && endValue && this.range.valid) {
+      const dateRange: DateRange = {
+        start: startValue,
+        end: endValue
+      };
+
+      console.log('[DatePicker] Valid range, updating service:', dateRange);
+      this.trackingExpensesService.setDateRange(dateRange);
+    } else {
+      console.warn('[DatePicker] Invalid range, missing start or end date');
+    }
   }
 }
