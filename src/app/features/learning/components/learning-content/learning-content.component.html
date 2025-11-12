@@ -1,0 +1,30 @@
+<div class="block block--financial-literacy">
+  <div class="financial-tips-list" *ngIf="!selectedTip">
+    <app-financial-tips
+        *ngFor="let tip of tips"
+        [title]="tip.title"
+        [shortDescription]="tip.shortDescription"
+        [description]="tip.description"
+        [imageSrc]="tip.imageSrc"
+        [author]="tip.author"
+        [authorTitle]="tip.authorTitle"
+        (expand)="onExpandTip(tip)"
+    >
+    </app-financial-tips>
+  </div>
+  <div class="financial-tip-detail" *ngIf="selectedTip">
+    <button class="close-btn" (click)="closeDetail()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    <h2 class="detail-title">{{ selectedTip.title }}</h2>
+    <div class="author-info">
+      <span class="author">{{ selectedTip.author }}</span>
+      <span class="author-title">{{ selectedTip.authorTitle }}</span>
+    </div>
+    <p class="detail-description">{{ selectedTip.description }}</p>
+    <button class="learn-more-btn">Enseñame más</button>
+  </div>
+</div>  
+

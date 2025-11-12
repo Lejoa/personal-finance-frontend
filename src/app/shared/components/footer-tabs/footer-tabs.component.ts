@@ -12,6 +12,8 @@ import { Subscription } from 'rxjs';
 })
 export class FooterTabsComponent implements OnInit, OnDestroy {
 
+  @Output() tabChange = new EventEmitter<string>(); // <-- Agrega esto
+
   tabs = [
     { name: 'Home', icon: 'home'},
     { name: 'Tracking', icon: 'track_changes' },
@@ -38,5 +40,6 @@ export class FooterTabsComponent implements OnInit, OnDestroy {
   onTabChange(tab: string): void {
     this.activeTab = tab;
     this.tabService.setActiveTab(tab);
+    this.tabChange.emit(tab); // <-- Emite el evento al padre
   }
 }

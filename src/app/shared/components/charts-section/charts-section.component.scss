@@ -1,7 +1,7 @@
 @import 'styles.scss';
 
 .charts-container {
-  @include card-base; // Utilizamos el mixin existente
+  @include card-base;
   padding: $spacer;
   
   @media (min-width: $breakpoint-md) {

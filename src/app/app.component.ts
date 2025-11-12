@@ -10,6 +10,7 @@ import { TrackingContentComponent } from './shared/components/tracking-content/t
 import { Subscription } from 'rxjs';
 import { TabService } from './core/services/tab/tab.service';
 import { NgIf } from '@angular/common';
+import { LearningContentComponent } from './features/learning/components/learning-content/learning-content.component';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,8 @@ import { NgIf } from '@angular/common';
     FinancialLiteracyComponent,
     RegisterButtonComponent,
     SynchronizationCardComponent,
-    TrackingContentComponent
+    TrackingContentComponent,
+    LearningContentComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
