@@ -1,10 +1,87 @@
 <div class="transaction-card">
+    <button
+            *ngIf="editable && !isEditing"
+            class="edit-button"
+            (click)="startEdit()"
+            title="Editar transacción"
+            type="button">
+            Editar
+    </button>
+    <!-- Read Mode -->
     <div class="transaction-header">
-        <span class="transaction-name"> {{ name }}</span>
-        <span class="transaction-amount"> ${{ amount  }}</span>
+        <span class="transaction-name">{{ name }}</span>
+        <span class="transaction-amount">${{ amount }}</span>
     </div>
     <div class="transaction-footer">
-        <span class="transaction-date"> {{ date }}</span>
-        <span class="transaction-category"> {{ category }}</span>
+        <span class="transaction-date">{{ date }}</span>
+        <span class="transaction-category">{{ category }}</span>
+    </div>
+</div>
+
+<!-- Modal Overlay for Edit Mode -->
+<div *ngIf="isEditing" class="edit-overlay">
+    <div class="edit-modal">
+        <h3 class="modal-title">Editar Transacción</h3>
+
+        <div class="edit-form">
+            <div class="form-group">
+                <label for="edit-name">Nombre</label>
+                <input
+                    id="edit-name"
+                    type="text"
+                    [(ngModel)]="editName"
+                    class="form-input"
+                    placeholder="Ingrese el nombre"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="edit-amount">Monto</label>
+                <input
+                    id="edit-amount"
+                    type="number"
+                    [(ngModel)]="editAmount"
+                    class="form-input"
+                    placeholder="Ingrese el monto"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="edit-date">Fecha</label>
+                <input
+                    id="edit-date"
+                    type="text"
+                    [(ngModel)]="editDate"
+                    class="form-input"
+                    placeholder="Ingrese la fecha"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="edit-category">Categoría</label>
+                <input
+                    id="edit-category"
+                    type="text"
+                    [(ngModel)]="editCategory"
+                    class="form-input"
+                    placeholder="Ingrese la categoría"
+                >
+            </div>
+
+            <div class="form-actions">
+                <button
+                    class="btn-save"
+                    (click)="saveEdit()"
+                    type="button">
+                    Guardar
+                </button>
+                <button
+                    class="btn-cancel"
+                    (click)="cancelEdit()"
+                    type="button">
+                    Cancelar
+                </button>
+            </div>
+        </div>
     </div>
 </div>

@@ -16,9 +16,12 @@
       <section class="gap-content" *ngIf="activeTab === 'Tracking'">
         <app-tracking-content></app-tracking-content>
       </section>
+      <section class="gap-content" *ngIf="activeTab === 'Create'">
+        <app-chat-content></app-chat-content>
+      </section>
       <section class="gap-content" *ngIf="activeTab === 'Learning'">
         <app-learning-content></app-learning-content>
-    </section>
+      </section>
   </div>
 </main>
 
