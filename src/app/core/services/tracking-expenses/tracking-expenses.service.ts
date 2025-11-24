@@ -27,14 +27,14 @@ export class TrackingExpensesService {
   );
 
   private expensesData: Transaction[] = [
-    { name: 'Almuerzo', amount: 15, date: '2024-06-01', category: 'Comida' },
-    { name: 'Transporte', amount: 10, date: '2024-06-02', category: 'Transporte' },
-    { name: 'Cine', amount: 20, date: '2024-06-03', category: 'Entretenimiento' }
+    { name: 'Almuerzo', amount: 15, date: '2024-06-01', category: ['Alimentos', 'Otros'] },
+    { name: 'Transporte', amount: 10, date: '2024-06-02', category: ['Transporte'] },
+    { name: 'Cine', amount: 20, date: '2024-06-03', category: ['Entretenimiento'] }
   ];
 
   private incomeData: Transaction[] = [
-    { name: 'Salario', amount: 1500, date: '2024-06-01', category: 'Trabajo' },
-    { name: 'Freelance', amount: 500, date: '2024-06-05', category: 'Proyectos' }
+    { name: 'Salario', amount: 1500, date: '2024-06-01', category: ['Trabajo'] },
+    { name: 'Freelance', amount: 500, date: '2024-06-05', category: ['Proyectos'] }
   ];
 
   /**

@@ -54,11 +54,35 @@
 }
 
 /* Secondary information */
-.transaction-date,
-.transaction-category {
-  font-size: 0.8rem;
-  color: #6c757d;
+.transaction-date{
+  font-size: $font-size-sm;
+  color: $gray-600;
   margin: 0;
+}
+
+/*Category badges container*/
+.category-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacer-xs;
+  align-items: center;
+}
+
+.category-badge {
+  display:inline-block;
+  padding: 0.25rem $spacer-sm;
+  font-size: 0.75rem;
+  font-weight: $font-weight-medium;
+  color: $primary-color;
+  background-color: rgba($primary-color, 0.1);
+  border: 1px solid rgba($primary-color, 0.3);
+  border-radius: $border-radius-sm;
+  white-space: nowrap;
+  transition: $transition-fast;
+  &:hover {
+    background-color: rgba($primary-color, 0.15);
+    border-color: rgba($primary-color, 0.4);
+  }
 }
 
 :host {
