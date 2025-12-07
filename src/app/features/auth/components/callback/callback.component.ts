@@ -36,13 +36,11 @@ export class CallbackComponent implements OnInit, OnDestroy {
           this.authService.handleOAuthCallback(token);
         } else if (error) {
           // Si hay error, redirigir al login con el mensaje de error
-          console.error('Error en OAuth callback:', error, message);
           this.router.navigate(['/login'], {
             queryParams: { error, message }
           });
         } else {
           // Si no hay ni token ni error, callback inválido
-          console.error('Callback OAuth inválido: sin token ni error');
           this.router.navigate(['/login'], {
             queryParams: { error: 'invalid_callback' }
           });

@@ -1,0 +1,49 @@
+/* ========================================
+   main.component.scss
+   ======================================== */
+
+@import '../../styles.scss';
+
+/* ============================================================
+    ESTRUCTURA PRINCIPAL DE LA APLICACIÓN
+    - Define el layout general (header, contenido, footer)
+    ============================================================ */
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: calc($header-height + $spacer) $spacer calc($footer-height + $spacer) $spacer;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* ============================================================
+    CONTENEDOR DE BLOQUES
+   ============================================================= */
+.main-blocks {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+    RESPONSIVE DESIGN (TABLET / DESKTOP)
+    ============================================================ */
+@media (min-width: $breakpoint-md) {
+  .main-content {
+    align-items: center; /* centra verticalmente el contenido */
+  }
+
+  .main-blocks {
+    max-width: 1200px;
+  }
+
+  .block {
+    flex: 1; /* cada bloque ocupa la misma proporción */
+  }
+}

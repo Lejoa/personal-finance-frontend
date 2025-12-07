@@ -19,7 +19,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('./app.component').then( m => m.AppComponent) // Aquí irá tu componente principal
+                loadComponent: () => import('./features/main/main.component').then( m => m.MainComponent)
             }
         ]
     },

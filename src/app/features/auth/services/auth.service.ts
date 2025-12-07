@@ -63,7 +63,6 @@ export class AuthService {
         this.router.navigate(['/']);
       },
       error: (error) => {
-        console.error('Error al obtener perfil de usuario:', error);
         this.logout();
         this.router.navigate(['/login'], {
           queryParams: { error: 'profile_fetch_failed' }
