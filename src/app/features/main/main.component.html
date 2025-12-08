@@ -1,8 +1,8 @@
 <app-header></app-header>
 
 <main class="main-content">
-  <div class="main-blocks">
-    <section class="gap-content" *ngIf="activeTab === 'Home'">
+  <div class="main-blocks" [ngSwitch]="activeTab">
+    <section class="gap-content" *ngSwitchCase="'Home'">
       <app-transaction-history mode="home"></app-transaction-history>
       <app-register-button></app-register-button>
       <app-synchronization-card
@@ -13,13 +13,13 @@
       </app-synchronization-card>
       <app-financial-literacy></app-financial-literacy>
     </section>
-    <section class="gap-content" *ngIf="activeTab === 'Tracking'">
+    <section class="gap-content" *ngSwitchCase="'Tracking'">
       <app-tracking-content></app-tracking-content>
     </section>
-    <section class="gap-content" *ngIf="activeTab === 'Create'">
+    <section class="gap-content" *ngSwitchCase="'Create'">
       <app-chat-content></app-chat-content>
     </section>
-    <section class="gap-content" *ngIf="activeTab === 'Learning'">
+    <section class="gap-content" *ngSwitchCase="'Learning'">
       <app-learning-content></app-learning-content>
     </section>
   </div>

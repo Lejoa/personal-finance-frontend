@@ -85,6 +85,25 @@ $breakpoint-xl: 1200px;
     MIXINS
    ============================================================ */
 
+@mixin main-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+@mixin content-wrapper($max-width: 1200px) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: $max-width;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
 // Mixin para card/block común
 @mixin card-base {
   position: relative;

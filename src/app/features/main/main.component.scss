@@ -1,49 +1,103 @@
 /* ========================================
    main.component.scss
+   Main Application Shell Styles
    ======================================== */
 
-@import '../../styles.scss';
+/**
+ * This stylesheet defines the layout structure for the main application shell.
+ * It creates a responsive container that holds the dynamic content sections
+ * and ensures proper spacing for fixed header and footer components.
+ *
+ * Structure:
+ * - .main-content: Outer container with full viewport height and scrolling
+ * - .main-blocks: Inner container with max-width constraint and vertical stacking
+ *
+ * Dependencies:
+ * - Imports global variables and mixins from styles.scss
+ * - Uses: $header-height, $footer-height, $spacer, $breakpoint-md
+ */
+
+@import '../../../styles.scss';
 
 /* ============================================================
-    ESTRUCTURA PRINCIPAL DE LA APLICACIÓN
-    - Define el layout general (header, contenido, footer)
+    MAIN CONTENT CONTAINER
+    - Creates a scrollable viewport-height container
+    - Adds padding to account for fixed header and footer
+    - Centers content horizontally
     ============================================================ */
+
+/**
+ * .main-content
+ *
+ * Purpose:
+ * - Acts as the scrollable viewport for all authenticated app content
+ * - Provides necessary spacing to prevent content from being hidden behind fixed header/footer
+ * - Ensures content is horizontally centered on all screen sizes
+ *
+ * Layout Behavior:
+ * - Mobile: Aligns content to top (flex-start) for better UX on small screens
+ * - Tablet+: Vertically centers content when viewport is tall enough
+ *
+ * Padding Calculation:
+ * - Top: header-height + 1rem spacer = Prevents overlap with fixed header
+ * - Bottom: footer-height + 1rem spacer = Prevents overlap with fixed footer tabs
+ * - Horizontal: 1rem spacer = Provides comfortable side margins on mobile
+ */
 .main-content {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
+  @include main-container;
   padding: calc($header-height + $spacer) $spacer calc($footer-height + $spacer) $spacer;
-  box-sizing: border-box;
-  overflow-y: auto;
 }
 
 /* ============================================================
-    CONTENEDOR DE BLOQUES
-   ============================================================= */
-.main-blocks {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-/* ============================================================
-    RESPONSIVE DESIGN (TABLET / DESKTOP)
+    CONTENT BLOCKS CONTAINER
+    - Stacks content sections vertically
+    - Constrains maximum width for readability on large screens
+    - Ensures full width utilization on mobile devices
     ============================================================ */
+
+/**
+ * .main-blocks
+ *
+ * Purpose:
+ * - Container for vertically stacked content sections (tabs)
+ * - Provides consistent max-width constraint across all sections
+ * - Ensures content is readable on ultra-wide displays
+ *
+ * Layout:
+ * - Mobile: Full width (100%) to maximize screen real estate
+ * - All sizes: max-width 1200px to maintain optimal reading length
+ * - Flexbox column: Stacks child sections vertically
+ * - align-items: stretch = Child sections take full container width
+ *
+ * Child Elements:
+ * - Each <section> with .gap-content class contains tab-specific content
+ * - Only one section is visible at a time (controlled by NgSwitch in template)
+ */
+.main-blocks {
+  @include content-wrapper(1200px);
+}
+
+/* ============================================================
+    RESPONSIVE DESIGN (TABLET & DESKTOP)
+    - Applies layout optimizations for larger screens
+    - Breakpoint: 768px (tablet and above)
+    ============================================================ */
+
+/**
+ * Tablet and Desktop Adjustments (≥768px)
+ *
+ * Changes at this breakpoint:
+ * 1. Vertical Centering: Content is centered vertically when viewport is tall
+ *    - Improves visual balance on desktop displays
+ *    - Content appears in the "sweet spot" for comfortable viewing
+ *
+ * Implementation:
+ * - Overrides the default align-items: flex-start (from main-container mixin)
+ * - Only affects vertical alignment; horizontal centering remains unchanged
+ * - All other layout properties (max-width, padding, etc.) remain from base styles
+ */
 @media (min-width: $breakpoint-md) {
   .main-content {
-    align-items: center; /* centra verticalmente el contenido */
-  }
-
-  .main-blocks {
-    max-width: 1200px;
-  }
-
-  .block {
-    flex: 1; /* cada bloque ocupa la misma proporción */
+    align-items: center; // Vertically center content on larger screens
   }
 }
