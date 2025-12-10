@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TrackingContentComponent } from './tracking-content.component';
+import { TrackingContentComponent } from '../../tracking-content.component';
 
 describe('TrackingContentComponent', () => {
   let component: TrackingContentComponent;

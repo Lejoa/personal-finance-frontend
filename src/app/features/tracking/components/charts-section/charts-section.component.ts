@@ -4,8 +4,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
-import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
-import { DateRange } from '../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
+import { TrackingExpensesService } from '../../../../core/services/tracking-expenses/tracking-expenses.service';
+import { DateRange } from '../../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
 
 @Component({
   selector: 'app-charts-section',

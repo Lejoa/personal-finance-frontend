@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TransactionHistoryComponent } from '../transaction-history/transaction-history.component';
+import { TransactionHistoryComponent } from '../../../../shared/components/transaction-history/transaction-history.component';
 import { ChartsSectionComponent } from '../charts-section/charts-section.component';
 
 @Component({

@@ -5,7 +5,7 @@ import { TransactionHistoryComponent } from '../../shared/components/transaction
 import { FinancialLiteracyComponent } from '../../shared/components/financial-literacy/financial-literacy.component';
 import { RegisterButtonComponent } from '../../shared/components/register-button/register-button.component';
 import { SynchronizationCardComponent } from '../../shared/components/synchronization-card/synchronization-card.component';
-import { TrackingContentComponent } from  '../tracking-content/tracking-content.component';
+import { TrackingContentComponent } from  '../tracking/components/tracking-content/tracking-content.component';
 import { TabService } from '../../core/services/tab/tab.service';
 import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { LearningContentComponent } from '../learning/components/learning-content/learning-content.component';
