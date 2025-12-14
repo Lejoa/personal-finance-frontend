@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { TransactionType, Transaction, DateRange } from './interfaces/tracking-expenses.interfaces';
+import { DateRange } from './interfaces/tracking-expenses.interfaces';
 import { NormalizeDatesService } from './normalize-dates.service';
+import { Transaction, TransactionType } from '../../../shared/models/transaction.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -27,14 +28,44 @@ export class TrackingExpensesService {
   );
 
   private expensesData: Transaction[] = [
-    { name: 'Almuerzo', amount: 15, date: '2024-06-01', category: ['Alimentos', 'Otros'] },
-    { name: 'Transporte', amount: 10, date: '2024-06-02', category: ['Transporte'] },
-    { name: 'Cine', amount: 20, date: '2024-06-03', category: ['Entretenimiento'] }
+    { 
+      name: 'Almuerzo', 
+      amount: 150000, 
+      date: new Date('2024-12-14'), 
+      category: 'Comida',
+      transactionType: 'expenses'
+    },
+    { 
+      name: 'Transporte', 
+      amount: 15000, 
+      date: new Date('2024-12-14'), 
+      category: 'Transporte',
+      transactionType: 'expenses'
+    },
+    { 
+      name: 'Cine', 
+      amount: 100000, 
+      date: new Date('2024-12-14'), 
+      category: 'Transporte',
+      transactionType: 'expenses'
+    },
   ];
 
   private incomeData: Transaction[] = [
-    { name: 'Salario', amount: 1500, date: '2024-06-01', category: ['Trabajo'] },
-    { name: 'Freelance', amount: 500, date: '2024-06-05', category: ['Proyectos'] }
+    { 
+      name: 'Salario', 
+      amount: 4500000, 
+      date: new Date('2024-12-14'), 
+      category: 'Trabajo',
+      transactionType: 'income'
+    },
+    { 
+      name: 'Trabajo Freelance', 
+      amount: 150000, 
+      date: new Date('2024-12-14'), 
+      category: 'Freelance',
+      transactionType: 'income'
+    }
   ];
 
   /**
@@ -61,8 +92,8 @@ export class TrackingExpensesService {
     });
 
     const filtered = transactions.filter(transaction => {
-      const transactionDate = this.normalizeDatesService.parseLocalDate(transaction.date);
-      const isInRange = transactionDate >= start && transactionDate <= end;
+      // const transactionDate = this.normalizeDatesService.parseLocalDate(transaction.date);
+      const isInRange = transaction.date >= start && transaction.date <= end;
       
       return isInRange;
     });

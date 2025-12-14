@@ -11,6 +11,7 @@ import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { LearningContentComponent } from '../learning/components/learning-content/learning-content.component';
 import { ChatContentComponent } from '../chat/components/chat-content/chat-content.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Transaction } from '../../shared/models/transaction.model';
 
 /**
  * Valid tab types for the main navigation
@@ -63,6 +64,17 @@ export class MainComponent {
    * @default 'Home'
    */
   activeTab: TabType = 'Home';
+
+  /**
+   * Temporary hardcoded transaction for testing purposes
+   */
+  testTransaction: Transaction = {
+    name: 'Compra de prueba',
+    amount: 150000,
+    date: new Date('2024-12-14'),
+    category: 'Comida',
+    transactionType: 'expenses'
+  };
 
   /**
    * Creates an instance of MainComponent and subscribes to tab changes

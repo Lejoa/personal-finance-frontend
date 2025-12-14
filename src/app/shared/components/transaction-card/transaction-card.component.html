@@ -9,17 +9,14 @@
     </button>
     <!-- Read Mode -->
     <div class="transaction-header">
-        <span class="transaction-name">{{ name }}</span>
-        <span class="transaction-amount">${{ amount }}</span>
+        <span class="transaction-name">{{ transaction.name }}</span>
+        <span class="transaction-amount">{{ transaction.amount |  
+        currency:'COP':'symbol-narrow':'1.0-0' }}</span>
     </div>
     <div class="transaction-footer">
-        <span class="transaction-date">{{ date }}</span>
+        <span class="transaction-date">{{transaction.date | date:'fullDate'}}</span>
         <div class="category-badges">
-            <span
-                *ngFor="let cat of category"
-                class="category-badge">
-                {{ cat }}
-            </span>
+            <span class="category-badge">{{ transaction.category }}</span>
         </div>
     </div>
 </div>

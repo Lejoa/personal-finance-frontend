@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { NgFor } from '@angular/common';
 import { TransactionCardComponent } from '../transaction-card/transaction-card.component';
 import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
-import { Transaction, TransactionType, DateRange } from '../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
+import { DateRange } from '../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
 import { Subscription } from 'rxjs';
-
+import { Transaction, TransactionType } from '../../models/transaction.model';
 @Component({
   selector: 'app-transaction-history',
   standalone: true,

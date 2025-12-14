@@ -1,4 +1,3 @@
-export type TransactionType = 'expenses' | 'income';
 
 export interface Transaction {
   name: string;

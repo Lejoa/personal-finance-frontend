@@ -2,11 +2,7 @@
   <div class="transactions-list">
     <app-transaction-card 
       *ngFor="let transaction of transactions"
-      [name]="transaction.name"
-      [amount]="transaction.amount"
-      [date]="transaction.date"
-      [category]="transaction.category"
-      [editable]="true"
+      [transaction]="transaction"
       >
     </app-transaction-card>
   </div>
