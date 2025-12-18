@@ -1,0 +1,18 @@
+<div class="balance-container">
+    <div class="balance-card">
+        <div class="balance-item income">
+            <span class="balance-label">Ingresos</span>
+            <span class="balance-value">{{ income | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
+        </div>
+
+        <div class="balance-item expenses">
+            <span class="balance-label">Gastos</span>
+            <span class="balance-value">{{ expenses | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
+        </div>
+
+        <div class="balance-item total">
+            <span class="balance-label">Balance</span>
+            <span class="balance-value">{{ balance | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
+        </div>
+    </div>
+</div>

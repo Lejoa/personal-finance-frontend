@@ -1,0 +1,213 @@
+<div class="budget-container">
+  <!-- Add Budget Button -->
+  <div class="button-container">
+    <button
+      class="btn-add-budget"
+      (click)="openModal()"
+      type="button">
+      Agregar
+    </button>
+  </div>
+
+  <!-- Budget List - Expansion Panels -->
+  <div class="budget-list">
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let budget of budgets">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ getMonthName(budget.mes) }} {{ budget.anio }}
+          </mat-panel-title>
+          <mat-panel-description>
+            Total: {{ getTotalBudget(budget) | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!-- Budget Items -->
+        <div class="budget-items">
+          <div *ngFor="let item of budget.items" class="budget-item">
+            <span class="item-name">{{ item.nombre }}</span>
+            <span class="item-limit">{{ item.tope | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+        </div>
+        <!-- Budget Actions -->
+         <div class="budget-actions">
+          <button
+            class="btn-edit-budget"
+            (click)="openEditBudgetModal(budget.id!)"
+            type="button"
+          >
+          Editar presupuesto
+          </button>
+          <button
+            class="btn-delete-budget"
+            (click)="deleteBudget(budget.id!)"
+            type="button"
+            >
+            Eliminar presupuesto
+          </button>
+        </div>
+
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>
+
+<!-- Modal Overlay -->
+<div *ngIf="isModalOpen" class="modal-overlay">
+  <div class="modal">
+    <h3 class="modal-title">{{ isEditMode ? 'Editar Presupuesto' : 'Agregar Presupuesto' }}</h3>
+
+    <div class="modal-form">
+      <!-- Month and Year Fields -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="month">Mes</label>
+          <input
+            id="month"
+            type="number"
+            [(ngModel)]="month"
+            class="form-input"
+            placeholder="Mes (1-12)"
+            min="1"
+            max="12"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="year">Año</label>
+          <input
+            id="year"
+            type="number"
+            [(ngModel)]="year"
+            class="form-input"
+            placeholder="Año"
+            min="2000"
+          >
+        </div>
+      </div>
+
+      <!-- Items Section -->
+      <div class="items-section">
+        <h4 class="section-title">Elementos del Presupuesto</h4>
+
+        <!-- Add Item Form -->
+        <div class="add-item-form">
+          <div class="form-row">
+            <div class="form-group flex-grow">
+              <label for="item-name">Nombre</label>
+              <input
+                id="item-name"
+                type="text"
+                [(ngModel)]="newName"
+                class="form-input"
+                placeholder="Nombre del elemento"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="item-limit">Tope</label>
+              <input
+                id="item-limit"
+                type="number"
+                [(ngModel)]="newLimit"
+                class="form-input"
+                placeholder="Tope"
+                min="0"
+              >
+            </div>
+          </div>
+
+          <button
+            class="btn-add-item"
+            (click)="addItem()"
+            type="button"
+            [disabled]="!newName.trim() || newLimit <= 0">
+            Añadir Elemento
+          </button>
+        </div>
+
+        <!-- Items List -->
+        <div class="items-list" *ngIf="items.length > 0">
+          <div *ngFor="let item of items; let i = index" class="item-row">
+            <!-- View mode -->
+            <ng-container *ngIf="!isEditing(i)">
+              <span class="item-name">{{ item.nombre }}</span>
+              <span class="item-limit">{{ item.tope | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              <div class="item-actions">
+                <button
+                  class="btn-edit-item"
+                  (click)="startEditItem(i)"
+                  type="button">
+                  Editar
+                </button>
+                <button
+                  class="btn-remove-item"
+                  (click)="removeItem(i)"
+                  type="button">
+                  Eliminar
+                </button>
+              </div>
+            </ng-container>
+
+            <!-- Edit Mode -->
+            <ng-container *ngIf="isEditing(i)">
+              <div class="edit-item-form">
+                <div class="form-row">
+                  <div class="form-group flex-grow">
+                    <input
+                      type="text"
+                      [(ngModel)]="editName"
+                      class="form-input"
+                      placeholder="Nombre del elemento"
+                    >
+                  </div>
+                  <div class="form-group">
+                    <input
+                      type="number"
+                      [(ngModel)]="editLimit"
+                      class="form-input"
+                      placeholder="Tope"
+                      min="0"
+                    >
+                  </div>
+                </div>
+                <div class="edit-item-actions">
+                  <button
+                    class="btn-save-edit"
+                    (click)="saveEditItem()"
+                    type="button"
+                    [disabled]="!editName.trim() || editLimit <= 0">
+                    Guardar
+                  </button>
+                  <button
+                    class="btn-cancel-edit"
+                    (click)="cancelEditItem()"
+                    type="button">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="form-actions">
+        <button
+          class="btn-save"
+          (click)="saveBudget()"
+          type="button"
+          [disabled]="items.length === 0">
+          Guardar
+        </button>
+        <button
+          class="btn-cancel"
+          (click)="closeModal()"
+          type="button">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -12,12 +12,13 @@ import { LearningContentComponent } from '../learning/components/learning-conten
 import { ChatContentComponent } from '../chat/components/chat-content/chat-content.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Transaction } from '../../shared/models/transaction.model';
-
+import { BudgetComponent } from '../budget/components/budget/budget.component';
+import { BalanceComponent } from '../../shared/components/balance/balance.component';
 /**
  * Valid tab types for the main navigation
  * @type {TabType}
  */
-export type TabType = 'Home' | 'Tracking' | 'Create' | 'Learning';
+export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' |'Learning';
 
 /**
  * MainComponent - Main application shell component
@@ -43,12 +44,14 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Learning';
   imports: [
     HeaderComponent,
     FooterTabsComponent,
+    BalanceComponent,
     TransactionHistoryComponent,
     FinancialLiteracyComponent,
     RegisterButtonComponent,
     SynchronizationCardComponent,
     TrackingContentComponent,
     ChatContentComponent,
+    BudgetComponent,
     LearningContentComponent,
     NgSwitch,
     NgSwitchCase

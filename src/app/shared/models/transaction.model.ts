@@ -4,7 +4,7 @@ export interface Transaction {
   amount: number;
   date: Date;
   category: TransactionCategory;
-  status?: 'pending' | 'synchronized' | 'rejected';
+  status?:  TransactionStatus
   transactionType: TransactionType;
   createdAt?: Date;
   updatedAt?: Date;
@@ -22,4 +22,9 @@ export type TransactionCategory =
   | 'Freelance'
   | 'Otros';
 
-  export type TransactionType = 'expenses' | 'income';
+export type TransactionType = 'expenses' | 'income';
+
+export type TransactionStatus = 
+ | 'pending' 
+ | 'synchronized' 
+ | 'rejected';
