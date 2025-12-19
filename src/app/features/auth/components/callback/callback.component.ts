@@ -23,11 +23,16 @@ export class CallbackComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
-    // Obtener el token y posibles errores de los query params
+    console.log('[CallbackComponent] Iniciando procesamiento del callback');
+
+    // Obtener el token, refresh token y posibles errores de los query params
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
+       console.log('[CallbackComponent] Iniciando procesamiento del callback');
+
         const token = params['token'];
+        const refreshToken = params['refreshToken'];  
         const error = params['error'];
         const message = params['message'];
 

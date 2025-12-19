@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
-import { User } from '../interfaces';
+import { User, RefreshTokenResponse } from '../interfaces';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -18,8 +18,11 @@ export class AuthService {
   // BehaviorSubject para el usuario autenticado (fuente de verdad)
   private currentUserSubject = new BehaviorSubject<User | null>(null);
 
-  // Observable público para suscribrise al usuario actual
+  // Observable público para suscribirse al usuario actual
   public currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
+
+  // Flag para evitar múltiples refresh simultáneos
+  private isRefreshing = false;
 
   constructor() {
     // Al inicializar, verificar si hay un token guardado
@@ -35,7 +38,24 @@ export class AuthService {
       // Si hay token, intentar obtener los datos del usuario
       this.getUserProfile().subscribe({
         next: (user) => this.currentUserSubject.next(user),
-        error: () => this.logout()
+        error: () => {
+          // Si falla, intentar refrescar el token
+          const refreshToken = this.getRefreshToken();
+          if (refreshToken) {
+            this.refreshAccessToken().subscribe({
+              next: () => {
+                // Después de refrescar, intentar obtener el perfil nuevamente
+                this.getUserProfile().subscribe({
+                  next: (user) => this.currentUserSubject.next(user),
+                  error: () => this.logout()
+                });
+              },
+              error: () => this.logout()
+            });
+          } else {
+            this.logout();
+          }
+        }
       });
     }
   }
@@ -49,11 +69,16 @@ export class AuthService {
   }
 
   /**
-   * Procesa el callback de OAuth y guarda el token
-   * @param token - Token JWT recibido del backend
+   * Procesa el callback de OAuth y guarda los tokens
+   * @param token - Access token JWT recibido del backend
+   * @param refreshToken - Refresh token recibido del backend
    */
-  handleOAuthCallback(token: string): void {
+  handleOAuthCallback(token: string, refreshToken?: string): void {
     this.saveToken(token);
+
+    if (refreshToken) {
+      this.saveRefreshToken(refreshToken);
+    }
 
     // Obtener información del usuario desde el backend
     this.getUserProfile().subscribe({
@@ -63,6 +88,7 @@ export class AuthService {
         this.router.navigate(['/']);
       },
       error: (error) => {
+        console.error('[AuthService] Error al obtener perfil después del callback:', error);
         this.logout();
         this.router.navigate(['/login'], {
           queryParams: { error: 'profile_fetch_failed' }
@@ -82,7 +108,46 @@ export class AuthService {
         this.currentUserSubject.next(user);
       }),
       catchError(error => {
-        console.error('Error al obtener perfil:', error);
+        console.error('[AuthService] Error al obtener perfil:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Refresca el access token usando el refresh token
+   * @returns Observable con la respuesta de tokens renovados
+   */
+  refreshAccessToken(): Observable<RefreshTokenResponse> {
+    const refreshToken = this.getRefreshToken();
+
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    if (this.isRefreshing) {
+      return throwError(() => new Error('Refresh already in progress'));
+    }
+
+    this.isRefreshing = true;
+
+    console.log('[AuthService] Refrescando access token...');
+
+    return this.http.post<RefreshTokenResponse>(`${this.API_URL}/api/token/refresh`, {
+      refreshToken
+    }).pipe(
+      tap(response => {
+        console.log('[AuthService] Tokens refrescados exitosamente');
+        // Guardar los nuevos tokens
+        this.saveToken(response.accessToken);
+        this.saveRefreshToken(response.refreshToken);
+        this.isRefreshing = false;
+      }),
+      catchError(error => {
+        console.error('[AuthService] Error al refrescar token:', error);
+        this.isRefreshing = false;
+        // Si el refresh falla, hacer logout
+        this.logout();
         return throwError(() => error);
       })
     );
@@ -90,35 +155,70 @@ export class AuthService {
 
   /**
    * Cierra la sesión del usuario
-   * Limpia el token y redirige al login
+   * Limpia los tokens y redirige al login
    */
   logout(): void {
+    const refreshToken = this.getRefreshToken();
+
+    // Intentar revocar el refresh token en el backend
+    if (refreshToken) {
+      this.http.post(`${this.API_URL}/api/auth/logout`, { refreshToken }).subscribe({
+        next: () => console.log('[AuthService] Logout exitoso en el backend'),
+        error: (error) => console.error('[AuthService] Error al hacer logout en el backend:', error)
+      });
+    }
+
+    // Limpiar tokens locales
     this.removeToken();
+    this.removeRefreshToken();
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
   /**
-   * Guarda el token JWT en el localStorage
-   * @param token - Token JWT
+   * Guarda el access token JWT en el localStorage
+   * @param token - Access token JWT
    */
   private saveToken(token: string): void {
     localStorage.setItem('auth_token', token);
   }
 
   /**
-   * Obtiene el token JWT del localStorage
-   * @returns Token JWT o null si no existe
+   * Obtiene el access token JWT del localStorage
+   * @returns Access token JWT o null si no existe
    */
   getToken(): string | null {
     return localStorage.getItem('auth_token');
   }
 
   /**
-   * Elimina el token JWT del localStorage
+   * Elimina el access token JWT del localStorage
    */
   private removeToken(): void {
     localStorage.removeItem('auth_token');
+  }
+
+  /**
+   * Guarda el refresh token en el localStorage
+   * @param refreshToken - Refresh token
+   */
+  private saveRefreshToken(refreshToken: string): void {
+    localStorage.setItem('refresh_token', refreshToken);
+  }
+
+  /**
+   * Obtiene el refresh token del localStorage
+   * @returns Refresh token o null si no existe
+   */
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token');
+  }
+
+  /**
+   * Elimina el refresh token del localStorage
+   */
+  private removeRefreshToken(): void {
+    localStorage.removeItem('refresh_token');
   }
 
   /**
