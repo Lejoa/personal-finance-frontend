@@ -29,7 +29,7 @@ export class CallbackComponent implements OnInit, OnDestroy {
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
-       console.log('[CallbackComponent] Iniciando procesamiento del callback');
+       console.log('[CallbackComponent] Query params recibidos:');
 
         const token = params['token'];
         const refreshToken = params['refreshToken'];  
@@ -37,15 +37,19 @@ export class CallbackComponent implements OnInit, OnDestroy {
         const message = params['message'];
 
         if (token) {
+          console.log('[CallbackComponent] Token y refreshToken recibidos, procesando con AuthService...');
           // Si hay token, procesarlo con el servicio de autenticación
-          this.authService.handleOAuthCallback(token);
+          // Pasar ambos tokens (access token y refresh token)
+          this.authService.handleOAuthCallback(token, refreshToken);
         } else if (error) {
           // Si hay error, redirigir al login con el mensaje de error
+          console.error('[CallbackComponent] Error en OAuth callback:', error, message);
           this.router.navigate(['/login'], {
             queryParams: { error, message }
           });
         } else {
           // Si no hay ni token ni error, callback inválido
+          console.error('[CallbackComponent] Callback OAuth inválido: sin token ni error.');
           this.router.navigate(['/login'], {
             queryParams: { error: 'invalid_callback' }
           });

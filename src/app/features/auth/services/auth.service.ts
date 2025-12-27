@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
@@ -9,8 +9,13 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
+  private injector = inject(Injector);
   private router = inject(Router);
+
+  //Lazy getter para HttpClient para evitar dependencia circular
+  private get http(): HttpClient {
+    return this.injector.get(HttpClient);
+  }
 
   // URL del backend
   private readonly API_URL = environment.apiUrl || 'https://localhost';
@@ -47,13 +52,13 @@ export class AuthService {
                 // Después de refrescar, intentar obtener el perfil nuevamente
                 this.getUserProfile().subscribe({
                   next: (user) => this.currentUserSubject.next(user),
-                  error: () => this.logout()
+                  error: () => this.logout(false) //No revocar en backend para evitar dependencia circular
                 });
               },
-              error: () => this.logout()
+              error: () => {} // El logout ya se llama dentro de refreshAccessToken con false
             });
           } else {
-            this.logout();
+            this.logout(false); //No revocar en backend para evitar dependencia circular
           }
         }
       });
@@ -147,7 +152,7 @@ export class AuthService {
         console.error('[AuthService] Error al refrescar token:', error);
         this.isRefreshing = false;
         // Si el refresh falla, hacer logout
-        this.logout();
+        this.logout(false);
         return throwError(() => error);
       })
     );
@@ -156,12 +161,14 @@ export class AuthService {
   /**
    * Cierra la sesión del usuario
    * Limpia los tokens y redirige al login
+   * @param revokeOnBackend - Si es true, revoca el token en el backend (default: true)
    */
-  logout(): void {
+  logout(revokeOnBackend: boolean = true): void {
     const refreshToken = this.getRefreshToken();
 
-    // Intentar revocar el refresh token en el backend
-    if (refreshToken) {
+    // Intentar revocar el refresh token en el backend solo si se solicita
+    // Evitamos hacerlo cuando viene desde refreshAccessToken para prevenir dependencia circular
+    if (refreshToken && revokeOnBackend) {
       this.http.post(`${this.API_URL}/api/auth/logout`, { refreshToken }).subscribe({
         next: () => console.log('[AuthService] Logout exitoso en el backend'),
         error: (error) => console.error('[AuthService] Error al hacer logout en el backend:', error)
