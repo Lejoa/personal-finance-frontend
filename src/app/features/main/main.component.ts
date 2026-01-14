@@ -4,7 +4,7 @@ import { FooterTabsComponent } from '../../shared/components/footer-tabs/footer-
 import { TransactionHistoryComponent } from '../../shared/components/transaction-history/transaction-history.component';
 import { FinancialLiteracyComponent } from '../../shared/components/financial-literacy/financial-literacy.component';
 import { RegisterButtonComponent } from '../../shared/components/register-button/register-button.component';
-import { SynchronizationCardComponent } from '../../shared/components/synchronization-card/synchronization-card.component';
+import { TransactionCardComponent } from '../../shared/components/transaction-card/transaction-card.component';
 import { TrackingContentComponent } from  '../tracking/components/tracking-content/tracking-content.component';
 import { TabService } from '../../core/services/tab/tab.service';
 import { NgSwitch, NgSwitchCase } from '@angular/common';
@@ -48,7 +48,7 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' |'Learning';
     TransactionHistoryComponent,
     FinancialLiteracyComponent,
     RegisterButtonComponent,
-    SynchronizationCardComponent,
+    TransactionCardComponent,
     TrackingContentComponent,
     ChatContentComponent,
     BudgetComponent,

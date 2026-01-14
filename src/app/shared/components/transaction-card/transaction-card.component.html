@@ -5,7 +5,7 @@
             (click)="startEdit()"
             title="Editar transacción"
             type="button">
-            Editar
+            {{buttonTitle}}
     </button>
     <!-- Read Mode -->
     <div class="transaction-header">
@@ -24,7 +24,7 @@
 <!-- Modal Overlay for Edit Mode -->
 <div *ngIf="isEditing" class="edit-overlay">
     <div class="edit-modal">
-        <h3 class="modal-title">Editar Transacción</h3>
+        <h3 class="modal-title">{{ modalTitle }}</h3>
 
         <div class="edit-form">
             <div class="form-group">
@@ -63,8 +63,8 @@
             <div class="form-group">
                 <label for="edit-category">Categoría</label>
                 <mat-form-field>
-                    <mat-label>Categorías</mat-label>
-                        <mat-select [formControl]="categories" multiple>
+                    <!-- <mat-label>Categorías</mat-label> -->
+                        <mat-select [formControl]="categories">
                         <mat-option *ngFor="let category of categoryList" [value]="category">
                             {{category}}
                         </mat-option>
@@ -81,9 +81,9 @@
                 </button>
                 <button
                     class="btn-cancel"
-                    (click)="cancelEdit()"
+                    (click)="handleCancel()"
                     type="button">
-                    Cancelar
+                    {{ cancelButtonText }}
                 </button>
             </div>
         </div>

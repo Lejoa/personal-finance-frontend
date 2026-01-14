@@ -4,6 +4,7 @@
       *ngFor="let transaction of transactions"
       [transaction]="transaction"
       [editable]="true"
+      [transactionAction]="'Edit'"
       >
     </app-transaction-card>
   </div>

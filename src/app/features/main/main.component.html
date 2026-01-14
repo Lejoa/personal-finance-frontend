@@ -6,9 +6,12 @@
       <app-balance></app-balance>
       <app-transaction-history mode="home"></app-transaction-history>
       <app-register-button></app-register-button>
-      <app-synchronization-card
-        [transaction]="testTransaction">
-      </app-synchronization-card>
+      <app-transaction-card
+        [transaction]="testTransaction"
+        [editable]="true"
+        [transactionAction]="'Sincronize'"
+        >
+      </app-transaction-card>
       <app-financial-literacy></app-financial-literacy>
     </section>
     <section class="gap-content" *ngSwitchCase="'Tracking'">

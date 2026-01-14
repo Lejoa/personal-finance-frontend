@@ -28,3 +28,5 @@ export type TransactionStatus =
  | 'pending' 
  | 'synchronized' 
  | 'rejected';
+
+ export type TransactionAction = 'Edit' | 'Sincronize';
