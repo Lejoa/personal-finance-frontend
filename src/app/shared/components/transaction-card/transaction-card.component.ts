@@ -1,10 +1,13 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule  } from '@angular/forms';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { Observable } from 'rxjs';
 import { Transaction, TransactionAction, TransactionCategory } from '../../models/transaction.model';
+import { Category } from '../../models/category.model';
+import { CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-transaction-card',
@@ -12,6 +15,7 @@ import { Transaction, TransactionAction, TransactionCategory } from '../../model
   imports: [
     NgIf,
     NgFor,
+    AsyncPipe,
     MatFormFieldModule,
     MatSelectModule,
     FormsModule,
@@ -22,14 +26,12 @@ import { Transaction, TransactionAction, TransactionCategory } from '../../model
   templateUrl: './transaction-card.component.html',
   styleUrl: './transaction-card.component.scss'
 })
-export class TransactionCardComponent {
+export class TransactionCardComponent implements OnInit {
+  private categoryService = inject(CategoryService);
 
   @Input() transaction!: Transaction;
-  
   @Input() editable: boolean = false;
-
   @Input() transactionAction!: TransactionAction;
-
   @Output() transactionUpdated = new EventEmitter<Transaction>();
 
   isEditing: boolean = false;
@@ -39,15 +41,21 @@ export class TransactionCardComponent {
   editDate: Date = new Date();
   editCategory: TransactionCategory = 'Otros';
 
-  categories = new FormControl<string[]>([], { nonNullable: true });
-  categoryList: string[] = [
-    'Alimentos',
-    'Transporte',
-    'Entretenimiento',
-    'Salud',
-    'Educación',
-    'Otros'
-  ];
+  selectedCategory = new FormControl<number | null>(null);
+  categories$: Observable<Category[]> = this.categoryService.categories$;
+
+  ngOnInit(): void {
+    this.loadCategories();
+  }
+
+  /** Carga las categorías desde el backend */
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
+  }
 
   /** Obtiene la configuración de textos y acciones según el tipo de transacción */
   private getActionConfig(): ActionConfig {
@@ -104,12 +112,12 @@ export class TransactionCardComponent {
 
   private cancelEdit(): void {
     this.isEditing = false;
-    this.categories.reset([]);
+    this.selectedCategory.reset();
   }
 
   private cancelSyncronization(): void {
     this.isEditing = false;
-    this.categories.reset([]);
+    this.selectedCategory.reset();
   }
 }
 

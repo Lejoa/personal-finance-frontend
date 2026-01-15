@@ -63,12 +63,12 @@
             <div class="form-group">
                 <label for="edit-category">Categoría</label>
                 <mat-form-field>
-                    <!-- <mat-label>Categorías</mat-label> -->
-                        <mat-select [formControl]="categories">
-                        <mat-option *ngFor="let category of categoryList" [value]="category">
-                            {{category}}
+                    <mat-label>Seleccione una categoría</mat-label>
+                    <mat-select [formControl]="selectedCategory">
+                        <mat-option *ngFor="let category of categories$ | async" [value]="category.id">
+                            {{ category.name }}
                         </mat-option>
-                        </mat-select>
+                    </mat-select>
                 </mat-form-field>
             </div>
 
