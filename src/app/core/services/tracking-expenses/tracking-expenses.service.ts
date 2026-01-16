@@ -11,7 +11,7 @@ export class TrackingExpensesService {
 
   constructor(private readonly normalizeDatesService: NormalizeDatesService) { }
 
-  private transactionTypeSubject = new BehaviorSubject<TransactionType>('expenses');
+  private transactionTypeSubject = new BehaviorSubject<TransactionType>('gasto');
   private dateRangeSubject = new BehaviorSubject<DateRange>({start: null, end: null});
 
   readonly transactionType$ = this.transactionTypeSubject.asObservable();
@@ -33,21 +33,21 @@ export class TrackingExpensesService {
       amount: 150000, 
       date: new Date('2024-12-14'), 
       category: 'Comida',
-      transactionType: 'expenses'
+      transactionType: 'gasto'
     },
     { 
       name: 'Transporte', 
       amount: 15000, 
       date: new Date('2024-12-14'), 
       category: 'Transporte',
-      transactionType: 'expenses'
+      transactionType: 'gasto'
     },
     { 
       name: 'Cine', 
       amount: 100000, 
       date: new Date('2024-12-14'), 
       category: 'Transporte',
-      transactionType: 'expenses'
+      transactionType: 'gasto'
     },
   ];
 
@@ -57,14 +57,14 @@ export class TrackingExpensesService {
       amount: 4500000, 
       date: new Date('2024-12-14'), 
       category: 'Trabajo',
-      transactionType: 'income'
+      transactionType: 'ingreso'
     },
     { 
       name: 'Trabajo Freelance', 
       amount: 150000, 
       date: new Date('2024-12-14'), 
       category: 'Freelance',
-      transactionType: 'income'
+      transactionType: 'ingreso'
     }
   ];
 
@@ -76,7 +76,7 @@ export class TrackingExpensesService {
    * @returns 
    */
   getTransactionsByType(type: TransactionType, dateRange?: DateRange): Transaction[] {
-    const transactions = type === 'expenses' ? this.expensesData : this.incomeData;
+    const transactions = type === 'gasto' ? this.expensesData : this.incomeData;
     
     if (!dateRange?.start || !dateRange?.end) {
       console.log('[Service] No valid date range, returning all transactions');

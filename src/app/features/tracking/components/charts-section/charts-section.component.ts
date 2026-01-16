@@ -71,12 +71,12 @@ export class ChartsSectionComponent {
       this.chartData.labels = this.foo.labels;
       this.chartData.datasets[0].data = this.foo.data;
       this.chartData.datasets[0].backgroundColor = this.foo.backgroundColor;
-      this.trackingExpensesService.setTransactionType('expenses');
+      this.trackingExpensesService.setTransactionType('gasto');
     } else {
       this.chartData.labels = this.foo2.labels;
       this.chartData.datasets[0].data = this.foo2.data;
       this.chartData.datasets[0].backgroundColor = this.foo2.backgroundColor;
-      this.trackingExpensesService.setTransactionType('income');
+      this.trackingExpensesService.setTransactionType('ingreso');
     }
     this.chart?.update();
   }

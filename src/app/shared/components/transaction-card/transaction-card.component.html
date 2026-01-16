@@ -16,7 +16,7 @@
     <div class="transaction-footer">
         <span class="transaction-date">{{transaction.date | date:'fullDate'}}</span>
         <div class="category-badges">
-            <span class="category-badge">{{ transaction.category }}</span>
+            <span class="category-badge">{{ transaction.categoryName || 'Sin categoría' }}</span>
         </div>
     </div>
 </div>
@@ -76,12 +76,14 @@
                 <button
                     class="btn-save"
                     (click)="saveEdit()"
+                    [disabled]="isSaving"
                     type="button">
-                    Guardar
+                    {{ isSaving ? 'Guardando...' : 'Guardar' }}
                 </button>
                 <button
                     class="btn-cancel"
                     (click)="handleCancel()"
+                    [disabled]="isSaving"
                     type="button">
                     {{ cancelButtonText }}
                 </button>

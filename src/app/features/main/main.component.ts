@@ -75,8 +75,8 @@ export class MainComponent {
     name: 'Compra de prueba',
     amount: 150000,
     date: new Date('2024-12-14'),
-    category: 'Comida',
-    transactionType: 'expenses'
+    category: 'Alimentos',
+    transactionType: 'gasto'
   };
 
   /**

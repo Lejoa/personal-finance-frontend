@@ -2,6 +2,7 @@ export interface Category {
   id: number;
   name: string;
   description: string;
+  type: 'ingreso' | 'gasto';
   createdAt: string;
 }
 

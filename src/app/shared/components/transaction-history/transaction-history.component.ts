@@ -27,7 +27,7 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
 
   transactions: Transaction[] = [];
   isLoading = false;
-  private currentType: TransactionType = 'expenses';
+  private currentType: TransactionType = 'gasto';
   private currentDateRange: DateRange = { start: null, end: null };
 
   ngOnInit(): void {

@@ -3,26 +3,17 @@ export interface Transaction {
   name: string;
   amount: number;
   date: Date;
-  category: TransactionCategory;
-  status?:  TransactionStatus
+  category?: string;
+  categoryId?: number;
+  categoryName?: string;
+  status?: TransactionStatus;
   transactionType: TransactionType;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type TransactionCategory = 
-  | 'Viajes'
-  | 'Comida'
-  | 'Transporte'
-  | 'Entretenimiento'
-  | 'Servicios'
-  | 'Salud'
-  | 'Educación'
-  | 'Trabajo'
-  | 'Freelance'
-  | 'Otros';
 
-export type TransactionType = 'expenses' | 'income';
+export type TransactionType = 'ingreso' | 'gasto';
 
 export type TransactionStatus = 
  | 'pending' 

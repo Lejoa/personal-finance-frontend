@@ -32,6 +32,8 @@ interface TransactionDTO {
   amount: number;
   date: string;
   note?: string;
+  categoryId?: number;
+  categoryName?: string;
   createdAt: string;
 }
 
@@ -142,8 +144,9 @@ export class TransactionService {
       name: dto.name,
       amount: dto.amount,
       date: new Date(dto.date),
-      category: 'Otros',
-      transactionType: dto.type === 'income' ? 'income' : 'expenses',
+      categoryId: dto.categoryId,
+      categoryName: dto.categoryName,
+      transactionType: dto.type === 'ingreso' ? 'ingreso' : 'gasto',
       createdAt: new Date(dto.createdAt)
     };
   }
@@ -152,11 +155,12 @@ export class TransactionService {
     const dto: Record<string, unknown> = {};
 
     if (transaction.name) dto['name'] = transaction.name;
-    if (transaction.amount) dto['amount'] = transaction.amount;
+    if (transaction.amount !== undefined) dto['amount'] = transaction.amount;
     if (transaction.date) dto['date'] = this.formatDate(transaction.date);
     if (transaction.transactionType) {
-      dto['type'] = transaction.transactionType === 'income' ? 'income' : 'expense';
+      dto['type'] = transaction.transactionType === 'ingreso' ? 'ingreso' : 'gasto';
     }
+    if (transaction.categoryId !== undefined) dto['categoryId'] = transaction.categoryId;
 
     return dto;
   }
