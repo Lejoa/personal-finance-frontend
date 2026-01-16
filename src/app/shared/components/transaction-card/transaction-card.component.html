@@ -24,6 +24,14 @@
 <!-- Modal Overlay for Edit Mode -->
 <div *ngIf="isEditing" class="edit-overlay">
     <div class="edit-modal">
+        <button
+            class="btn-close"
+            (click)="handleCancel()"
+            [disabled]="isSaving"
+            type="button"
+            title="Cerrar">
+            ✕
+        </button>
         <h3 class="modal-title">{{ modalTitle }}</h3>
 
         <div class="edit-form">
