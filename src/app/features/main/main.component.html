@@ -7,10 +7,10 @@
       <app-transaction-history mode="home"></app-transaction-history>
       <app-register-button></app-register-button>
       <app-transaction-card
-        [transaction]="testTransaction"
+        *ngIf="unsyncedTransaction"
+        [transaction]="unsyncedTransaction"
         [editable]="true"
-        [transactionAction]="'Sincronize'"
-        >
+        [transactionAction]="'Sincronize'">
       </app-transaction-card>
       <app-financial-literacy></app-financial-literacy>
     </section>

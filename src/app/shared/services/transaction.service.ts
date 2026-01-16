@@ -9,6 +9,7 @@ export interface TransactionFilters {
   startDate?: string;
   endDate?: string;
   limit?: number;
+  sync?: boolean;
 }
 
 interface TransactionsResponse {
@@ -54,6 +55,9 @@ export class TransactionService {
     if (filters?.type) {
       params = params.set('type', filters.type);
     }
+    if (filters?.sync) {
+      params = params.set('sync', filters.sync);
+    }
     if (filters?.startDate) {
       params = params.set('startDate', filters.startDate);
     }
@@ -64,10 +68,11 @@ export class TransactionService {
       params = params.set('limit', filters.limit.toString());
     }
 
-    return this.http.get<TransactionsResponse>(this.apiUrl, { params }).pipe(
-      map(response => response.data.map(dto => this.mapDtoToTransaction(dto))),
-      tap(transactions => this.transactionsSubject.next(transactions))
-    );
+    return this.http.get<TransactionsResponse>(this.apiUrl, { params })
+            .pipe(
+              map(response => response.data.map(dto => this.mapDtoToTransaction(dto))),
+              tap(transactions => this.transactionsSubject.next(transactions))
+            );
   }
 
   /** Obtiene las últimas N transacciones */
@@ -90,9 +95,14 @@ export class TransactionService {
 
   /** Obtiene una transacción por ID */
   getTransactionById(id: number): Observable<Transaction> {
-    return this.http.get<TransactionResponse>(`${this.apiUrl}/${id}`).pipe(
-      map(response => this.mapDtoToTransaction(response.transaction))
-    );
+    return this.http.get<TransactionResponse>(`${this.apiUrl}/${id}`)
+            .pipe(
+              map(response => this.mapDtoToTransaction(response.transaction))
+            );
+  }
+
+  getTransactionsUnsynced(): Observable<Transaction[]> {
+    return this.getTransactions({ sync: false, limit: 1 });
   }
 
   /** Crea una nueva transacción */
