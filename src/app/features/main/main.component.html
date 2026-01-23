@@ -10,7 +10,8 @@
         *ngIf="unsyncedTransaction"
         [transaction]="unsyncedTransaction"
         [editable]="true"
-        [transactionAction]="'Sincronize'">
+        [transactionAction]="'Sincronize'"
+        (transactionUpdated)="onTransactionSynced()">
       </app-transaction-card>
       <app-financial-literacy></app-financial-literacy>
     </section>

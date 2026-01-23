@@ -8,6 +8,7 @@ export interface Transaction {
   categoryName?: string;
   status?: TransactionStatus;
   transactionType: TransactionType;
+  synchronized?: 'pending' | 'done' | 'rejected';
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -15,9 +16,6 @@ export interface Transaction {
 
 export type TransactionType = 'ingreso' | 'gasto';
 
-export type TransactionStatus = 
- | 'pending' 
- | 'synchronized' 
- | 'rejected';
+export type TransactionStatus = 'pending' | 'done' | 'rejected';
 
  export type TransactionAction = 'Edit' | 'Sincronize';

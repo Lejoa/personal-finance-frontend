@@ -62,13 +62,15 @@ export class TransactionCardComponent implements OnInit {
         cancelText: 'Cancelar',
         modalTitle: 'Editar Transacción',
         buttonTitle: 'Editar',
-        cancelAction: () => this.cancelEdit()
+        cancelAction: () => this.cancelEdit(),
+        updateAction: () => this.saveEdit()
       },
       'Sincronize': {
         cancelText: 'Descartar',
         modalTitle: 'Sincronizar Transacción',
         buttonTitle: 'Sincronizar',
-        cancelAction: () => this.cancelSyncronization()
+        cancelAction: () => this.cancelSyncronization(),
+        updateAction: () => this.saveEdit()
       }
     };
     return configs[this.transactionAction];
@@ -96,19 +98,14 @@ export class TransactionCardComponent implements OnInit {
 
   saveEdit(): void {
     if (!this.transaction.id) return;
-    console.log('Valores antes de guardar:', {
-      editName: this.editName,
-      editAmount: this.editAmount,
-      editDate: this.editDate,
-      selectedCategory: this.selectedCategory.value
-    });
 
     this.isSaving = true;
     const updatedData: Partial<Transaction> = {
       name: this.editName,
       amount: this.editAmount,
       date: new Date(this.editDate),
-      categoryId: this.selectedCategory.value ?? undefined
+      categoryId: this.selectedCategory.value ?? undefined,
+      status: this.transactionAction === 'Sincronize' ? 'done' : undefined
     };
 
     this.transactionService.updateTransaction(Number(this.transaction.id), updatedData)
@@ -130,14 +127,32 @@ export class TransactionCardComponent implements OnInit {
     this.getActionConfig().cancelAction();
   }
 
-  private cancelEdit(): void {
+  cancelEdit(): void {
     this.isEditing = false;
     this.selectedCategory.reset();
   }
 
   private cancelSyncronization(): void {
-    this.isEditing = false;
-    this.selectedCategory.reset();
+    if (!this.transaction.id) return;
+
+    this.isSaving = true;
+    const updatedData: Partial<Transaction> = {
+      status: 'rejected'
+    };
+
+    this.transactionService.updateTransaction(Number(this.transaction.id), updatedData)
+      .subscribe({
+        next: (updated) => {
+          this.transaction = updated;
+          this.isEditing = false;
+          this.isSaving = false;
+          this.transactionUpdated.emit(updated);
+        },
+        error: (error) => {
+          console.error('Error updating transaction:', error);
+          this.isSaving = false;
+        }
+      });
   }
 
   private formatDateForInput(date: Date): string {
@@ -150,4 +165,5 @@ interface ActionConfig {
   modalTitle: string;
   buttonTitle: string;
   cancelAction: () => void;
+  updateAction: () => void;
 }

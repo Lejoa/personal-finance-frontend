@@ -68,4 +68,8 @@ export class MainComponent implements OnInit {
       }
     });
   }
+
+  onTransactionSynced(): void {
+    this.loadUnsyncedTransaction();
+  }
 }

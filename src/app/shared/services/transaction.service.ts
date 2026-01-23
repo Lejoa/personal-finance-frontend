@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap, map } from 'rxjs';
-import { Transaction, TransactionType } from '../models/transaction.model';
+import { Transaction, TransactionType, TransactionStatus } from '../models/transaction.model';
 import { environment } from '../../../environments/environment';
 
 export interface TransactionFilters {
@@ -9,7 +9,7 @@ export interface TransactionFilters {
   startDate?: string;
   endDate?: string;
   limit?: number;
-  sync?: boolean;
+  sync?: TransactionStatus;
 }
 
 interface TransactionsResponse {
@@ -35,6 +35,7 @@ interface TransactionDTO {
   note?: string;
   categoryId?: number;
   categoryName?: string;
+  synchronized: string;
   createdAt: string;
 }
 
@@ -102,7 +103,7 @@ export class TransactionService {
   }
 
   getTransactionsUnsynced(): Observable<Transaction[]> {
-    return this.getTransactions({ sync: false, limit: 1 });
+    return this.getTransactions({ sync: 'pending', limit: 1 });
   }
 
   /** Crea una nueva transacción */
@@ -156,6 +157,7 @@ export class TransactionService {
       date: new Date(dto.date),
       categoryId: dto.categoryId,
       categoryName: dto.categoryName,
+      status: dto.synchronized as TransactionStatus,
       transactionType: dto.type === 'ingreso' ? 'ingreso' : 'gasto',
       createdAt: new Date(dto.createdAt)
     };
@@ -171,6 +173,7 @@ export class TransactionService {
       dto['type'] = transaction.transactionType === 'ingreso' ? 'ingreso' : 'gasto';
     }
     if (transaction.categoryId !== undefined) dto['categoryId'] = transaction.categoryId;
+    if (transaction.status) dto['synchronized'] = transaction.status;
 
     return dto;
   }
