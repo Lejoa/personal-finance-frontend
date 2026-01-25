@@ -1,8 +1,13 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap, map } from 'rxjs';
-import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../models/category.model';
+import { Category, CategoryType, CreateCategoryRequest, UpdateCategoryRequest } from '../models/category.model';
 import { environment } from '../../../environments/environment';
+
+export interface CategoryFilters {
+  type?: CategoryType;
+  name?: string;
+}
 
 interface CategoriesResponse {
   data: Category[];
@@ -18,6 +23,14 @@ interface CategoryCreateResponse {
   category: Category;
 }
 
+interface CategoryDTO {
+  id: number;
+  name: string;
+  description: string;
+  type: string;
+  createdAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,11 +42,20 @@ export class CategoryService {
   public categories$ = this.categoriesSubject.asObservable();
 
   /** Obtiene todas las categorías del backend y actualiza el estado */
-  getCategories(): Observable<Category[]> {
-    return this.http.get<CategoriesResponse>(this.apiUrl).pipe(
-      map(response => response.data),
-      tap(categories => this.categoriesSubject.next(categories))
-    );
+  getCategories(filters?: CategoryFilters): Observable<Category[]> {
+    let params = new HttpParams();
+
+    if (filters?.type) {
+      params = params.set('type', filters.type);
+    }
+    if (filters?.name) {
+      params = params.set('name', filters.name);
+    }
+    return this.http.get<CategoriesResponse>(this.apiUrl, { params })
+            .pipe(
+              map(response => response.data.map(dto => this.mapDtoToCategory(dto))),
+              tap(categories => this.categoriesSubject.next(categories))
+            );
   }
 
   /** Obtiene una categoría por ID */
@@ -83,4 +105,15 @@ export class CategoryService {
   getCurrentCategories(): Category[] {
     return this.categoriesSubject.value;
   }
+
+  private mapDtoToCategory(dto: CategoryDTO): Category {
+      return {
+        id: dto.id,
+        name: dto.name,
+        description: dto.description,
+        type: dto.type as CategoryType,
+        createdAt: new Date(dto.createdAt)
+      };
+  }
+      
 }

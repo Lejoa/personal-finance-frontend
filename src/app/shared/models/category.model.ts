@@ -2,9 +2,11 @@ export interface Category {
   id: number;
   name: string;
   description: string;
-  type: 'ingreso' | 'gasto';
-  createdAt: string;
+  type: CategoryType;
+  createdAt?: Date;
 }
+
+export type CategoryType = 'ingreso' | 'gasto';
 
 export interface CreateCategoryRequest {
   name: string;

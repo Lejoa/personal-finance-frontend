@@ -15,7 +15,7 @@
       <mat-expansion-panel *ngFor="let budget of budgets">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            {{ getMonthName(budget.mes) }} {{ budget.anio }}
+            {{ getDateRangeDisplay(budget) }}
           </mat-panel-title>
           <mat-panel-description>
             Total: {{ getTotalBudget(budget) | currency:'COP':'symbol-narrow':'1.0-0' }}
@@ -58,32 +58,17 @@
     <h3 class="modal-title">{{ isEditMode ? 'Editar Presupuesto' : 'Agregar Presupuesto' }}</h3>
 
     <div class="modal-form">
-      <!-- Month and Year Fields -->
+      <!-- Date Range Field -->
       <div class="form-row">
-        <div class="form-group">
-          <label for="month">Mes</label>
-          <input
-            id="month"
-            type="number"
-            [(ngModel)]="month"
-            class="form-input"
-            placeholder="Mes (1-12)"
-            min="1"
-            max="12"
-          >
-        </div>
-
-        <div class="form-group">
-          <label for="year">Año</label>
-          <input
-            id="year"
-            type="number"
-            [(ngModel)]="year"
-            class="form-input"
-            placeholder="Año"
-            min="2000"
-          >
-        </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rango de fechas</mat-label>
+          <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
+            <input matStartDate formControlName="start" placeholder="Fecha inicio">
+            <input matEndDate formControlName="end" placeholder="Fecha fin">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
       </div>
 
       <!-- Items Section -->
@@ -94,14 +79,15 @@
         <div class="add-item-form">
           <div class="form-row">
             <div class="form-group flex-grow">
-              <label for="item-name">Nombre</label>
-              <input
-                id="item-name"
-                type="text"
-                [(ngModel)]="newName"
-                class="form-input"
-                placeholder="Nombre del elemento"
-              >
+              <label for="item-category">Categoría</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Seleccionar categoría</mat-label>
+                <mat-select [(ngModel)]="selectedCategoryId">
+                  <mat-option *ngFor="let category of expenseCategories$ | async" [value]="category.id">
+                    {{ category.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
 
             <div class="form-group">
@@ -121,7 +107,7 @@
             class="btn-add-item"
             (click)="addItem()"
             type="button"
-            [disabled]="!newName.trim() || newLimit <= 0">
+            [disabled]="selectedCategoryId === null || newLimit <= 0">
             Añadir Elemento
           </button>
         </div>
@@ -154,12 +140,14 @@
               <div class="edit-item-form">
                 <div class="form-row">
                   <div class="form-group flex-grow">
-                    <input
-                      type="text"
-                      [(ngModel)]="editName"
-                      class="form-input"
-                      placeholder="Nombre del elemento"
-                    >
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Categoría</mat-label>
+                      <mat-select [(ngModel)]="editCategoryId">
+                        <mat-option *ngFor="let category of expenseCategories$ | async" [value]="category.id">
+                          {{ category.name }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
                   </div>
                   <div class="form-group">
                     <input
@@ -176,7 +164,7 @@
                     class="btn-save-edit"
                     (click)="saveEditItem()"
                     type="button"
-                    [disabled]="!editName.trim() || editLimit <= 0">
+                    [disabled]="editCategoryId === null || editLimit <= 0">
                     Guardar
                   </button>
                   <button

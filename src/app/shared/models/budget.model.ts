@@ -5,8 +5,8 @@ export interface BudgetItem {
 
 export interface Budget {
   id?: string;
-  mes: number;
-  anio: number;
+  startDate: Date;
+  endDate: Date;
   items: BudgetItem[];
   createdAt?: Date;
 }
