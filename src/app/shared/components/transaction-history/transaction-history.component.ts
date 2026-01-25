@@ -30,6 +30,10 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
   private currentType: TransactionType = 'gasto';
   private currentDateRange: DateRange = { start: null, end: null };
 
+  private readonly today = new Date();
+  private readonly defaultStartDate = new Date(this.today.getFullYear(), this.today.getMonth() - 1, 1);
+  private readonly defaultEndDate = new Date(this.today.getFullYear(), this.today.getMonth(), 0);
+
   ngOnInit(): void {
     if (this.mode === 'tracking') {
       this.initializeTrackingMode();
@@ -55,15 +59,14 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
   }
 
   private loadTransactionsByDateRange(): void {
-    if (!this.currentDateRange.start || !this.currentDateRange.end) {
-      return;
-    }
+    const startDate = this.currentDateRange.start || this.defaultStartDate;
+    const endDate = this.currentDateRange.end || this.defaultEndDate;
 
     this.isLoading = true;
     this.subscription.add(
       this.transactionService.getTransactionsByDateRange(
-        this.currentDateRange.start,
-        this.currentDateRange.end,
+        startDate,
+        endDate,
         this.currentType
       ).subscribe({
         next: transactions => {
