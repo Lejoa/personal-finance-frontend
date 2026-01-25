@@ -3,7 +3,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { TransactionCardComponent } from '../transaction-card/transaction-card.component';
 import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
 import { DateRange } from '../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest } from 'rxjs';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { TransactionService } from '../../services/transaction.service';
 
@@ -44,14 +44,11 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
 
   private initializeTrackingMode(): void {
     this.subscription.add(
-      this.trackingExpensesService.transactionType$.subscribe(type => {
+      combineLatest([
+        this.trackingExpensesService.transactionType$,
+        this.trackingExpensesService.dateRange$
+      ]).subscribe(([type, dateRange]) => {
         this.currentType = type;
-        this.loadTransactionsByDateRange();
-      })
-    );
-
-    this.subscription.add(
-      this.trackingExpensesService.dateRange$.subscribe(dateRange => {
         this.currentDateRange = dateRange;
         this.loadTransactionsByDateRange();
       })
