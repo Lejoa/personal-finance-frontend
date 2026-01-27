@@ -26,7 +26,6 @@ import { Observable, map, shareReplay } from 'rxjs';
     FormsModule,
     ReactiveFormsModule,
     CurrencyPipe,
-    DatePipe,
     MatExpansionModule,
     MatButtonModule,
     MatIconModule,
@@ -76,9 +75,10 @@ export class BudgetComponent implements OnInit {
   }
 
   private loadExpenseCategories(): void {
-    this.expenseCategories$ = this.categoryService.getCategories({ type: 'gasto' }).pipe(
-      shareReplay(1)
-    );
+    this.expenseCategories$ = 
+      this.categoryService.getCategories({ type: 'gasto' }).pipe(
+        shareReplay(1)
+      );
   }
 
   openModal(): void {

@@ -10,17 +10,17 @@ export interface CategoryFilters {
 }
 
 interface CategoriesResponse {
-  data: Category[];
+  data: CategoryDTO[];
   total: number;
 }
 
 interface CategoryResponse {
-  category: Category;
+  category: CategoryDTO;
 }
 
 interface CategoryCreateResponse {
   message: string;
-  category: Category;
+  category: CategoryDTO;
 }
 
 interface CategoryDTO {
@@ -61,14 +61,14 @@ export class CategoryService {
   /** Obtiene una categoría por ID */
   getCategoryById(id: number): Observable<Category> {
     return this.http.get<CategoryResponse>(`${this.apiUrl}/${id}`).pipe(
-      map(response => response.category)
+      map(response => this.mapDtoToCategory(response.category))
     );
   }
 
   /** Crea una nueva categoría */
   createCategory(request: CreateCategoryRequest): Observable<Category> {
     return this.http.post<CategoryCreateResponse>(this.apiUrl, request).pipe(
-      map(response => response.category),
+      map(response => this.mapDtoToCategory(response.category)),
       tap(newCategory => {
         const currentCategories = this.categoriesSubject.value;
         this.categoriesSubject.next([...currentCategories, newCategory]);
@@ -79,7 +79,7 @@ export class CategoryService {
   /** Actualiza una categoría existente */
   updateCategory(id: number, request: UpdateCategoryRequest): Observable<Category> {
     return this.http.patch<CategoryCreateResponse>(`${this.apiUrl}/${id}`, request).pipe(
-      map(response => response.category),
+      map(response => this.mapDtoToCategory(response.category)),
       tap(updatedCategory => {
         const currentCategories = this.categoriesSubject.value;
         const index = currentCategories.findIndex(c => c.id === id);
