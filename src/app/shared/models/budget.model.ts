@@ -3,10 +3,37 @@ export interface BudgetItem {
   tope: number;
 }
 
+export interface BudgetCategory {
+  id?: number;
+  categoryId: number;
+  categoryName: string;
+  categoryDescription: string;
+  amount: number;
+}
+
 export interface Budget {
-  id?: string;
+  id?: number;
   startDate: Date;
   endDate: Date;
   items: BudgetItem[];
+  categories?: BudgetCategory[];
   createdAt?: Date;
+}
+
+export interface CreateBudgetRequest {
+  startDate: string;
+  endDate: string;
+  categories: Array<{
+    categoryId: number;
+    amount: number;
+  }>;
+}
+
+export interface UpdateBudgetRequest {
+  startDate?: string;
+  endDate?: string;
+  categories?: Array<{
+    categoryId: number;
+    amount: number;
+  }>;
 }

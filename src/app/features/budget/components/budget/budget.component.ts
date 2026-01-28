@@ -10,9 +10,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
-import { Budget, BudgetItem } from '../../../../shared/models/budget.model';
+import { Budget, BudgetItem, CreateBudgetRequest } from '../../../../shared/models/budget.model';
 import { Category } from '../../../../shared/models/category.model';
 import { CategoryService } from '../../../../shared/services/category.service';
+import { BudgetService } from '../../../../shared/services/budget.service';
 import { A11yModule } from "@angular/cdk/a11y";
 import { Observable, map, shareReplay } from 'rxjs';
 
@@ -41,6 +42,7 @@ import { Observable, map, shareReplay } from 'rxjs';
 })
 export class BudgetComponent implements OnInit {
   private categoryService = inject(CategoryService);
+  private budgetService = inject(BudgetService);
 
   isModalOpen: boolean = false;
   budgets: Budget[] = [];
@@ -54,8 +56,8 @@ export class BudgetComponent implements OnInit {
   // Categories
   expenseCategories$: Observable<Category[]> | null = null;
 
-  // Items collection
-  items: BudgetItem[] = [];
+  // Items collection (with categoryId tracking)
+  items: Array<BudgetItem & { categoryId?: number }> = [];
 
   // New item fields
   selectedCategoryId: number | null = null;
@@ -67,11 +69,12 @@ export class BudgetComponent implements OnInit {
   editLimit: number = 0;
 
   // Edit budget state
-  editingBudgetId: string | null = null;
+  editingBudgetId: number | null = null;
   isEditMode: boolean = false;
 
   ngOnInit(): void {
     this.loadExpenseCategories();
+    this.loadBudgets();
   }
 
   private loadExpenseCategories(): void {
@@ -79,6 +82,18 @@ export class BudgetComponent implements OnInit {
       this.categoryService.getCategories({ type: 'gasto' }).pipe(
         shareReplay(1)
       );
+  }
+
+  private loadBudgets(): void {
+    
+    this.budgetService.getBudgets().subscribe({
+      next: (budgets) => {
+        this.budgets = budgets;
+      },
+      error: (error) => {
+        console.error('Error loading budgets:', error);
+      }
+    });
   }
 
   openModal(): void {
@@ -111,7 +126,7 @@ export class BudgetComponent implements OnInit {
     this.editingIndex = null;
   }
 
-  openEditBudgetModal(budgetId: string): void {
+  openEditBudgetModal(budgetId: number): void {
     const budget = this.budgets.find(b => b.id === budgetId);
     if (budget) {
       this.isModalOpen = true;
@@ -121,7 +136,18 @@ export class BudgetComponent implements OnInit {
         start: budget.startDate,
         end: budget.endDate
       });
-      this.items = budget.items.map(item => ({...item}));
+
+      // Map items with categoryId from categories if available
+      if (budget.categories && budget.categories.length > 0) {
+        this.items = budget.categories.map(cat => ({
+          nombre: cat.categoryName,
+          tope: cat.amount,
+          categoryId: cat.categoryId
+        }));
+      } else {
+        this.items = budget.items.map(item => ({...item}));
+      }
+
       this.selectedCategoryId = null;
       this.newLimit = 0;
       this.editingIndex = null;
@@ -137,7 +163,8 @@ export class BudgetComponent implements OnInit {
         if (category) {
           this.items.push({
             nombre: category.name,
-            tope: this.newLimit
+            tope: this.newLimit,
+            categoryId: category.id
           });
           this.selectedCategoryId = null;
           this.newLimit = 0;
@@ -178,7 +205,8 @@ export class BudgetComponent implements OnInit {
         if (category && this.editingIndex !== null) {
           this.items[this.editingIndex] = {
             nombre: category.name,
-            tope: this.editLimit
+            tope: this.editLimit,
+            categoryId: category.id
           };
           this.cancelEditItem();
         }
@@ -201,37 +229,78 @@ export class BudgetComponent implements OnInit {
     const endDate = this.dateRange.value.end;
 
     if (this.items.length > 0 && startDate && endDate) {
-      if(this.isEditMode && this.editingBudgetId) {
-        const budgetIndex = this.budgets.findIndex( b => b.id === this.editingBudgetId)
-        if(budgetIndex !== -1) {
-          this.budgets[budgetIndex] = {
-            ...this.budgets[budgetIndex],
-            startDate: startDate,
-            endDate: endDate,
-            items: [...this.items]
-          }
-        }
-      } else {
-        const newBudget: Budget = {
-          id: Date.now().toString(),
-          startDate: startDate,
-          endDate: endDate,
-          items: [...this.items],
-          createdAt: new Date()
-        };
+      const categories = this.items
+      .filter( item => item.categoryId !== undefined)
+      .map( item => ({
+        categoryId: item.categoryId!,
+        amount: item.tope
+      }))
 
-        this.budgets.push(newBudget);
+      if (categories.length === 0) {
+        console.error('No valid categories to save.');
+        return;
       }
 
-      this.closeModal();
+      if (this.isEditMode && this.editingBudgetId) {
+        const updateRequest = {
+          startDate: this.formatDate(startDate),
+          endDate: this.formatDate(endDate),
+          categories: categories
+        };
+
+        this.budgetService.updateBudget(
+          Number(this.editingBudgetId), updateRequest).subscribe({
+            next: (updatedBudget) => {
+              const budgetIndex = this.budgets.findIndex(
+                b => b.id === updatedBudget.id
+              );
+              if (budgetIndex !== -1) {
+                this.budgets[budgetIndex] = updatedBudget;
+              }
+              this.closeModal();
+            },
+            error: (error) => {
+              console.error('Error updating budget:', error);
+            }
+          });
+      } else {
+        const createRequest: CreateBudgetRequest = { 
+          startDate: this.formatDate(startDate),
+          endDate: this.formatDate(endDate),
+          categories: categories
+        };
+        this.budgetService.createBudget(createRequest).subscribe({
+          next: (newBudget) => {
+            this.budgets.push(newBudget);
+            this.closeModal();
+          },
+          error: (error) => {
+            console.error('Error creating budget:', error);
+          }
+        });
+      }      
     }
   }
 
-  deleteBudget(budgetId: string): void {
-    const budgetIndex = this.budgets.findIndex( b => b.id === budgetId);
-    if(budgetIndex !== -1) {
-      this.budgets.splice(budgetIndex, 1);
-    }
+  deleteBudget(budgetId: number): void {
+    this.budgetService.deleteBudget(budgetId).subscribe({
+      next: () => {
+        const budgetIndex = this.budgets.findIndex(b => b.id === budgetId);
+        if (budgetIndex !== -1) {
+          this.budgets.splice(budgetIndex, 1);
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting budget:', error);
+      }
+    });
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   getDateRangeDisplay(budget: Budget): string {
