@@ -1,14 +1,26 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, delay, of } from 'rxjs';
-import { ChatMessage, ChatState } from '../interfaces/chat.interfaces';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import {
+  ChatMessage,
+  ChatResponse,
+  ChatState,
+  Conversation,
+  ConversationDetail
+} from '../interfaces/chat.interfaces';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/api/chat`;
+
   private chatStateSubject = new BehaviorSubject<ChatState>({
     messages: [],
-    isTyping: false
+    isTyping: false,
+    currentConversationId: null
   });
 
   public chatState$: Observable<ChatState> = this.chatStateSubject.asObservable();
@@ -21,7 +33,7 @@ export class ChatService {
     const welcomeMessage: ChatMessage = {
       id: this.generateId(),
       content: '¡Hola! Soy tu asistente financiero. Puedo ayudarte a registrar gastos e ingresos, y responder preguntas sobre tus finanzas. ¿En qué puedo ayudarte hoy?',
-      type: 'bot',
+      type: 'assistant',
       timestamp: new Date()
     };
 
@@ -39,36 +51,73 @@ export class ChatService {
     this.addMessage(userMessage);
     this.setTyping(true);
 
-    // Simular respuesta del LLM con delay
-    this.getBotResponse(content)
-      .pipe(delay(1500))
-      .subscribe(response => {
+    const conversationId = this.chatStateSubject.value.currentConversationId ?? undefined;
+
+    this.sendToBackend(content, conversationId).subscribe({
+      next: (response) => {
         const botMessage: ChatMessage = {
-          id: this.generateId(),
-          content: response,
-          type: 'bot',
-          timestamp: new Date()
+          id: response.id,
+          content: response.message,
+          type: 'assistant',
+          timestamp: new Date(response.timestamp)
         };
+
         this.setTyping(false);
         this.addMessage(botMessage);
-      });
+        this.setConversationId(response.conversationId);
+      },
+      error: () => {
+        const errorMessage: ChatMessage = {
+          id: this.generateId(),
+          content: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.',
+          type: 'assistant',
+          timestamp: new Date()
+        };
+
+        this.setTyping(false);
+        this.addMessage(errorMessage);
+      }
+    });
   }
 
-  private getBotResponse(userMessage: string): Observable<string> {
-    // Mock responses - reemplazar con llamada HTTP al LLM
-    const lowercaseMessage = userMessage.toLowerCase();
+  public getConversations(): Observable<{ data: Conversation[]; total: number }> {
+    return this.http.get<{ data: Conversation[]; total: number }>(`${this.apiUrl}/conversations`);
+  }
 
-    if (lowercaseMessage.includes('gast') || lowercaseMessage.includes('pagué') || lowercaseMessage.includes('compré')) {
-      return of('He registrado tu gasto. ¿Puedes indicarme la categoría y el monto exacto?');
-    } else if (lowercaseMessage.includes('ingreso') || lowercaseMessage.includes('ganancia') || lowercaseMessage.includes('cobré')) {
-      return of('Perfecto, registraré tu ingreso. ¿De qué fuente proviene y cuál es el monto?');
-    } else if (lowercaseMessage.includes('cuánto') || lowercaseMessage.includes('total') || lowercaseMessage.includes('balance')) {
-      return of('Basado en tus registros, tu balance actual es de $1,500. Has gastado $800 este mes.');
-    } else if (lowercaseMessage.includes('hola') || lowercaseMessage.includes('ayuda')) {
-      return of('¡Hola! Puedo ayudarte a registrar gastos e ingresos, consultar tu balance, y analizar tus patrones de gasto. ¿Qué necesitas?');
-    } else {
-      return of('Entiendo. ¿Podrías darme más detalles sobre tu consulta financiera?');
-    }
+  public loadConversation(id: number): Observable<ConversationDetail> {
+    return this.http.get<ConversationDetail>(`${this.apiUrl}/conversations/${id}`);
+  }
+
+  public deleteConversation(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/conversations/${id}`);
+  }
+
+  public restoreConversation(detail: ConversationDetail): void {
+    const messages: ChatMessage[] = detail.messages.map(msg => ({
+      id: msg.id,
+      content: msg.content,
+      type: msg.role,
+      timestamp: new Date(msg.createdAt)
+    }));
+
+    this.chatStateSubject.next({
+      messages,
+      isTyping: false,
+      currentConversationId: detail.conversation.id
+    });
+  }
+
+  public clearChat(): void {
+    this.chatStateSubject.next({
+      messages: [],
+      isTyping: false,
+      currentConversationId: null
+    });
+    this.initializeChat();
+  }
+
+  private sendToBackend(message: string, conversationId?: number): Observable<ChatResponse> {
+    return this.http.post<ChatResponse>(this.apiUrl, { message, conversationId });
   }
 
   private addMessage(message: ChatMessage): void {
@@ -87,15 +136,15 @@ export class ChatService {
     });
   }
 
-  private generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  private setConversationId(conversationId: number): void {
+    const currentState = this.chatStateSubject.value;
+    this.chatStateSubject.next({
+      ...currentState,
+      currentConversationId: conversationId
+    });
   }
 
-  public clearChat(): void {
-    this.chatStateSubject.next({
-      messages: [],
-      isTyping: false
-    });
-    this.initializeChat();
+  private generateId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 }

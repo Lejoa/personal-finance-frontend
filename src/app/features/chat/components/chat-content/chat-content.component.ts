@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked }
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../services/chat.service';
-import { ChatMessage, ChatState } from '../../interfaces/chat.interfaces';
+import { ChatState } from '../../interfaces/chat.interfaces';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -20,10 +20,7 @@ import { Subscription } from 'rxjs';
 export class ChatContentComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
-  chatState: ChatState = {
-    messages: [],
-    isTyping: false
-  };
+  chatState!: ChatState;
 
   userInput: string = '';
   private subscription: Subscription = new Subscription();

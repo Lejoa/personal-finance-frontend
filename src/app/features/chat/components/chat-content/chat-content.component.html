@@ -14,7 +14,7 @@
       *ngFor="let message of chatState.messages"
       class="message-wrapper"
       [class.user-message]="message.type === 'user'"
-      [class.bot-message]="message.type === 'bot'">
+      [class.bot-message]="message.type === 'assistant'">
       <div class="message-bubble">
         <p class="message-content">{{ message.content }}</p>
         <span class="message-timestamp">{{ message.timestamp | date:'short' }}</span>
