@@ -1,4 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost'
+  apiUrl: 'https://localhost',
+  isNative: false,
+  platform: 'web' as const
 };
