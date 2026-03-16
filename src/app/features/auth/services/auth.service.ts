@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { User, RefreshTokenResponse } from '../interfaces';
 import { environment } from '../../../../environments/environment';
+import { PlatformService } from '../../../core/services/platform/platform.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { environment } from '../../../../environments/environment';
 export class AuthService {
   private injector = inject(Injector);
   private router = inject(Router);
+  private platform = inject(PlatformService);
 
   //Lazy getter para HttpClient para evitar dependencia circular
   private get http(): HttpClient {
@@ -66,12 +68,65 @@ export class AuthService {
   }
 
   /**
-   * Inicia el flujo de autenticación OAuth con Google
-   * Redirige al endpoint del backend que maneja OAuth
+   * Dispatcher de autenticación OAuth: delega al flujo web o nativo según la plataforma.
+   * 
+   * En web: redirige el browser al endpoint OAuth del backend(flujo original)
+   * En nativo: abre un chrome Custom Tab y escucha el deep link del callback.
    */
   loginWithGoogle(): void {
-    window.location.href = `${this.API_URL}/auth/google`;
+    if(this.platform.isNative) {
+      this.loginWithGoogleNative();
+    } else {
+      window.location.href = `${this.API_URL}/auth/google`;
+    }
   }
+
+  /**
+   * Flujo OAuth nativo para Android usando Capacitor
+   * 
+   * Usa imports dinámicos para evitar que el código de Capacitor se incluya
+   * en la build web. El bundles (esbuild) hace tree-shaking de estos imports
+   * cuando están dentro de un branch que nunca se ejecuta en la web.
+   * 
+   * Pasos:
+   * 1. Registrar listener 'appUrlOpen' ANTES de abrir el browser.
+   *    Cuando el backend redirige a personalfinance://auth/callback?token=X,
+   *    Android enruta la URL a MainActivity y Capacitor dispara este evento.
+   * 2. Abrir Chrome Custom Tab apuntando al mismo endpoint OAuth del backend,
+   *    con ?client=android para que el backend sepa a qué scheme redirigir.
+   * 3. Al recibir appUrlOpen: cerrar el browser y procesar los tokens.
+   */
+  private loginWithGoogleNative(): void {
+    Promise.all([
+      import('@capacitor/app'),
+      import('@capacitor/browser')
+    ]).then(([{ App }, { Browser }]) => {
+
+      // Registrar el listener del depp link antes de abrir el browser
+      App.addListener('appUrlOpen', async (event) => {
+        const url = new URL(event.url);
+        const token = url.searchParams.get('token');
+        const refreshToken = url.searchParams.get('refreshToken');
+        const error = url.searchParams.get('error');
+
+        await Browser.close();
+
+        if(token) {
+          //Reutiliza el método existene - guarda tokens y navega a la raiz /
+          this.handleOAuthCallback(token, refreshToken ?? undefined); 
+        } else if (error) {
+          console.error('[AuthService] Error en callback nativo:', error);
+          this.router.navigate(['/login']);
+        }
+      });
+
+      // Abrir Chrome Custom Tab con el mismo endpoint que el flujo web.
+      // ?client=android le indica al backend que debe redirigir a
+      // personalfinance://auth/callback en vez de /auth/callback web.
+      Browser.open({ url: `${this.API_URL}/auth/google?client=android` });
+    });
+  }
+
 
   /**
    * Procesa el callback de OAuth y guarda los tokens

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Network Security Configuration para desarrollo con dispositivo físico.
+
+    Contexto: FrankenPHP/Caddy genera certificados TLS firmados por su propia CA local
+    ("Caddy Local Authority"). Android no confía en esta CA por defecto porque no está
+    en el System trust store del dispositivo.
+
+    Solución: este archivo le indica al WebView de Android que en debug builds también
+    confíe en las CAs instaladas por el usuario (User trust store), donde instalaremos
+    el certificado raíz de Caddy via ADB.
+
+    IMPORTANTE: el bloque <debug-overrides> es ignorado completamente en release builds
+    (APKs firmados con keystore de producción). La seguridad en producción no se degrada.
+
+    Referencia: https://developer.android.com/training/articles/security-config
+-->
+<network-security-config>
+    <debug-overrides>
+        <trust-anchors>
+            <!-- CAs normales del sistema (Let's Encrypt, DigiCert, etc.) -->
+            <certificates src="system" />
+            <!-- CAs instaladas manualmente por el usuario (donde estará la CA de Caddy) -->
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

@@ -1,8 +1,9 @@
 export const environment = {
   production: false,
-  // 10.0.2.2 es el alias que el emulador de Android usa para localhost del host machine.
-  // Esto permite que la app en el emulador alcance el backend Symfony corriendo en tu PC.
-  apiUrl: 'http://10.0.2.2:8000',
+  // Túnel ngrok para desarrollo con dispositivo físico.
+  // ngrok expone el backend local con un dominio HTTPS público que Google OAuth acepta.
+  // Esta URL cambia cada vez que se reinicia ngrok (plan gratuito) — actualizar y rebuild.
+  apiUrl: 'https://3737-186-86-52-17.ngrok-free.app',
   isNative: true,
   platform: 'android' as const
 };
