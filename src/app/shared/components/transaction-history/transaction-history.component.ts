@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input, inject } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, NgClass } from '@angular/common';
 import { TransactionCardComponent } from '../transaction-card/transaction-card.component';
 import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
 import { DateRange } from '../../../core/services/tracking-expenses/interfaces/tracking-expenses.interfaces';
@@ -13,13 +13,16 @@ import { TransactionService } from '../../services/transaction.service';
   imports: [
     TransactionCardComponent,
     NgFor,
-    NgIf
+    NgIf,
+    NgClass
   ],
   templateUrl: './transaction-history.component.html',
   styleUrl: './transaction-history.component.scss'
 })
 export class TransactionHistoryComponent implements OnInit, OnDestroy {
   @Input() mode: 'tracking' | 'home' = 'home';
+  @Input() pageSize: number = 5;
+  @Input() showPagination: boolean = true;
 
   private transactionService = inject(TransactionService);
   private trackingExpensesService = inject(TrackingExpensesService);
@@ -27,12 +30,40 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
 
   transactions: Transaction[] = [];
   isLoading = false;
+  currentPage: number = 1;
   private currentType: TransactionType = 'gasto';
   private currentDateRange: DateRange = { start: null, end: null };
 
   private readonly today = new Date();
   private readonly defaultStartDate = new Date(this.today.getFullYear(), this.today.getMonth() - 1, 1);
   private readonly defaultEndDate = new Date(this.today.getFullYear(), this.today.getMonth(), 0);
+
+  get totalPages(): number {
+    return Math.ceil(this.transactions.length / this.pageSize);
+  }
+
+  get paginatedTransactions(): Transaction[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.transactions.slice(start, start + this.pageSize);
+  }
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  previousPage(): void {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  nextPage(): void {
+    this.goToPage(this.currentPage + 1);
+  }
 
   ngOnInit(): void {
     if (this.mode === 'tracking') {
@@ -68,6 +99,7 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
       ).subscribe({
         next: transactions => {
           this.transactions = transactions;
+          this.currentPage = 1;
           this.isLoading = false;
         },
         error: () => {

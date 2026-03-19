@@ -9,10 +9,47 @@
 
   <div *ngIf="!isLoading && transactions.length > 0" class="transactions-list">
     <app-transaction-card
-      *ngFor="let transaction of transactions"
+      *ngFor="let transaction of paginatedTransactions"
       [transaction]="transaction"
       [editable]="true"
       [transactionAction]="'Edit'">
     </app-transaction-card>
   </div>
+
+  <nav
+    *ngIf="!isLoading && totalPages > 1 && showPagination"
+    class="pagination"
+    aria-label="Paginación de transacciones">
+
+    <button
+      class="pagination__btn pagination__btn--prev"
+      [disabled]="currentPage === 1"
+      (click)="previousPage()"
+      aria-label="Página anterior">
+      &#8249;
+    </button>
+
+    <div class="pagination__pages">
+      <button
+        *ngFor="let page of pageNumbers"
+        class="pagination__btn pagination__btn--page"
+        [ngClass]="{ 'pagination__btn--active': page === currentPage }"
+        (click)="goToPage(page)"
+        [attr.aria-current]="page === currentPage ? 'page' : null">
+        {{ page }}
+      </button>
+    </div>
+
+    <span class="pagination__label" aria-hidden="true">
+      {{ currentPage }} / {{ totalPages }}
+    </span>
+
+    <button
+      class="pagination__btn pagination__btn--next"
+      [disabled]="currentPage === totalPages"
+      (click)="nextPage()"
+      aria-label="Página siguiente">
+      &#8250;
+    </button>
+  </nav>
 </div>

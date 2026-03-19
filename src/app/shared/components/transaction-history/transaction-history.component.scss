@@ -19,3 +19,92 @@
   gap: $spacer-sm;
   width: 100%;
 }
+
+/* ============================================================
+    PAGINACIÓN
+    Mobile-first: label compacto por defecto, números de página
+    visibles desde $breakpoint-sm en adelante.
+    ============================================================ */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacer-xs;
+  margin-top: $spacer;
+  padding-top: $spacer-sm;
+  border-top: 1px solid $gray-200;
+  width: 100%;
+}
+
+.pagination__pages {
+  display: none;
+
+  @media (min-width: $breakpoint-sm) {
+    display: flex;
+    gap: $spacer-xs;
+  }
+}
+
+.pagination__label {
+  font-size: $font-size-sm;
+  color: $gray-600;
+  font-weight: $font-weight-medium;
+  min-width: 3rem;
+  text-align: center;
+
+  @media (min-width: $breakpoint-sm) {
+    display: none;
+  }
+}
+
+.pagination__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: $spacer-xs $spacer-sm;
+  background-color: $gray-100;
+  border: 1px solid $gray-300;
+  border-radius: $border-radius-sm;
+  color: $gray-700;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: $transition-fast;
+  line-height: 1;
+
+  &:hover:not(:disabled) {
+    background-color: $gray-200;
+    border-color: $gray-400;
+    color: $gray-900;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--active {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    color: #fff;
+    font-weight: $font-weight-semibold;
+
+    &:hover {
+      background-color: darken($primary-color, 8%);
+      border-color: darken($primary-color, 8%);
+    }
+  }
+
+  &--prev,
+  &--next {
+    font-size: 1.1rem;
+    font-weight: $font-weight-bold;
+  }
+}
