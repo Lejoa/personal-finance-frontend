@@ -208,6 +208,227 @@
   }
 }
 
+.transaction-card {
+  margin-top: $spacer-sm;
+  border-radius: $border-radius-sm;
+  padding: $spacer-sm $spacer;
+  font-size: $font-size-sm;
+
+  &--pending {
+    background-color: rgba($primary-color, 0.08);
+    border: 1px solid rgba($primary-color, 0.25);
+  }
+
+  &--confirmed {
+    background-color: rgba(#28a745, 0.08);
+    border: 1px solid rgba(#28a745, 0.3);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $spacer-sm;
+    margin-bottom: $spacer-xs;
+  }
+
+  &__type {
+    font-weight: $font-weight-bold;
+    font-size: $font-size-md;
+    min-width: 16px;
+    text-align: center;
+
+    &--gasto   { color: #dc3545; }
+    &--ingreso { color: #28a745; }
+  }
+
+  &__name {
+    flex: 1;
+    font-weight: $font-weight-medium;
+    color: $gray-800;
+  }
+
+  &__amount {
+    font-weight: $font-weight-semibold;
+    color: $gray-900;
+  }
+
+  &__extras {
+    display: flex;
+    gap: $spacer-sm;
+    margin-top: $spacer-xs;
+
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+    }
+  }
+
+  &__extras-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    font-size: $font-size-sm;
+    color: $gray-700;
+  }
+
+  &__extras-input {
+    padding: $spacer-xs $spacer-sm;
+    border: 1px solid $gray-400;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-sm;
+    font-family: $font-family-base;
+    background-color: white;
+    color: $gray-900;
+    transition: $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.15);
+    }
+  }
+
+  &__label {
+    margin: $spacer-xs 0;
+    color: $gray-700;
+  }
+
+  &__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacer-xs;
+    margin-top: $spacer-xs;
+  }
+
+  &__category-btn {
+    padding: $spacer-xs $spacer-sm;
+    background-color: white;
+    border: 1px solid $primary-color;
+    border-radius: $border-radius-sm;
+    color: $primary-color;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: $primary-color;
+      color: white;
+    }
+
+    &--selected {
+      background-color: $primary-color;
+      color: white;
+    }
+  }
+
+  &__suggested {
+    display: flex;
+    align-items: center;
+    gap: $spacer-xs;
+    margin-bottom: $spacer-xs;
+  }
+
+  &__suggested-badge {
+    font-size: 0.7rem;
+    font-weight: $font-weight-semibold;
+    color: $primary-color;
+    background-color: rgba($primary-color, 0.1);
+    border-radius: $border-radius-sm;
+    padding: 2px $spacer-xs;
+  }
+
+  &__show-more-link {
+    background: none;
+    border: none;
+    color: $primary-color;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    padding: $spacer-xs 0;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+
+  &__selection-summary {
+    margin: $spacer-xs 0 0;
+    font-size: $font-size-sm;
+    color: $gray-700;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacer-sm;
+    margin-top: $spacer-sm;
+    padding-top: $spacer-sm;
+    border-top: 1px solid rgba($primary-color, 0.15);
+  }
+
+  &__action-btn {
+    flex: 1;
+    padding: $spacer-xs $spacer-sm;
+    border: none;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &--confirm {
+      background-color: $primary-color;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: darken($primary-color, 10%);
+      }
+
+      &:disabled {
+        background-color: $gray-400;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+
+    &--cancel {
+      background-color: white;
+      color: #dc3545;
+      border: 1px solid #dc3545;
+
+      &:hover {
+        background-color: #dc3545;
+        color: white;
+      }
+    }
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    color: $gray-600;
+    font-size: 0.75rem;
+    margin-bottom: $spacer-xs;
+  }
+
+  &__category {
+    font-weight: $font-weight-medium;
+  }
+
+  &__undo {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

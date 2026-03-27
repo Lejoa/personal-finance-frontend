@@ -6,8 +6,10 @@ import {
   ChatResponse,
   ChatState,
   Conversation,
-  ConversationDetail
+  ConversationDetail,
+  TransactionCreated,
 } from '../interfaces/chat.interfaces';
+import { TransactionService } from '../../../shared/services/transaction.service';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -15,6 +17,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class ChatService {
   private readonly http = inject(HttpClient);
+  private readonly transactionService = inject(TransactionService);
   private readonly apiUrl = `${environment.apiUrl}/api/chat`;
 
   private chatStateSubject = new BehaviorSubject<ChatState>({
@@ -59,7 +62,19 @@ export class ChatService {
           id: response.id,
           content: response.message,
           type: 'assistant',
-          timestamp: new Date(response.timestamp)
+          timestamp: new Date(response.timestamp),
+          transactionCreated: response.metadata?.transaction_created,
+          pendingCategorization: response.metadata?.pending_categorization
+            ? {
+                transactionId: response.metadata.pending_categorization.transaction_id,
+                suggestedCategory: response.metadata.pending_categorization.suggested_category,
+                categories: response.metadata.pending_categorization.categories,
+                name: response.metadata.pending_categorization.name,
+                type: response.metadata.pending_categorization.type,
+                amount: response.metadata.pending_categorization.amount,
+                date: response.metadata.pending_categorization.date,
+              }
+            : undefined,
         };
 
         this.setTyping(false);
@@ -144,7 +159,65 @@ export class ChatService {
     });
   }
 
+  /**
+   * Assigns a category to a pending transaction and replaces the
+   * pending_categorization card with a transaction_created confirmation.
+   */
+  public assignCategory(
+    messageId: string | number,
+    transactionId: number,
+    categoryId: number,
+    categoryName: string,
+    date?: string,
+    note?: string
+  ): void {
+    const payload: Parameters<typeof this.transactionService.updateTransaction>[1] = { categoryId };
+    if (date) payload.date = new Date(date);
+    if (note) payload.note = note;
+
+    this.transactionService.updateTransaction(transactionId, payload).subscribe({
+      next: () => {
+        const currentState = this.chatStateSubject.value;
+        const messages = currentState.messages.map(msg => {
+          if (msg.id !== messageId || !msg.pendingCategorization) return msg;
+          const pc = msg.pendingCategorization;
+          return {
+            ...msg,
+            pendingCategorization: undefined,
+            transactionCreated: {
+              id: transactionId,
+              name: pc.name,
+              type: pc.type,
+              amount: pc.amount,
+              date: date || pc.date,
+              categoryId,
+              categoryName,
+            } satisfies TransactionCreated,
+          };
+        });
+        this.chatStateSubject.next({ ...currentState, messages });
+      },
+    });
+  }
+
+  /**
+   * Deletes a previously created transaction and adds a confirmation message.
+   */
+  public undoTransaction(transactionId: number): void {
+    this.transactionService.deleteTransaction(transactionId).subscribe({
+      next: () => {
+        const undoMessage: ChatMessage = {
+          id: this.generateId(),
+          content: 'La transacción fue eliminada.',
+          type: 'assistant',
+          timestamp: new Date(),
+        };
+        this.addMessage(undoMessage);
+      },
+    });
+  }
+
   private generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
   }
 }

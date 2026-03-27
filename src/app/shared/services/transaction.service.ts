@@ -173,7 +173,10 @@ export class TransactionService {
       dto['type'] = transaction.transactionType === 'ingreso' ? 'ingreso' : 'gasto';
     }
     if (transaction.categoryId !== undefined) dto['categoryId'] = transaction.categoryId;
+    if (transaction.note !== undefined) dto['note'] = transaction.note;
     if (transaction.status) dto['synchronized'] = transaction.status;
+    // Propaga el origen al backend ('manual' | 'sms') para trazabilidad
+    if (transaction.source) dto['source'] = transaction.source;
 
     return dto;
   }

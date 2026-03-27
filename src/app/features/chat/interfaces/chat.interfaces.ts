@@ -1,10 +1,37 @@
 export type MessageType = 'user' | 'assistant';
 
+export interface TransactionCreated {
+  id: number;
+  name: string;
+  type: 'ingreso' | 'gasto';
+  amount: number;
+  date: string;
+  categoryId: number;
+  categoryName: string;
+}
+
+export interface CategoryOption {
+  id: number;
+  name: string;
+}
+
+export interface PendingCategorization {
+  transactionId: number;
+  suggestedCategory: CategoryOption | null;
+  categories: CategoryOption[];
+  name: string;
+  type: 'ingreso' | 'gasto';
+  amount: number;
+  date: string;
+}
+
 export interface ChatMessage {
   id: string | number;
   content: string;
   type: MessageType;
   timestamp: Date;
+  transactionCreated?: TransactionCreated;
+  pendingCategorization?: PendingCategorization;
 }
 
 export interface ChatState {
@@ -27,6 +54,16 @@ export interface ChatResponse {
   metadata?: {
     confidence?: number;
     type?: string;
+    transaction_created?: TransactionCreated;
+    pending_categorization?: {
+      transaction_id: number;
+      suggested_category: CategoryOption | null;
+      categories: CategoryOption[];
+      name: string;
+      type: 'ingreso' | 'gasto';
+      amount: number;
+      date: string;
+    };
   };
 }
 

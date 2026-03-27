@@ -6,9 +6,12 @@ export interface Transaction {
   category?: string;
   categoryId?: number;
   categoryName?: string;
+  note?: string;
   status?: TransactionStatus;
   transactionType: TransactionType;
   synchronized?: 'pending' | 'done' | 'rejected';
+  /** Origen de la transacción: 'manual' (entrada manual) o 'sms' (detectada de SMS bancario) */
+  source?: 'manual' | 'sms';
   createdAt?: Date;
   updatedAt?: Date;
 }
