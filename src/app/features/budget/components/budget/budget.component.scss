@@ -51,6 +51,21 @@ mat-form-field {
   margin-top: $spacer-lg;
 }
 
+/* ===== ACCORDION ===== */
+::ng-deep mat-accordion mat-expansion-panel {
+  margin-bottom: $spacer-sm;
+}
+
+@media (max-width: 600px) {
+  ::ng-deep .mat-expansion-panel-header-title {
+    font-size: $font-size-sm;
+  }
+
+  ::ng-deep .mat-expansion-panel-header-description {
+    font-size: $font-size-sm;
+  }
+}
+
 .budget-items {
   display: flex;
   flex-direction: column;
