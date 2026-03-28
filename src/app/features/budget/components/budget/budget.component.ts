@@ -72,6 +72,9 @@ export class BudgetComponent implements OnInit {
   editingBudgetId: number | null = null;
   isEditMode: boolean = false;
 
+  // Date range validation
+  dateRangeError: string | null = null;
+
   ngOnInit(): void {
     this.loadExpenseCategories();
     this.loadBudgets();
@@ -100,6 +103,7 @@ export class BudgetComponent implements OnInit {
     this.isModalOpen = true;
     this.isEditMode = false;
     this.editingBudgetId = null;
+    this.dateRangeError = null;
 
     // Set default date range (current month)
     const today = new Date();
@@ -109,6 +113,8 @@ export class BudgetComponent implements OnInit {
       start: firstDay,
       end: lastDay
     });
+
+    this.dateRange.valueChanges.subscribe(() => { this.dateRangeError = null; });
 
     this.items = [];
     this.selectedCategoryId = null;
@@ -120,6 +126,7 @@ export class BudgetComponent implements OnInit {
     this.isModalOpen = false;
     this.isEditMode = false;
     this.editingBudgetId = null;
+    this.dateRangeError = null;
     this.items = [];
     this.selectedCategoryId = null;
     this.newLimit = 0;
@@ -132,10 +139,12 @@ export class BudgetComponent implements OnInit {
       this.isModalOpen = true;
       this.isEditMode = true;
       this.editingBudgetId = budgetId;
+      this.dateRangeError = null;
       this.dateRange.patchValue({
         start: budget.startDate,
         end: budget.endDate
       });
+      this.dateRange.valueChanges.subscribe(() => { this.dateRangeError = null; });
 
       // Map items with categoryId from categories if available
       if (budget.categories && budget.categories.length > 0) {
@@ -224,11 +233,25 @@ export class BudgetComponent implements OnInit {
     return this.editingIndex === index;
   }
 
+  private hasDateOverlap(start: Date, end: Date): boolean {
+    return this.budgets.some(budget => {
+      if (this.isEditMode && budget.id === this.editingBudgetId) return false;
+      const bStart = new Date(budget.startDate);
+      const bEnd = new Date(budget.endDate);
+      return start <= bEnd && bStart <= end;
+    });
+  }
+
   saveBudget(): void {
     const startDate = this.dateRange.value.start;
     const endDate = this.dateRange.value.end;
 
     if (this.items.length > 0 && startDate && endDate) {
+      if (this.hasDateOverlap(startDate, endDate)) {
+        this.dateRangeError = 'El rango de fechas seleccionado se cruza con un presupuesto existente.';
+        return;
+      }
+      this.dateRangeError = null;
       const categories = this.items
       .filter( item => item.categoryId !== undefined)
       .map( item => ({

@@ -46,6 +46,14 @@ mat-form-field {
   }
 }
 
+/* ===== DATE RANGE ERROR ===== */
+.date-range-error {
+  color: #dc3545;
+  font-size: $font-size-sm;
+  margin-top: -$spacer-sm;
+  margin-bottom: $spacer-sm;
+}
+
 /* ===== BUDGET LIST ===== */
 .budget-list {
   margin-top: $spacer-lg;

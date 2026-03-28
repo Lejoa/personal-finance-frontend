@@ -69,6 +69,9 @@
           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
+        <div *ngIf="dateRangeError" class="date-range-error">
+          {{ dateRangeError }}
+        </div>
       </div>
 
       <!-- Items Section -->
@@ -186,7 +189,7 @@
           class="btn-save"
           (click)="saveBudget()"
           type="button"
-          [disabled]="items.length === 0">
+          [disabled]="items.length === 0 || !!dateRangeError">
           Guardar
         </button>
         <button
