@@ -1,204 +1,168 @@
-<div class="budget-container">
-  <!-- Add Budget Button -->
-  <div class="button-container">
-    <button
-      class="btn-add-budget"
-      (click)="openModal()"
-      type="button">
-      Agregar
-    </button>
-  </div>
+<div class="budget-page">
 
-  <!-- Budget List - Expansion Panels -->
-  <div class="budget-list">
-    <mat-accordion>
-      <mat-expansion-panel *ngFor="let budget of budgets">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{ getDateRangeDisplay(budget) }}
-          </mat-panel-title>
-          <mat-panel-description>
-            Total: {{ getTotalBudget(budget) | currency:'COP':'symbol-narrow':'1.0-0' }}
-          </mat-panel-description>
-        </mat-expansion-panel-header>
+  <!-- Navegador de mes -->
+  <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
 
-        <!-- Budget Items -->
-        <div class="budget-items">
-          <div *ngFor="let item of budget.items" class="budget-item">
-            <span class="item-name">{{ item.nombre }}</span>
-            <span class="item-limit">{{ item.tope | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+  <!-- Resumen financiero -->
+  <app-balance [selectedMonth]="selectedMonth"></app-balance>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-indicator">Cargando...</div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- Resumen de presupuesto global -->
+    <div class="budget-summary-card" *ngIf="budgetedCategories.length > 0">
+      <div class="budget-summary-row">
+        <span class="budget-summary__label">Presupuesto total</span>
+        <span class="budget-summary__value">
+          {{ totalBudget | currency:'COP':'symbol-narrow':'1.0-0' }}
+        </span>
+      </div>
+      <div class="budget-summary-row">
+        <span class="budget-summary__label">Total gastado</span>
+        <span class="budget-summary__value budget-summary__value--spent"
+          [class.budget-summary__value--over]="isGlobalOverBudget">
+          {{ totalSpent | currency:'COP':'symbol-narrow':'1.0-0' }}
+        </span>
+      </div>
+      <div class="progress-bar" role="progressbar"
+        [attr.aria-valuenow]="globalProgressPercent" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar__fill"
+          [style.width.%]="globalProgressPercent"
+          [class.progress-bar__fill--over]="isGlobalOverBudget">
+        </div>
+      </div>
+    </div>
+
+    <!-- Categorías con presupuesto -->
+    <section class="budget-section" *ngIf="budgetedCategories.length > 0">
+      <h3 class="budget-section__title">
+        Categorías presupuestadas
+        <span class="budget-section__month">{{ selectedMonth | date:'MMM y' }}</span>
+      </h3>
+
+      <div class="category-card" *ngFor="let cat of budgetedCategories">
+        <div class="category-card__header">
+          <div class="category-card__icon-name">
+            <span class="category-icon">{{ cat.categoryName.charAt(0).toUpperCase() }}</span>
+            <span class="category-card__name">{{ cat.categoryName }}</span>
+          </div>
+          <button
+            class="category-card__delete"
+            (click)="deleteBudget(cat.budgetId!)"
+            type="button"
+            aria-label="Eliminar presupuesto">
+            ✕
+          </button>
+        </div>
+
+        <div class="category-card__body">
+          <div class="category-card__amounts">
+            <div class="amount-row">
+              <span class="amount-label">Límite:</span>
+              <span class="amount-value">{{ cat.limit | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+            <div class="amount-row">
+              <span class="amount-label">Gastado:</span>
+              <span class="amount-value amount-value--spent">{{ cat.spent | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+            <div class="amount-row">
+              <span class="amount-label">Restante:</span>
+              <span class="amount-value" [class.amount-value--over]="cat.isOverBudget">
+                {{ cat.remaining | currency:'COP':'symbol-narrow':'1.0-0' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="category-card__aside">
+            <span class="category-month-label">({{ selectedMonth | date:'MMM, y' }})</span>
+            <span class="remaining-badge" [class.remaining-badge--over]="cat.isOverBudget">
+              {{ cat.remaining | currency:'COP':'symbol-narrow':'1.0-0' }}
+            </span>
           </div>
         </div>
-        <!-- Budget Actions -->
-         <div class="budget-actions">
-          <button
-            class="btn-edit-budget"
-            (click)="openEditBudgetModal(budget.id!)"
-            type="button"
-          >
-          Editar presupuesto
-          </button>
-          <button
-            class="btn-delete-budget"
-            (click)="deleteBudget(budget.id!)"
-            type="button"
-            >
-            Eliminar presupuesto
-          </button>
-        </div>
 
-      </mat-expansion-panel>
-    </mat-accordion>
-  </div>
+        <div class="progress-bar" role="progressbar"
+          [attr.aria-valuenow]="cat.progressPercent" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar__fill"
+            [style.width.%]="cat.progressPercent"
+            [class.progress-bar__fill--over]="cat.isOverBudget">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categorías sin presupuesto -->
+    <section class="budget-section" *ngIf="unbudgetedCategories.length > 0">
+      <h3 class="budget-section__title">Sin presupuestar este mes</h3>
+
+      <div class="unbudgeted-row" *ngFor="let cat of unbudgetedCategories">
+        <div class="unbudgeted-row__info">
+          <span class="category-icon category-icon--sm">{{ cat.categoryName.charAt(0).toUpperCase() }}</span>
+          <span class="unbudgeted-row__name">{{ cat.categoryName }}</span>
+        </div>
+        <button
+          class="btn-set-budget"
+          (click)="openSetBudgetModal(cat)"
+          type="button">
+          FIJAR LÍMITE
+        </button>
+      </div>
+    </section>
+
+    <!-- Estado vacío -->
+    <div class="empty-state"
+      *ngIf="budgetedCategories.length === 0 && unbudgetedCategories.length === 0">
+      <p>No hay categorías de gasto disponibles.</p>
+    </div>
+
+  </ng-container>
+
 </div>
 
-<!-- Modal Overlay -->
-<div *ngIf="isModalOpen" class="modal-overlay">
-  <div class="modal">
-    <h3 class="modal-title">{{ isEditMode ? 'Editar Presupuesto' : 'Agregar Presupuesto' }}</h3>
+<!-- Modal para fijar presupuesto -->
+<div *ngIf="isModalOpen" class="modal-overlay" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+    aria-labelledby="modal-title">
 
-    <div class="modal-form">
-      <!-- Date Range Field -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Rango de fechas</mat-label>
-          <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
-            <input matStartDate formControlName="start" placeholder="Fecha inicio">
-            <input matEndDate formControlName="end" placeholder="Fecha fin">
-          </mat-date-range-input>
-          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker></mat-date-range-picker>
-        </mat-form-field>
-        <div *ngIf="dateRangeError" class="date-range-error">
-          {{ dateRangeError }}
-        </div>
-      </div>
+    <h3 class="modal__title" id="modal-title">Fijar presupuesto</h3>
 
-      <!-- Items Section -->
-      <div class="items-section">
-        <h4 class="section-title">Elementos del Presupuesto</h4>
+    <div class="modal__category-header">
+      <span class="category-icon category-icon--lg">
+        {{ selectedCategoryForModal?.categoryName?.charAt(0)?.toUpperCase() }}
+      </span>
+      <span class="modal__category-name">{{ selectedCategoryForModal?.categoryName }}</span>
+    </div>
 
-        <!-- Add Item Form -->
-        <div class="add-item-form">
-          <div class="form-row">
-            <div class="form-group flex-grow">
-              <label for="item-category">Categoría</label>
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Seleccionar categoría</mat-label>
-                <mat-select [(ngModel)]="selectedCategoryId">
-                  <mat-option *ngFor="let category of expenseCategories$ | async" [value]="category.id">
-                    {{ category.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
+    <div class="modal__field">
+      <label class="modal__label" for="budget-limit">Límite</label>
+      <input
+        id="budget-limit"
+        type="number"
+        class="modal__input"
+        [(ngModel)]="modalLimit"
+        placeholder="0"
+        min="1"
+        inputmode="numeric"
+        autofocus>
+    </div>
 
-            <div class="form-group">
-              <label for="item-limit">Tope</label>
-              <input
-                id="item-limit"
-                type="number"
-                [(ngModel)]="newLimit"
-                class="form-input"
-                placeholder="Tope"
-                min="0"
-              >
-            </div>
-          </div>
+    <p class="modal__month-info">
+      Mes: {{ selectedMonth | date:'MMMM y' }}
+    </p>
 
-          <button
-            class="btn-add-item"
-            (click)="addItem()"
-            type="button"
-            [disabled]="selectedCategoryId === null || newLimit <= 0">
-            Añadir Elemento
-          </button>
-        </div>
-
-        <!-- Items List -->
-        <div class="items-list" *ngIf="items.length > 0">
-          <div *ngFor="let item of items; let i = index" class="item-row">
-            <!-- View mode -->
-            <ng-container *ngIf="!isEditing(i)">
-              <span class="item-name">{{ item.nombre }}</span>
-              <span class="item-limit">{{ item.tope | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-              <div class="item-actions">
-                <button
-                  class="btn-edit-item"
-                  (click)="startEditItem(i)"
-                  type="button">
-                  Editar
-                </button>
-                <button
-                  class="btn-remove-item"
-                  (click)="removeItem(i)"
-                  type="button">
-                  Eliminar
-                </button>
-              </div>
-            </ng-container>
-
-            <!-- Edit Mode -->
-            <ng-container *ngIf="isEditing(i)">
-              <div class="edit-item-form">
-                <div class="form-row">
-                  <div class="form-group flex-grow">
-                    <mat-form-field appearance="outline" class="full-width">
-                      <mat-label>Categoría</mat-label>
-                      <mat-select [(ngModel)]="editCategoryId">
-                        <mat-option *ngFor="let category of expenseCategories$ | async" [value]="category.id">
-                          {{ category.name }}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                  <div class="form-group">
-                    <input
-                      type="number"
-                      [(ngModel)]="editLimit"
-                      class="form-input"
-                      placeholder="Tope"
-                      min="0"
-                    >
-                  </div>
-                </div>
-                <div class="edit-item-actions">
-                  <button
-                    class="btn-save-edit"
-                    (click)="saveEditItem()"
-                    type="button"
-                    [disabled]="editCategoryId === null || editLimit <= 0">
-                    Guardar
-                  </button>
-                  <button
-                    class="btn-cancel-edit"
-                    (click)="cancelEditItem()"
-                    type="button">
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </ng-container>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal Actions -->
-      <div class="form-actions">
-        <button
-          class="btn-save"
-          (click)="saveBudget()"
-          type="button"
-          [disabled]="items.length === 0 || !!dateRangeError">
-          Guardar
-        </button>
-        <button
-          class="btn-cancel"
-          (click)="closeModal()"
-          type="button">
-          Cancelar
-        </button>
-      </div>
+    <div class="modal__actions">
+      <button class="modal__btn modal__btn--cancel" (click)="closeModal()" type="button">
+        CANCELAR
+      </button>
+      <button
+        class="modal__btn modal__btn--confirm"
+        (click)="confirmSetBudget()"
+        type="button"
+        [disabled]="modalLimit <= 0 || isSaving">
+        {{ isSaving ? 'GUARDANDO...' : 'FIJAR' }}
+      </button>
     </div>
   </div>
 </div>

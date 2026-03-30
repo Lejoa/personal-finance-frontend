@@ -15,8 +15,9 @@ import { Transaction } from '../../shared/models/transaction.model';
 import { BudgetComponent } from '../budget/components/budget/budget.component';
 import { BalanceComponent } from '../../shared/components/balance/balance.component';
 import { TransactionService } from '../../shared/services/transaction.service';
+import { CategoryContentComponent } from '../categories/components/category-content/category-content.component';
 
-export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning';
+export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 'Categories';
 
 @Component({
   selector: 'app-main',
@@ -33,6 +34,7 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning';
     ChatContentComponent,
     BudgetComponent,
     LearningContentComponent,
+    CategoryContentComponent,
     NgSwitch,
     NgSwitchCase,
     NgIf

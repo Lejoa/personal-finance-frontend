@@ -1,23 +1,18 @@
 <div class="block block--financial-literacy">
   <h2 class="block-title">Consejos</h2>
-  <div class="financial-tips-list">
+  <p *ngIf="isLoading" class="tips-loading">Cargando consejos...</p>
+  <p *ngIf="!isLoading && tips.length === 0" class="tips-empty">No hay consejos disponibles por el momento.</p>
+  <div class="financial-tips-list" *ngIf="!isLoading && tips.length > 0">
     <app-financial-tips
-      title="Gasta menos de lo que ganas"
-      description="Crea un presupuesto mensual y destina una parte fija al ahorro antes de gastar. Prioriza tus necesidades sobre los deseos y evita endeudarte por consumo."
-      imageSrc="https://images.unsplash.com/photo-1579621970795-87facc2f976d?w=500"
-      >
-  </app-financial-tips>
-  <app-financial-tips
-      title="Ahorra e invierte con propósito"
-      description="Define metas claras  como un fondo de emergencia o la compra de vivienda y elige instrumentos de inversión acordes a tu perfil de riesgo. Deja que tu dinero trabaje por ti."
-      imageSrc="https://images.unsplash.com/photo-1579621970795-87facc2f976d?w=500"
-      >
-  </app-financial-tips> 
-    <app-financial-tips
-    title="Diversifica tus ingresos"
-    description="No dependas solo de un salario; busca fuentes adicionales como inversiones, freelancing o emprendimientos. Así reduces el riesgo y aumentas tu estabilidad financiera."
-    imageSrc="https://images.unsplash.com/photo-1579621970795-87facc2f976d?w=500"
+      *ngFor="let tip of tips"
+      [title]="tip.title"
+      [shortDescription]="tip.shortDescription"
+      [description]="tip.description"
+      [imageSrc]="tip.imageSrc"
+      [author]="tip.author"
+      [authorTitle]="tip.authorTitle"
     >
-  </app-financial-tips>
+    </app-financial-tips>
   </div>
-</div>  
+</div>
+

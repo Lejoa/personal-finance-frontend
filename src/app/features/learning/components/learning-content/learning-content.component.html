@@ -1,5 +1,7 @@
 <div class="block block--financial-literacy">
-  <div class="financial-tips-list" *ngIf="!selectedTip">
+  <p *ngIf="isLoading" class="tips-loading">Cargando consejos...</p>
+  <p *ngIf="!isLoading && tips.length === 0" class="tips-empty">No hay consejos disponibles por el momento.</p>
+  <div class="financial-tips-list" *ngIf="!selectedTip && !isLoading && tips.length > 0">
     <app-financial-tips
         *ngFor="let tip of tips"
         [title]="tip.title"

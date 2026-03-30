@@ -47,6 +47,52 @@ export class BudgetService {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
+    getBudgetByMonth(month: Date): Observable<Budget | null> {
+        return this.getBudgets().pipe(
+            map(budgets => {
+                return budgets.find(budget => {
+                    const bStart = new Date(budget.startDate);
+                    return (
+                        bStart.getFullYear() === month.getFullYear() &&
+                        bStart.getMonth() === month.getMonth()
+                    );
+                }) ?? null;
+            })
+        );
+    }
+
+    setBudgetForCategory(categoryId: number, limit: number, month: Date, existingBudget: Budget | null): Observable<Budget> {
+        const startDate = this.formatDate(new Date(month.getFullYear(), month.getMonth(), 1));
+        const endDate = this.formatDate(new Date(month.getFullYear(), month.getMonth() + 1, 0));
+
+        if (existingBudget?.id) {
+            // Ya existe un budget para este mes: agregar la nueva categoría a las existentes
+            const existingCategories = (existingBudget.categories ?? []).map(c => ({
+                categoryId: c.categoryId,
+                amount: c.amount
+            }));
+            const request: UpdateBudgetRequest = {
+                categories: [...existingCategories, { categoryId, amount: limit }]
+            };
+            return this.updateBudget(existingBudget.id, request);
+        }
+
+        // No existe budget para este mes: crear uno nuevo
+        const request: CreateBudgetRequest = {
+            startDate,
+            endDate,
+            categories: [{ categoryId, amount: limit }]
+        };
+        return this.createBudget(request);
+    }
+
+    private formatDate(date: Date): string {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
     private mapDtoToBudget(dto: BudgetDTO): Budget {
         return {
             id: dto.id,

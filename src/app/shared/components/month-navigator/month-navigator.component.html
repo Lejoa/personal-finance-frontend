@@ -1,0 +1,25 @@
+<div class="month-navigator" role="navigation" aria-label="Navegador de mes">
+  <button
+    class="month-nav-btn"
+    (click)="goToPreviousMonth()"
+    type="button"
+    aria-label="Mes anterior">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z" fill="currentColor"/>
+    </svg>
+  </button>
+
+  <span class="month-navigator__label" aria-live="polite">
+    {{ displayLabel }}
+  </span>
+
+  <button
+    class="month-nav-btn"
+    (click)="goToNextMonth()"
+    type="button"
+    aria-label="Mes siguiente">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" fill="currentColor"/>
+    </svg>
+  </button>
+</div>

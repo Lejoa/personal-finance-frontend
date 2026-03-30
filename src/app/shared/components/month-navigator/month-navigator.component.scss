@@ -1,0 +1,49 @@
+@import 'styles.scss';
+
+.month-navigator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: $spacer-xs $spacer-sm;
+  background-color: $card-bg;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow-sm;
+}
+
+.month-navigator__label {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  text-align: center;
+  flex: 1;
+  letter-spacing: 0.3px;
+}
+
+.month-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: $touch-target;
+  min-height: $touch-target;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: $primary-color;
+  cursor: pointer;
+  transition: $transition-fast;
+  padding: 0;
+
+  &:hover {
+    background-color: rgba($primary-color, 0.08);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}

@@ -1,47 +1,12 @@
 @import '../../../../styles.scss';
 
-/* ===== BALANCE CONTAINER ===== */
-.balance-container {
-  width: 100%;
-}
-
+/* ===== BALANCE CARD ===== */
 .balance-card {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  border-radius: $border-radius;
+  width: 100%;
+  background-color: $card-bg;
+  border-radius: $border-radius-lg;
   box-shadow: $box-shadow-md;
-
-  @media (max-width: $breakpoint-sm) {
-    gap: $spacer;
-  }
-}
-
-/* ===== BUDGET PERIOD ===== */
-.budget-period {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: $spacer-sm $spacer;
-  background-color: rgba(0, 123, 255, 0.05);
-  border-bottom: 2px solid rgba(0, 123, 255, 0.1);
-  border-radius: $border-radius $border-radius 0 0;
-}
-
-.budget-date-range {
-  font-size: $font-size-md;
-  font-weight: $font-weight-semibold;
-  color: #007bff;
-  text-align: center;
-  letter-spacing: 0.5px;
-}
-
-.no-budget-message {
-  font-size: $font-size-md;
-  font-weight: $font-weight-medium;
-  color: $gray-600;
-  text-align: center;
-  font-style: italic;
+  overflow: hidden;
 }
 
 /* ===== BALANCE ITEMS CONTAINER ===== */
@@ -49,12 +14,7 @@
   display: flex;
   justify-content: space-around;
   align-items: stretch;
-  gap: $spacer-md;
-  padding: $spacer;
-
-  @media (max-width: $breakpoint-sm) {
-    flex-direction: column;
-  }
+  padding: $spacer-sm $spacer-xs;
 }
 
 /* ===== BALANCE ITEMS ===== */
@@ -64,57 +24,63 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: $spacer-sm;
-  padding: $spacer;
+  gap: $spacer-xs;
+  padding: $spacer-sm $spacer-xs;
   border-radius: $border-radius-sm;
+  min-width: 0;
   transition: $transition-fast;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: $box-shadow-sm;
+    transform: translateY(-1px);
   }
 
   &.income {
-    background-color: rgba(40, 167, 69, 0.1);
-    border: 2px solid rgba(40, 167, 69, 0.3);
+    background-color: rgba($success-color, 0.08);
+    border: 2px solid rgba($success-color, 0.25);
 
     .balance-value {
-      color: #28a745;
+      color: $success-color;
     }
   }
 
   &.expenses {
-    background-color: rgba(220, 53, 69, 0.1);
-    border: 2px solid rgba(220, 53, 69, 0.3);
+    background-color: rgba($danger-color, 0.08);
+    border: 2px solid rgba($danger-color, 0.25);
 
     .balance-value {
-      color: #dc3545;
+      color: $danger-color;
     }
   }
 
   &.total {
-    background-color: rgba(0, 123, 255, 0.1);
-    border: 2px solid rgba(0, 123, 255, 0.3);
+    background-color: rgba($primary-color, 0.08);
+    border: 2px solid rgba($primary-color, 0.25);
 
     .balance-value {
-      color: #007bff;
+      color: $primary-color;
     }
   }
 }
 
 .balance-label {
-  font-size: $font-size-md;
+  font-size: $font-size-xs;
   font-weight: $font-weight-semibold;
-  color: $gray-700;
+  color: $text-secondary;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .balance-value {
-  font-size: $font-size-md; 
+  font-size: $font-size-sm;
   font-weight: $font-weight-bold;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 
-  @media (max-width: $breakpoint-md) {
-    font-size: $font-size-md;
+  @media (min-width: $breakpoint-sm) {
+    font-size: $font-size-base;
   }
 }

@@ -10,6 +10,9 @@
 }
 
 .chart-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
 }
 
@@ -32,6 +35,7 @@
   gap: $spacer-sm;
   width: 100%;
   max-width: 300px;
+  margin-bottom: $spacer-md;
 
   @media (min-width: $breakpoint-sm) {
     flex-direction: row;
@@ -52,27 +56,28 @@
     transition: all 0.3s ease, transform 0.1s ease-in-out;
     text-decoration: none;
     color: #fff;
-    background-color: #007bff;
-    border: 1px solid #007bff;
+    background-color: $primary-color;
+    border: 1px solid $primary-color;
+    min-height: $touch-target;
 
     &:hover {
       color: #fff;
-      background-color: #0056b3;
-      border-color: #0056b3;
+      background-color: $primary-color-dark;
+      border-color: $primary-color-dark;
       transform: scale(1.05);
     }
 
     &:focus {
       color: #fff;
-      background-color: #0056b3;
-      border-color: #0056b3;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+      background-color: $primary-color-dark;
+      border-color: $primary-color-dark;
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.5);
     }
 
     &:disabled {
       color: #fff;
-      background-color: #007bff;
-      border-color: #007bff;
+      background-color: $primary-color;
+      border-color: $primary-color;
     }
 
     @media (min-width: $breakpoint-sm) {

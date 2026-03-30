@@ -1,26 +1,18 @@
-<div class="balance-container">
-    <div class="balance-card">
-        <!-- Budget Date Range Display -->
-        <div class="budget-period">
-            <span *ngIf="hasActiveBudget" class="budget-date-range">{{ budgetDateRange }}</span>
-            <span *ngIf="!hasActiveBudget" class="no-budget-message">No hay presupuesto definido</span>
-        </div>
-
-        <div class="balance-items-wrapper">
-            <div class="balance-item income">
-                <span class="balance-label">Ingresos</span>
-                <span class="balance-value">{{ income | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
-            </div>
-
-            <div class="balance-item expenses">
-                <span class="balance-label">Gastos</span>
-                <span class="balance-value">{{ expenses | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
-            </div>
-
-            <div class="balance-item total">
-                <span class="balance-label">Balance</span>
-                <span class="balance-value">{{ balance | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
-            </div>
-        </div>
+<div class="balance-card">
+  <div class="balance-items-wrapper">
+    <div class="balance-item expenses">
+      <span class="balance-label">Gastos</span>
+      <span class="balance-value">{{ expenses | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
     </div>
+
+    <div class="balance-item income">
+      <span class="balance-label">Ingresos</span>
+      <span class="balance-value">{{ income | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
+    </div>
+
+    <div class="balance-item total">
+      <span class="balance-label">Balance</span>
+      <span class="balance-value">{{ balance | currency: 'COP': 'symbol-narrow': '1.0-0' }}</span>
+    </div>
+  </div>
 </div>

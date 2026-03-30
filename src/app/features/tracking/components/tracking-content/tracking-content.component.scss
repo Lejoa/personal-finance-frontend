@@ -1,0 +1,8 @@
+@import 'styles.scss';
+
+.tracking-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer;
+  width: 100%;
+}
