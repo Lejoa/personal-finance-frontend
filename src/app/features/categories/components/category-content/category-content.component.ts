@@ -27,6 +27,7 @@ export class CategoryContentComponent implements OnInit {
   isSaving = false;
   isDeleting = false;
   showDeleteConfirm = false;
+  deleteError: string | null = null;
 
   form: CategoryFormData = { name: '', description: '', type: 'gasto' };
 
@@ -63,6 +64,7 @@ export class CategoryContentComponent implements OnInit {
     this.isModalOpen = false;
     this.editingCategory = null;
     this.showDeleteConfirm = false;
+    this.deleteError = null;
   }
 
   saveCategory(): void {
@@ -76,7 +78,7 @@ export class CategoryContentComponent implements OnInit {
         error: () => { this.isSaving = false; }
       });
     } else {
-      const req: CreateCategoryRequest = { name: this.form.name.trim(), description: this.form.description.trim() };
+      const req: CreateCategoryRequest = { name: this.form.name.trim(), description: this.form.description.trim(), type: this.form.type };
       this.categoryService.createCategory(req).subscribe({
         next: () => { this.isSaving = false; this.closeModal(); this.loadCategories(); },
         error: () => { this.isSaving = false; }
@@ -85,15 +87,21 @@ export class CategoryContentComponent implements OnInit {
   }
 
   confirmDelete(): void {
+    this.deleteError = null;
     this.showDeleteConfirm = true;
   }
 
   deleteCategory(): void {
     if (!this.editingCategory) return;
     this.isDeleting = true;
+    this.deleteError = null;
     this.categoryService.deleteCategory(this.editingCategory.id).subscribe({
       next: () => { this.isDeleting = false; this.closeModal(); this.loadCategories(); },
-      error: () => { this.isDeleting = false; }
+      error: (err) => {
+        this.isDeleting = false;
+        this.showDeleteConfirm = false;
+        this.deleteError = err?.error?.error ?? 'No se pudo eliminar la categoría.';
+      }
     });
   }
 

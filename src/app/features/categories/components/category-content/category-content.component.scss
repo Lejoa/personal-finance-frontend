@@ -224,6 +224,23 @@
   }
 }
 
+.modal__error {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacer-xs;
+  background-color: rgba($danger-color, 0.08);
+  border: 1px solid rgba($danger-color, 0.3);
+  border-radius: $border-radius;
+  padding: $spacer-sm $spacer-md;
+  color: $danger-color;
+  font-size: $font-size-sm;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
 .modal__delete-text {
   font-size: $font-size-sm;
   color: $text-secondary;

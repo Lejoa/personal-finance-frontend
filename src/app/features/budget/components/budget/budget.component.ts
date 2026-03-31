@@ -17,7 +17,6 @@ interface BudgetCategoryView {
   limit: number;
   spent: number;
   remaining: number;
-  progressPercent: number;
   isOverBudget: boolean;
   budgetId?: number;
   budgetCategoryId?: number;
@@ -55,11 +54,17 @@ export class BudgetComponent implements OnInit {
   totalSpent: number = 0;
   isLoading: boolean = false;
 
-  // Modal state
+  // Modal: fijar límite (categorías sin presupuesto)
   isModalOpen: boolean = false;
   selectedCategoryForModal: UnbudgetedCategory | null = null;
   modalLimit: number = 0;
   isSaving: boolean = false;
+
+  // Modal: editar límite (categorías con presupuesto)
+  isEditModalOpen: boolean = false;
+  editingBudgetCategory: BudgetCategoryView | null = null;
+  editModalLimit: number = 0;
+  isEditSaving: boolean = false;
 
   ngOnInit(): void {
     // monthChange emits on init from MonthNavigatorComponent
@@ -106,7 +111,6 @@ export class BudgetComponent implements OnInit {
         const spent = spentByCategory[bc.categoryId] || 0;
         const limit = bc.amount;
         const remaining = limit - spent;
-        const progressPercent = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
         budgetedCategoryIds.add(bc.categoryId);
         return {
           categoryId: bc.categoryId,
@@ -114,7 +118,6 @@ export class BudgetComponent implements OnInit {
           limit,
           spent,
           remaining,
-          progressPercent,
           isOverBudget: spent > limit,
           budgetId: budget.id,
           budgetCategoryId: bc.id
@@ -168,10 +171,37 @@ export class BudgetComponent implements OnInit {
     });
   }
 
-  deleteBudget(budgetId: number): void {
-    this.budgetService.deleteBudget(budgetId).subscribe({
+  openEditBudgetModal(cat: BudgetCategoryView): void {
+    this.editingBudgetCategory = cat;
+    this.editModalLimit = cat.limit;
+    this.isEditModalOpen = true;
+  }
+
+  closeEditModal(): void {
+    this.isEditModalOpen = false;
+    this.editingBudgetCategory = null;
+    this.editModalLimit = 0;
+    this.isEditSaving = false;
+  }
+
+  confirmEditBudget(): void {
+    if (!this.editingBudgetCategory?.budgetId || !this.editingBudgetCategory?.budgetCategoryId || this.editModalLimit <= 0) return;
+    this.isEditSaving = true;
+    this.budgetService.updateBudgetCategoryAmount(
+      this.editingBudgetCategory.budgetId,
+      this.editingBudgetCategory.budgetCategoryId,
+      this.editModalLimit
+    ).subscribe({
+      next: () => { this.closeEditModal(); this.loadBudgetData(); },
+      error: () => { this.isEditSaving = false; }
+    });
+  }
+
+  deleteBudgetCategory(cat: BudgetCategoryView): void {
+    if (!cat.budgetId || !cat.budgetCategoryId) return;
+    this.budgetService.deleteBudgetCategory(cat.budgetId, cat.budgetCategoryId).subscribe({
       next: () => this.loadBudgetData(),
-      error: (err) => console.error('Error deleting budget:', err)
+      error: (err) => console.error('Error deleting budget category:', err)
     });
   }
 

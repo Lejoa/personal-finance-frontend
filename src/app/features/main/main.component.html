@@ -5,7 +5,6 @@
     <section class="gap-content" *ngSwitchCase="'Home'">
       <app-balance></app-balance>
       <app-transaction-history mode="home"></app-transaction-history>
-      <app-register-button></app-register-button>
       <app-transaction-card
         *ngIf="unsyncedTransaction"
         [transaction]="unsyncedTransaction"
@@ -33,4 +32,5 @@
   </div>
 </main>
 
+<app-register-button></app-register-button>
 <app-footer-tabs></app-footer-tabs>

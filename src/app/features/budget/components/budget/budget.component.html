@@ -48,13 +48,26 @@
             <span class="category-icon">{{ cat.categoryName.charAt(0).toUpperCase() }}</span>
             <span class="category-card__name">{{ cat.categoryName }}</span>
           </div>
-          <button
-            class="category-card__delete"
-            (click)="deleteBudget(cat.budgetId!)"
-            type="button"
-            aria-label="Eliminar presupuesto">
-            ✕
-          </button>
+          <div class="category-card__actions">
+            <button
+              class="category-card__action-btn category-card__action-btn--edit"
+              (click)="openEditBudgetModal(cat)"
+              type="button"
+              aria-label="Editar límite">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+              </svg>
+            </button>
+            <button
+              class="category-card__action-btn category-card__action-btn--delete"
+              (click)="deleteBudgetCategory(cat)"
+              type="button"
+              aria-label="Eliminar categoría del presupuesto">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="category-card__body">
@@ -75,20 +88,6 @@
             </div>
           </div>
 
-          <div class="category-card__aside">
-            <span class="category-month-label">({{ selectedMonth | date:'MMM, y' }})</span>
-            <span class="remaining-badge" [class.remaining-badge--over]="cat.isOverBudget">
-              {{ cat.remaining | currency:'COP':'symbol-narrow':'1.0-0' }}
-            </span>
-          </div>
-        </div>
-
-        <div class="progress-bar" role="progressbar"
-          [attr.aria-valuenow]="cat.progressPercent" aria-valuemin="0" aria-valuemax="100">
-          <div class="progress-bar__fill"
-            [style.width.%]="cat.progressPercent"
-            [class.progress-bar__fill--over]="cat.isOverBudget">
-          </div>
         </div>
       </div>
     </section>
@@ -119,6 +118,57 @@
 
   </ng-container>
 
+</div>
+
+<!-- Modal para editar límite de categoría presupuestada -->
+<div *ngIf="isEditModalOpen" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+    aria-labelledby="edit-modal-title">
+
+    <h3 class="modal__title" id="edit-modal-title">Editar límite</h3>
+
+    <div class="modal__category-header">
+      <span class="category-icon category-icon--lg">
+        {{ editingBudgetCategory?.categoryName?.charAt(0)?.toUpperCase() }}
+      </span>
+      <div>
+        <div class="modal__category-name">{{ editingBudgetCategory?.categoryName }}</div>
+        <div class="modal__category-current">
+          Límite actual: {{ editingBudgetCategory?.limit | currency:'COP':'symbol-narrow':'1.0-0' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal__field">
+      <label class="modal__label" for="edit-limit">Nuevo límite</label>
+      <input
+        id="edit-limit"
+        type="number"
+        class="modal__input"
+        [(ngModel)]="editModalLimit"
+        placeholder="0"
+        min="1"
+        inputmode="numeric"
+        autofocus>
+    </div>
+
+    <p class="modal__month-info">
+      Mes: {{ selectedMonth | date:'MMMM y' }}
+    </p>
+
+    <div class="modal__actions">
+      <button class="modal__btn modal__btn--cancel" (click)="closeEditModal()" type="button">
+        CANCELAR
+      </button>
+      <button
+        class="modal__btn modal__btn--confirm"
+        (click)="confirmEditBudget()"
+        type="button"
+        [disabled]="editModalLimit <= 0 || isEditSaving">
+        {{ isEditSaving ? 'GUARDANDO...' : 'GUARDAR' }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal para fijar presupuesto -->

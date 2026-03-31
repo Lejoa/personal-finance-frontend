@@ -47,6 +47,14 @@ export class BudgetService {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
+    deleteBudgetCategory(budgetId: number, budgetCategoryId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${budgetId}/categories/${budgetCategoryId}`);
+    }
+
+    updateBudgetCategoryAmount(budgetId: number, budgetCategoryId: number, amount: number): Observable<void> {
+        return this.http.patch<void>(`${this.apiUrl}/${budgetId}/categories/${budgetCategoryId}`, { amount });
+    }
+
     getBudgetByMonth(month: Date): Observable<Budget | null> {
         return this.getBudgets().pipe(
             map(budgets => {
@@ -93,11 +101,17 @@ export class BudgetService {
         return `${y}-${m}-${d}`;
     }
 
+    /** Parse a YYYY-MM-DD string as local midnight (avoids UTC-offset month shift) */
+    private parseLocalDate(dateStr: string): Date {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+
     private mapDtoToBudget(dto: BudgetDTO): Budget {
         return {
             id: dto.id,
-            startDate: new Date(dto.startDate),
-            endDate: new Date(dto.endDate),
+            startDate: this.parseLocalDate(dto.startDate),
+            endDate: this.parseLocalDate(dto.endDate),
             categories: dto.categories,
             items: dto.categories.map(category => ({
                 nombre: category.categoryName,
