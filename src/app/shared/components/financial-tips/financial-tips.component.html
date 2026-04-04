@@ -4,6 +4,7 @@
       <h5 class="tip-title">{{ title }} </h5>
       <img *ngIf="imageSrc" [src]="imageSrc" alt="tip-image" class="tip-image"/>
     </div>
+    <p *ngIf="reason" class="tip-reason">{{ reason }}</p>
     <p>{{ shortDescription }}</p>
   </div>
 </div>

@@ -11,6 +11,79 @@
 }
 
 /* ============================================================
+    VISTA DE DETALLE — pantalla completa
+    Se superpone al layout del Home para dar la misma
+    experiencia que en la sección Learning dedicada.
+    ============================================================ */
+.financial-tip-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow-y: auto;
+  padding: calc($header-height + $spacer-lg) $spacer calc($footer-height + $spacer-lg) $spacer;
+  background: #fff;
+
+  .close-btn {
+    background: #eee;
+    border: none;
+    border-radius: 50%;
+    padding: $spacer-sm;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacer;
+  }
+
+  .detail-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .detail-reason {
+    font-size: 0.85rem;
+    color: $primary-color;
+    margin-bottom: $spacer;
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: $spacer-sm;
+    margin: $spacer 0;
+    font-size: 1rem;
+    color: #555;
+
+    .author {
+      font-weight: 600;
+    }
+    .author-title {
+      font-style: italic;
+    }
+  }
+
+  .detail-description {
+    margin: $spacer 0 2rem 0;
+    font-size: 1rem;
+    color: #333;
+    white-space: pre-line;
+  }
+
+  .learn-more-btn {
+    display: block;
+    margin: 0 auto;
+    background: $primary-color;
+    color: #fff;
+    border: none;
+    border-radius: $border-radius;
+    padding: $spacer-sm $spacer-md;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+}
+
+/* ============================================================
     LISTA DE CONSEJOS
     - Mobile-first: columna por defecto
     ============================================================ */

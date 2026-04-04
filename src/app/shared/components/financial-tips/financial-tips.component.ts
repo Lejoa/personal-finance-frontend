@@ -17,6 +17,7 @@ export class FinancialTipsComponent {
   @Input() imageSrc?: string;
   @Input() author?: string;
   @Input() authorTitle?: string;
+  @Input() reason?: string;
 
   @Output() expand = new EventEmitter<void>();
 

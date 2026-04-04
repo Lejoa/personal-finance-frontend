@@ -3,6 +3,8 @@ import { FinancialTipsComponent } from '../../../../shared/components/financial-
 import { NgIf, NgFor } from '@angular/common';
 import { FinancialTip } from '../../interfaces/learning-content.interfaces';
 import { TipService } from '../../../../shared/services/tip.service';
+import { TabService } from '../../../../core/services/tab/tab.service';
+import { ChatService } from '../../../chat/services/chat.service';
 
 @Component({
   selector: 'app-learning-content',
@@ -17,6 +19,8 @@ import { TipService } from '../../../../shared/services/tip.service';
 })
 export class LearningContentComponent implements OnInit {
   private tipService = inject(TipService);
+  private tabService = inject(TabService);
+  private chatService = inject(ChatService);
 
   tips: FinancialTip[] = [];
   isLoading = true;
@@ -40,5 +44,11 @@ export class LearningContentComponent implements OnInit {
 
   closeDetail() {
     this.selectedTip = undefined;
+  }
+
+  learnMore(tip: FinancialTip): void {
+    const message = `Quiero aprender más sobre este tema: "${tip.title}". ${tip.shortDescription ?? ''}`.trim();
+    this.tabService.setActiveTab('Create');
+    setTimeout(() => this.chatService.sendMessage(message));
   }
 }

@@ -6,4 +6,5 @@ export interface FinancialTip {
   imageSrc?: string;
   author?: string;
   authorTitle?: string;
+  reason?: string;
 }

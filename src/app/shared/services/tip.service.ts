@@ -13,6 +13,7 @@ interface TipDTO {
     description: string;
     imageSrc: string | null;
     tags: string | null;
+    reason?: string | null;
     createdAt: string;
 }
 
@@ -49,6 +50,7 @@ export class TipService {
             shortDescription: dto.shortDescription ?? undefined,
             description: dto.description,
             imageSrc: dto.imageSrc ?? undefined,
+            reason: dto.reason ?? undefined,
         };
     }
 }

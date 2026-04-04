@@ -10,6 +10,7 @@
         [imageSrc]="tip.imageSrc"
         [author]="tip.author"
         [authorTitle]="tip.authorTitle"
+        [reason]="tip.reason"
         (expand)="onExpandTip(tip)"
     >
     </app-financial-tips>
@@ -21,12 +22,13 @@
         </svg>
     </button>
     <h2 class="detail-title">{{ selectedTip.title }}</h2>
+    <p *ngIf="selectedTip.reason" class="detail-reason">{{ selectedTip.reason }}</p>
     <div class="author-info">
       <span class="author">{{ selectedTip.author }}</span>
       <span class="author-title">{{ selectedTip.authorTitle }}</span>
     </div>
     <p class="detail-description">{{ selectedTip.description }}</p>
-    <button class="learn-more-btn">Enseñame más</button>
+    <button class="learn-more-btn" (click)="learnMore(selectedTip)">Aprende más →</button>
   </div>
 </div>  
 
