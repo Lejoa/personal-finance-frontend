@@ -1,0 +1,486 @@
+@import '../../../../../styles.scss';
+
+/* ============================================================
+    OVERLAY
+    ============================================================ */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 1040;
+  animation: sheetFadeIn 0.2s ease;
+}
+
+/* ============================================================
+    BOTTOM SHEET CONTAINER
+    ============================================================ */
+.sms-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $card-bg;
+  border-radius: $border-radius-lg $border-radius-lg 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  animation: sheetSlideUp 0.25s ease-out;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.sms-sheet__handle {
+  width: 40px;
+  height: 4px;
+  background-color: $gray-300;
+  border-radius: 2px;
+  margin: $spacer-sm auto $spacer-xs;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+    HEADER
+    ============================================================ */
+.sms-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacer-xs $spacer-md $spacer-sm;
+  border-bottom: 1px solid $gray-200;
+  flex-shrink: 0;
+}
+
+.sms-sheet__title-group {
+  display: flex;
+  align-items: center;
+  gap: $spacer-sm;
+  color: $primary-color;
+}
+
+.sms-sheet__title {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.sms-sheet__header-right {
+  display: flex;
+  align-items: center;
+  gap: $spacer-sm;
+}
+
+.sms-sheet__count {
+  background-color: $primary-color;
+  color: #fff;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 $spacer-xs;
+}
+
+.sms-sheet__close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: $gray-100;
+    color: $text-primary;
+  }
+}
+
+/* ============================================================
+    FETCH BAR — selector de rango + botón Obtener
+    ============================================================ */
+.sms-sheet__fetch-bar {
+  display: flex;
+  align-items: center;
+  gap: $spacer-sm;
+  padding: $spacer-xs $spacer-md $spacer-sm;
+  border-bottom: 1px solid $gray-200;
+  flex-shrink: 0;
+}
+
+.sms-fetch__select {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  background-color: $card-bg;
+  border: 1px solid $gray-300;
+  border-radius: $border-radius;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23757575' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.12);
+  }
+}
+
+.sms-fetch__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: $touch-target;
+  padding: 0 $spacer-sm;
+  background-color: $primary-color;
+  color: #fff;
+  border: none;
+  border-radius: $border-radius;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-color-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.sms-fetch__spinner {
+  animation: iconSpin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes iconSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ============================================================
+    EMPTY STATE
+    ============================================================ */
+.sms-sheet__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacer-sm;
+  padding: $spacer-lg $spacer-md;
+  color: $text-secondary;
+  flex: 1;
+
+  svg {
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+}
+
+/* ============================================================
+    SCROLLABLE CARD LIST
+    ============================================================ */
+.sms-sheet__list {
+  overflow-y: auto;
+  flex: 1;
+  padding: $spacer-sm $spacer-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-sm;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================================
+    SMS CARD (accordion)
+    ============================================================ */
+.sms-card {
+  background-color: $bg-surface;
+  border: 1px solid $gray-200;
+  border-radius: $border-radius;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+
+  &--checked {
+    border-color: rgba($primary-color, 0.4);
+    background-color: rgba($primary-color, 0.02);
+  }
+}
+
+/* Collapsed header row */
+.sms-card__row {
+  display: flex;
+  align-items: center;
+  gap: $spacer-sm;
+  padding: $spacer-sm;
+  cursor: pointer;
+  min-height: $touch-target;
+  user-select: none;
+}
+
+/* Custom checkbox */
+.sms-card__check {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+
+.sms-card__checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid $gray-400;
+  border-radius: 4px;
+  background-color: $card-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  flex-shrink: 0;
+
+  .sms-card__check input:checked + & {
+    border-color: $primary-color;
+    background-color: $primary-color;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 5px;
+      height: 9px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+  }
+}
+
+.sms-card__summary {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sms-card__name {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sms-card__meta {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $spacer-xs;
+}
+
+.sms-card__type {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $danger-color;
+  background-color: rgba($danger-color, 0.08);
+  padding: 1px 6px;
+  border-radius: 10px;
+
+  &--income {
+    color: $success-color;
+    background-color: rgba($success-color, 0.08);
+  }
+}
+
+.sms-card__right {
+  display: flex;
+  align-items: center;
+  gap: $spacer-xs;
+  flex-shrink: 0;
+}
+
+.sms-card__amount {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $danger-color;
+
+  &--income {
+    color: $success-color;
+  }
+}
+
+.sms-card__chevron {
+  color: $text-secondary;
+  transition: transform 0.2s ease;
+
+  .sms-card--expanded & {
+    transform: rotate(180deg);
+  }
+}
+
+/* ============================================================
+    ACCORDION DETAIL (expanded)
+    ============================================================ */
+.sms-card__detail {
+  border-top: 1px solid $gray-200;
+  animation: detailOpen 0.2s ease-out;
+}
+
+.sms-card__fields {
+  padding: $spacer-sm;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacer-sm;
+}
+
+/* ============================================================
+    INLINE FORM FIELDS
+    ============================================================ */
+.sms-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.sms-field__label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  letter-spacing: 0.04em;
+}
+
+.sms-field__input,
+.sms-field__select {
+  padding: 6px 10px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  background-color: $card-bg;
+  border: 1px solid $gray-300;
+  border-radius: $border-radius;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.12);
+  }
+}
+
+.sms-field__select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23757575' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+
+.sms-field__note {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  background-color: $gray-100;
+  border: 1px solid $gray-200;
+  border-radius: $border-radius;
+  padding: $spacer-xs $spacer-sm;
+  margin: 0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* ============================================================
+    FOOTER ACTIONS
+    ============================================================ */
+.sms-sheet__actions {
+  display: flex;
+  gap: $spacer-sm;
+  padding: $spacer-sm $spacer-md $spacer-md;
+  border-top: 1px solid $gray-200;
+  flex-shrink: 0;
+}
+
+.sms-sheet__btn {
+  flex: 1;
+  min-height: $touch-target;
+  border-radius: $border-radius;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--close {
+    background-color: $gray-200;
+    color: $text-primary;
+    &:hover { background-color: $gray-300; }
+  }
+
+  &--approve {
+    background-color: $primary-color;
+    color: #fff;
+    &:hover:not(:disabled) { background-color: $primary-color-dark; }
+  }
+
+  &--full {
+    flex: unset;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+    ANIMATIONS
+    ============================================================ */
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes sheetFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes detailOpen {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

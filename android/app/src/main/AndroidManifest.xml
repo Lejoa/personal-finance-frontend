@@ -50,4 +50,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Permiso para leer el buzón de SMS.
+         Necesario para que SmsPlugin pueda consultar content://sms/inbox.
+         Android 6.0+ requiere que el usuario lo apruebe en runtime (el plugin lo solicita). -->
+    <uses-permission android:name="android.permission.READ_SMS" />
 </manifest>

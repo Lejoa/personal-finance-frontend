@@ -98,6 +98,41 @@
  */
 @media (min-width: $breakpoint-md) {
   .main-content {
-    align-items: center; // Vertically center content on larger screens
+    align-items: center;
+  }
+}
+
+/* ============================================================
+    BOTÓN SINCRONIZAR SMS — inline en tab Home
+    ============================================================ */
+
+.sms-sync-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacer-xs;
+  width: 100%;
+  min-height: $touch-target;
+  padding: $spacer-xs $spacer-sm;
+  background-color: transparent;
+  color: $primary-color;
+  border: 1.5px solid $primary-color;
+  border-radius: $border-radius;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($primary-color, 0.06);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &__icon {
+    flex-shrink: 0;
   }
 }

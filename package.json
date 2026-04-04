@@ -30,6 +30,7 @@
     "@capacitor/app": "^8.0.1",
     "@capacitor/browser": "^8.0.2",
     "@capacitor/core": "^8.2.0",
+    "@capacitor/preferences": "^8.0.1",
     "chart.js": "^4.5.1",
     "ng2-charts": "^7.0.0",
     "rxjs": "~7.8.0",

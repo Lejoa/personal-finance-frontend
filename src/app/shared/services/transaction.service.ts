@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap, map } from 'rxjs';
+import { Observable, BehaviorSubject, tap, map, forkJoin } from 'rxjs';
 import { Transaction, TransactionType, TransactionStatus } from '../models/transaction.model';
 import { environment } from '../../../environments/environment';
 
@@ -36,6 +36,7 @@ interface TransactionDTO {
   categoryId?: number;
   categoryName?: string;
   synchronized: string;
+  source?: 'manual' | 'sms';
   createdAt: string;
 }
 
@@ -103,7 +104,28 @@ export class TransactionService {
   }
 
   getTransactionsUnsynced(): Observable<Transaction[]> {
-    return this.getTransactions({ sync: 'pending', limit: 1 });
+    return this.getTransactions({ sync: 'pending' });
+  }
+
+  /** Marca todas las transacciones del array como synchronized='done' en paralelo */
+  approveAllPending(transactions: Transaction[]): Observable<Transaction[]> {
+    const updates = transactions.map(t =>
+      this.updateTransaction(Number(t.id), { synchronized: 'done' })
+    );
+    return forkJoin(updates);
+  }
+
+  /**
+   * Aprueba o rechaza transacciones según el set de IDs aprobados.
+   * Los IDs en approvedIds → synchronized='done', el resto → synchronized='rejected'.
+   */
+  batchApprove(transactions: Transaction[], approvedIds: Set<string>): Observable<Transaction[]> {
+    const updates = transactions.map(t =>
+      this.updateTransaction(Number(t.id), {
+        synchronized: approvedIds.has(t.id!) ? 'done' : 'rejected'
+      })
+    );
+    return forkJoin(updates);
   }
 
   /** Crea una nueva transacción */
@@ -157,8 +179,11 @@ export class TransactionService {
       date: new Date(dto.date),
       categoryId: dto.categoryId,
       categoryName: dto.categoryName,
+      note: dto.note,
+      synchronized: dto.synchronized as 'pending' | 'done' | 'rejected',
       status: dto.synchronized as TransactionStatus,
       transactionType: dto.type === 'ingreso' ? 'ingreso' : 'gasto',
+      source: dto.source,
       createdAt: new Date(dto.createdAt)
     };
   }
@@ -174,7 +199,8 @@ export class TransactionService {
     }
     if (transaction.categoryId !== undefined) dto['categoryId'] = transaction.categoryId;
     if (transaction.note !== undefined) dto['note'] = transaction.note;
-    if (transaction.status) dto['synchronized'] = transaction.status;
+    const sync = transaction.synchronized ?? transaction.status;
+    if (sync) dto['synchronized'] = sync;
     // Propaga el origen al backend ('manual' | 'sms') para trazabilidad
     if (transaction.source) dto['source'] = transaction.source;
 
