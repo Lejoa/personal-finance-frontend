@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 import {
   ChatMessage,
   ChatResponse,
@@ -175,8 +175,10 @@ export class ChatService {
     if (date) payload.date = new Date(date);
     if (note) payload.note = note;
 
-    this.transactionService.updateTransaction(transactionId, payload).subscribe({
-      next: () => {
+    this.transactionService.updateTransaction(transactionId, payload).pipe(
+      switchMap(() => this.transactionService.getFeedback(transactionId))
+    ).subscribe({
+      next: ({ feedback }) => {
         const currentState = this.chatStateSubject.value;
         const messages = currentState.messages.map(msg => {
           if (msg.id !== messageId || !msg.pendingCategorization) return msg;
@@ -195,7 +197,20 @@ export class ChatService {
             } satisfies TransactionCreated,
           };
         });
-        this.chatStateSubject.next({ ...currentState, messages });
+
+        const updatedState = { ...currentState, messages };
+
+        if (feedback) {
+          const feedbackMessage: ChatMessage = {
+            id: `feedback-${transactionId}`,
+            content: feedback,
+            type: 'assistant',
+            timestamp: new Date(),
+          };
+          updatedState.messages = [...messages, feedbackMessage];
+        }
+
+        this.chatStateSubject.next(updatedState);
       },
     });
   }

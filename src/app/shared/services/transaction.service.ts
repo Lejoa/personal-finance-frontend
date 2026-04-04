@@ -156,6 +156,11 @@ export class TransactionService {
     );
   }
 
+  /** Solicita el mensaje de retroalimentación formativa para una transacción confirmada */
+  getFeedback(transactionId: number): Observable<{ feedback: string | null }> {
+    return this.http.post<{ feedback: string | null }>(`${this.apiUrl}/${transactionId}/feedback`, {});
+  }
+
   /** Elimina una transacción */
   deleteTransaction(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
