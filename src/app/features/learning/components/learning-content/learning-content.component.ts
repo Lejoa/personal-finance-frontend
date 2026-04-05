@@ -5,6 +5,8 @@ import { FinancialTip } from '../../interfaces/learning-content.interfaces';
 import { TipService } from '../../../../shared/services/tip.service';
 import { TabService } from '../../../../core/services/tab/tab.service';
 import { ChatService } from '../../../chat/services/chat.service';
+import { AnalysisService, FinancialAnalysis } from '../../services/analysis.service';
+import { AnalysisCardComponent } from '../analysis-card/analysis-card.component';
 
 @Component({
   selector: 'app-learning-content',
@@ -12,7 +14,8 @@ import { ChatService } from '../../../chat/services/chat.service';
   imports: [
     NgIf,
     NgFor,
-    FinancialTipsComponent
+    FinancialTipsComponent,
+    AnalysisCardComponent
   ],
   templateUrl: './learning-content.component.html',
   styleUrl: './learning-content.component.scss'
@@ -21,8 +24,10 @@ export class LearningContentComponent implements OnInit {
   private tipService = inject(TipService);
   private tabService = inject(TabService);
   private chatService = inject(ChatService);
+  private analysisService = inject(AnalysisService);
 
   tips: FinancialTip[] = [];
+  analyses: FinancialAnalysis[] = [];
   isLoading = true;
   selectedTip?: FinancialTip;
 
@@ -35,6 +40,11 @@ export class LearningContentComponent implements OnInit {
       error: () => {
         this.isLoading = false;
       }
+    });
+
+    this.analysisService.getAnalyses().subscribe({
+      next: (analyses) => { this.analyses = analyses; },
+      error: () => {}
     });
   }
 
@@ -50,5 +60,9 @@ export class LearningContentComponent implements OnInit {
     const message = `Quiero aprender más sobre este tema: "${tip.title}". ${tip.shortDescription ?? ''}`.trim();
     this.tabService.setActiveTab('Create');
     setTimeout(() => this.chatService.sendMessage(message));
+  }
+
+  onAnalysisRead(id: number): void {
+    this.analysisService.markAsRead(id).subscribe();
   }
 }

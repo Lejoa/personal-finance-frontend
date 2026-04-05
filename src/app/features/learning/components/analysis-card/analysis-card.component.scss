@@ -1,0 +1,112 @@
+@import 'styles.scss';
+
+.analysis-card {
+  background: #fff;
+  border: 1px solid $gray-200;
+  border-radius: $border-radius;
+  overflow: hidden;
+  margin-bottom: $spacer-sm;
+
+  &--expanded {
+    border-color: $primary-color;
+  }
+}
+
+.analysis-card__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacer-sm $spacer;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: $spacer-xs;
+}
+
+.analysis-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: $spacer-xs;
+  flex: 1;
+}
+
+.analysis-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: $gray-800;
+}
+
+.badge-new {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background-color: $primary-color;
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.analysis-card__chevron {
+  color: $gray-500;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+
+  &--open {
+    transform: rotate(180deg);
+  }
+}
+
+.analysis-card__body {
+  padding: 0 $spacer $spacer;
+  border-top: 1px solid $gray-100;
+}
+
+.analysis-card__content {
+  margin-top: $spacer-sm;
+
+  ::ng-deep {
+    .analysis-heading {
+      font-size: 13px;
+      font-weight: 700;
+      color: $gray-800;
+      margin: $spacer-sm 0 4px;
+      letter-spacing: 0.04em;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .analysis-paragraph {
+      font-size: 14px;
+      line-height: 1.6;
+      color: $gray-700;
+      margin: 0 0 $spacer-xs;
+    }
+
+    .analysis-list {
+      font-size: 14px;
+      line-height: 1.6;
+      color: $gray-700;
+      margin: 0 0 $spacer-xs;
+      padding-left: $spacer;
+
+      li {
+        margin-bottom: 4px;
+      }
+    }
+
+    strong {
+      color: $gray-800;
+      font-weight: 600;
+    }
+  }
+}
+
+.analysis-card__date {
+  font-size: 12px;
+  color: $gray-500;
+  margin-top: $spacer-sm;
+}

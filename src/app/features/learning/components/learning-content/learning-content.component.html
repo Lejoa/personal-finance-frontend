@@ -1,4 +1,17 @@
 <div class="block block--financial-literacy">
+
+  <!-- Sección: Mis análisis -->
+  <div class="section-analyses" *ngIf="analyses.length > 0">
+    <h3 class="section-title">Mis análisis</h3>
+    <app-analysis-card
+      *ngFor="let analysis of analyses"
+      [analysis]="analysis"
+      (read)="onAnalysisRead($event)">
+    </app-analysis-card>
+  </div>
+
+  <!-- Sección: Consejos -->
+  <h3 class="section-title">Consejos para ti</h3>
   <p *ngIf="isLoading" class="tips-loading">Cargando consejos...</p>
   <p *ngIf="!isLoading && tips.length === 0" class="tips-empty">No hay consejos disponibles por el momento.</p>
   <div class="financial-tips-list" *ngIf="!selectedTip && !isLoading && tips.length > 0">
@@ -11,8 +24,7 @@
         [author]="tip.author"
         [authorTitle]="tip.authorTitle"
         [reason]="tip.reason"
-        (expand)="onExpandTip(tip)"
-    >
+        (expand)="onExpandTip(tip)">
     </app-financial-tips>
   </div>
   <div class="financial-tip-detail" *ngIf="selectedTip">
@@ -30,5 +42,4 @@
     <p class="detail-description">{{ selectedTip.description }}</p>
     <button class="learn-more-btn" (click)="learnMore(selectedTip)">Aprende más →</button>
   </div>
-</div>  
-
+</div>

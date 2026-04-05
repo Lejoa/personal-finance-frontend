@@ -18,7 +18,7 @@ export class FooterTabsComponent implements OnInit, OnDestroy {
     { name: 'Home', icon: 'home'},
     { name: 'Tracking', icon: 'pie_chart' },
     { name: 'Budgets', icon: 'account_balance_wallet' },
-    { name: 'Learning', icon: 'school'},
+    { name: 'Aprende', icon: 'school'},
     { name: 'Categories', icon: 'label'}
   ];
 
