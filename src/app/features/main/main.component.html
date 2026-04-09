@@ -3,9 +3,8 @@
 <main class="main-content">
   <div class="main-blocks" [ngSwitch]="activeTab">
     <section class="gap-content" *ngSwitchCase="'Home'">
+      <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
       <app-balance></app-balance>
-      <app-transaction-history mode="home"></app-transaction-history>
-
       <!-- Botón Sincronizar SMS -->
       <button class="sms-sync-btn" (click)="openSheet()" type="button">
         <svg class="sms-sync-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,8 +12,12 @@
         </svg>
         Sincronizar SMS
       </button>
-
-      <app-financial-literacy></app-financial-literacy>
+      <app-transaction-history
+        mode="home"
+        [selectedMonth]="selectedMonth"
+        [showPagination]="true"
+        [pageSize]="5">
+      </app-transaction-history>
     </section>
     <section class="gap-content" *ngSwitchCase="'Tracking'">
       <app-tracking-content></app-tracking-content>

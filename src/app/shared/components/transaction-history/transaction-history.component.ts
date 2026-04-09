@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Input, SimpleChanges, inject } from '@angular/core';
 import { NgFor, NgIf, NgClass } from '@angular/common';
 import { TransactionCardComponent } from '../transaction-card/transaction-card.component';
 import { TrackingExpensesService } from '../../../core/services/tracking-expenses/tracking-expenses.service';
@@ -19,10 +19,11 @@ import { TransactionService } from '../../services/transaction.service';
   templateUrl: './transaction-history.component.html',
   styleUrl: './transaction-history.component.scss'
 })
-export class TransactionHistoryComponent implements OnInit, OnDestroy {
+export class TransactionHistoryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() mode: 'tracking' | 'home' = 'home';
   @Input() pageSize: number = 5;
   @Input() showPagination: boolean = true;
+  @Input() selectedMonth: Date | null = null;
 
   private transactionService = inject(TransactionService);
   private trackingExpensesService = inject(TrackingExpensesService);
@@ -73,6 +74,12 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.mode === 'home' && changes['selectedMonth'] && !changes['selectedMonth'].firstChange) {
+      this.initializeHomeMode();
+    }
+  }
+
   private initializeTrackingMode(): void {
     this.subscription.add(
       combineLatest([
@@ -111,17 +118,35 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
 
   private initializeHomeMode(): void {
     this.isLoading = true;
-    this.subscription.add(
-      this.transactionService.getLatestTransactions(3).subscribe({
-        next: transactions => {
-          this.transactions = transactions;
-          this.isLoading = false;
-        },
-        error: () => {
-          this.isLoading = false;
-        }
-      })
-    );
+
+    if (this.selectedMonth) {
+      const start = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth(), 1);
+      const end = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth() + 1, 0);
+      this.subscription.add(
+        this.transactionService.getTransactionsByDateRange(start, end).subscribe({
+          next: transactions => {
+            this.transactions = transactions;
+            this.currentPage = 1;
+            this.isLoading = false;
+          },
+          error: () => {
+            this.isLoading = false;
+          }
+        })
+      );
+    } else {
+      this.subscription.add(
+        this.transactionService.getLatestTransactions(3).subscribe({
+          next: transactions => {
+            this.transactions = transactions;
+            this.isLoading = false;
+          },
+          error: () => {
+            this.isLoading = false;
+          }
+        })
+      );
+    }
   }
 
   ngOnDestroy(): void {

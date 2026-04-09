@@ -14,6 +14,7 @@ import { BudgetComponent } from '../budget/components/budget/budget.component';
 import { BalanceComponent } from '../../shared/components/balance/balance.component';
 import { CategoryContentComponent } from '../categories/components/category-content/category-content.component';
 import { SmsSyncSheetComponent } from '../sms-sync/components/sms-sync-sheet/sms-sync-sheet.component';
+import { MonthNavigatorComponent } from '../../shared/components/month-navigator/month-navigator.component';
 
 export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 'Categories';
 
@@ -33,6 +34,7 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 
     LearningContentComponent,
     CategoryContentComponent,
     SmsSyncSheetComponent,
+    MonthNavigatorComponent,
     NgSwitch,
     NgSwitchCase,
   ],
@@ -42,6 +44,7 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 
 export class MainComponent {
   activeTab: TabType = 'Home';
   isSheetOpen = false;
+  selectedMonth: Date = new Date();
 
   constructor(private tabService: TabService) {
     this.tabService.activeTab$
@@ -49,6 +52,10 @@ export class MainComponent {
       .subscribe(tab => {
         this.activeTab = tab as TabType;
       });
+  }
+
+  onMonthChange(month: Date): void {
+    this.selectedMonth = month;
   }
 
   openSheet(): void {

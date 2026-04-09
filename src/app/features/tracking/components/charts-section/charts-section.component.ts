@@ -3,6 +3,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { TransactionService } from '../../../../shared/services/transaction.service';
 import { Transaction, TransactionType } from '../../../../shared/models/transaction.model';
+import { TrackingExpensesService } from '../../../../core/services/tracking-expenses/tracking-expenses.service';
 
 @Component({
   selector: 'app-charts-section',
@@ -13,6 +14,7 @@ import { Transaction, TransactionType } from '../../../../shared/models/transact
 })
 export class ChartsSectionComponent implements OnInit, OnChanges {
   private transactionService = inject(TransactionService);
+  private trackingExpensesService = inject(TrackingExpensesService);
 
   @Input() selectedMonth: Date = new Date();
   @ViewChild(BaseChartDirective) chart!: BaseChartDirective;
@@ -42,6 +44,7 @@ export class ChartsSectionComponent implements OnInit, OnChanges {
 
   toggleChartData(type: string): void {
     this.currentTransactionType = type === 'expenses' ? 'gasto' : 'ingreso';
+    this.trackingExpensesService.setTransactionType(this.currentTransactionType);
     this.loadChartData();
   }
 
