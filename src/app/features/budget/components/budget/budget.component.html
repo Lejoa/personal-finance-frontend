@@ -26,13 +26,6 @@
           {{ totalSpent | currency:'COP':'symbol-narrow':'1.0-0' }}
         </span>
       </div>
-      <div class="progress-bar" role="progressbar"
-        [attr.aria-valuenow]="globalProgressPercent" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar__fill"
-          [style.width.%]="globalProgressPercent"
-          [class.progress-bar__fill--over]="isGlobalOverBudget">
-        </div>
-      </div>
     </div>
 
     <!-- Categorías con presupuesto -->

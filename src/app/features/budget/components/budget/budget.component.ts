@@ -205,11 +205,7 @@ export class BudgetComponent implements OnInit {
     });
   }
 
-  get globalProgressPercent(): number {
-    return this.totalBudget > 0
-      ? Math.min((this.totalSpent / this.totalBudget) * 100, 100)
-      : 0;
-  }
+  
 
   get isGlobalOverBudget(): boolean {
     return this.totalSpent > this.totalBudget;
