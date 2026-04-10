@@ -142,9 +142,17 @@ export class SmsSyncSheetComponent implements OnChanges {
     if (this.transactions.length === 0 || this.isApproving) return;
     this.isApproving = true;
 
-    const toCreate = this.transactions.filter(tx => this.cardStates.get(tx.note)?.checked);
+    const toCreate   = this.transactions.filter(tx =>  this.cardStates.get(tx.note)?.checked);
+    const toDiscard  = this.transactions.filter(tx => !this.cardStates.get(tx.note)?.checked);
+
+    const markAllProcessed = () => {
+      [...toCreate, ...toDiscard].forEach(tx => {
+        this.smsService.markSmsAsProcessed(tx.smsAddress, tx.note, tx.smsDate);
+      });
+    };
 
     if (toCreate.length === 0) {
+      markAllProcessed();
       this.isApproving = false;
       this.approved.emit();
       return;
@@ -166,9 +174,7 @@ export class SmsSyncSheetComponent implements OnChanges {
 
     forkJoin(creates).subscribe({
       next: () => {
-        toCreate.forEach(tx => {
-          this.smsService.markSmsAsProcessed(tx.smsAddress, tx.note, tx.smsDate);
-        });
+        markAllProcessed();
         this.isApproving = false;
         this.approved.emit();
       },

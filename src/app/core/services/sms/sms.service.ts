@@ -150,32 +150,39 @@ export class SmsService {
    */
   // --- MOCK DATA (remover para pruebas con dispositivo real) ---
   private getMockSms() {
-    const h = (hours: number) => Date.now() - hours * 60 * 60 * 1000;
+    // Timestamps fijos (epoch ms) para que el hash SHA-256 de SmsDeduplicationService
+    // sea siempre el mismo para el mismo SMS, independientemente de cuándo se llame.
+    // Las fechas en el cuerpo del SMS y en sms.date son coherentes entre sí.
+    //
+    // Distribución por selector (referencia: 2026-04-10):
+    //   Hace 1 día  (≤24 h):  SMS 1 (2026-04-09)
+    //   Hace 3 días (≤72 h):  SMS 1-2 (2026-04-09, 2026-04-08)
+    //   Hace 7 días (≤168 h): SMS 1-5 (2026-04-09 al 2026-04-04)
     return [
       {
         address: '85540',
-        body: 'Bancolombia: Recibiste una transferencia por $431,991 de MARIA SOTO en tu cuenta **9514, el 25/01/2026 a las 18:51. Si tienes dudas, hablemos: 018000931987. Siempre a tu lado.',
-        date: h(12),   // ~hace 12 h → visible en "Hace 1 día"
+        body: 'Bancolombia: Recibiste una transferencia por $431,991 de MARIA SOTO en tu cuenta **9514, el 09/04/2026 a las 18:51. Si tienes dudas, hablemos: 018000931987. Siempre a tu lado.',
+        date: 1744228260000,   // 2026-04-09 18:51 UTC fijo
       },
       {
         address: '85540',
-        body: 'Bancolombia: Compraste COP40.900,00 en APPLE.COM/BILL, el 13:36 a las 14/03/2026. Esta compra esta asociada a T.Cred *8564. Si tienes dudas, encuentranos aqui: 01800931987. Siempre contigo.',
-        date: h(48),   // ~hace 2 días → visible desde "Hace 3 días"
+        body: 'Bancolombia: Compraste COP40.900,00 en APPLE.COM/BILL, el 13:36 a las 08/04/2026. Esta compra esta asociada a T.Cred *8564. Si tienes dudas, encuentranos aqui: 01800931987. Siempre contigo.',
+        date: 1744118160000,   // 2026-04-08 13:36 UTC fijo
       },
       {
         address: '85540',
-        body: 'Bancolombia: Transferiste $2,500.00 por QR desde tu cuenta 9514 a la cuenta 0163, el 2026/03/11 15:03. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
-        date: h(108),  // ~hace 4.5 días → visible desde "Hace 7 días"
+        body: 'Bancolombia: Transferiste $2,500.00 por QR desde tu cuenta 9514 a la cuenta 0163, el 2026/04/06 15:03. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+        date: 1743951780000,   // 2026-04-06 15:03 UTC fijo
       },
       {
         address: '85540',
-        body: 'Bancolombia: Pagaste $200,000.00 a CINE COLOMBIA S.A. desde tu producto *9514 el 04/03/2026 10:11:14. ¿Dudas? Llamanos al 6045109095. Estamos cerca',
-        date: h(132),  // ~hace 5.5 días → visible desde "Hace 7 días"
+        body: 'Bancolombia: Pagaste $200,000.00 a CINE COLOMBIA S.A. desde tu producto *9514 el 05/04/2026 10:11:14. ¿Dudas? Llamanos al 6045109095. Estamos cerca',
+        date: 1743847874000,   // 2026-04-05 10:11 UTC fijo
       },
       {
         address: '85540',
-        body: 'Bancolombia: Transferiste $100,000.00 desde tu cuenta 9514 a la cuenta *3001230523 el 07/03/2026 a las 14:27. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
-        date: h(156),  // ~hace 6.5 días → visible desde "Hace 7 días"
+        body: 'Bancolombia: Transferiste $100,000.00 desde tu cuenta 9514 a la cuenta *3001230523 el 04/04/2026 a las 14:27. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+        date: 1743774420000,   // 2026-04-04 14:27 UTC fijo
       },
     ];
   }
@@ -190,16 +197,26 @@ export class SmsService {
 
   /**
    * Versión mock de parseBankSms() para desarrollo en web.
-   * Filtra los mock SMS por el rango de días seleccionado.
+   * Filtra los mock SMS por el rango de días seleccionado usando la fecha parseada
+   * del cuerpo del SMS (no sms.date, que ahora es un timestamp fijo del pasado).
+   * Integra SmsDeduplicationService igual que parseBankSms() para que la dedup
+   * funcione correctamente en el flujo web/mock.
    * @deprecated Reemplazar por parseBankSms(days) en pruebas reales
    */
   async triggerMockFetch(days: number): Promise<PendingSmsTransaction[]> {
     const minDate = Date.now() - days * 24 * 60 * 60 * 1000;
     const pending: PendingSmsTransaction[] = [];
 
-    for (const sms of this.getMockSms().filter(s => s.date >= minDate)) {
+    for (const sms of this.getMockSms()) {
+      const alreadyProcessed = await this.dedup.isProcessed(sms.address, sms.body, sms.date);
+      if (alreadyProcessed) continue;
+
       const parsed = this.parser.parse(sms.body, sms.date);
       if (!parsed) continue;
+
+      // Filtrar por la fecha parseada del cuerpo del SMS (no por sms.date fijo)
+      if (parsed.date.getTime() < minDate) continue;
+
       pending.push({
         name: parsed.merchant,
         amount: parsed.amount,
