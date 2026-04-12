@@ -1,6 +1,7 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, OnDestroy, SimpleChanges, inject } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { TransactionService } from '../../services/transaction.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-balance',
@@ -9,10 +10,11 @@ import { TransactionService } from '../../services/transaction.service';
   templateUrl: './balance.component.html',
   styleUrl: './balance.component.scss'
 })
-export class BalanceComponent implements OnInit, OnChanges {
+export class BalanceComponent implements OnInit, OnChanges, OnDestroy {
   @Input() selectedMonth: Date = new Date();
 
   private transactionService = inject(TransactionService);
+  private subscription = new Subscription();
 
   income: number = 0;
   expenses: number = 0;
@@ -21,12 +23,21 @@ export class BalanceComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadMonthSummary();
+    this.subscription.add(
+      this.transactionService.transactionChanged$.subscribe(() => {
+        this.loadMonthSummary();
+      })
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedMonth'] && !changes['selectedMonth'].firstChange) {
       this.loadMonthSummary();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   private loadMonthSummary(): void {

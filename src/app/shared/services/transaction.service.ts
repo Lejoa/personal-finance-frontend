@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap, map, forkJoin } from 'rxjs';
+import { Observable, BehaviorSubject, Subject, tap, map, forkJoin } from 'rxjs';
 import { Transaction, TransactionType, TransactionStatus } from '../models/transaction.model';
 import { environment } from '../../../environments/environment';
 
@@ -49,6 +49,10 @@ export class TransactionService {
 
   private transactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public transactions$ = this.transactionsSubject.asObservable();
+
+  private transactionChangedSubject = new Subject<void>();
+  /** Emite cuando una transacción es creada, actualizada o eliminada */
+  public transactionChanged$ = this.transactionChangedSubject.asObservable();
 
   /** Obtiene transacciones con filtros opcionales */
   getTransactions(filters?: TransactionFilters): Observable<Transaction[]> {
@@ -136,6 +140,7 @@ export class TransactionService {
       tap(newTransaction => {
         const current = this.transactionsSubject.value;
         this.transactionsSubject.next([newTransaction, ...current]);
+        this.transactionChangedSubject.next();
       })
     );
   }
@@ -152,6 +157,7 @@ export class TransactionService {
           current[index] = updatedTransaction;
           this.transactionsSubject.next([...current]);
         }
+        this.transactionChangedSubject.next();
       })
     );
   }
@@ -167,6 +173,7 @@ export class TransactionService {
       tap(() => {
         const current = this.transactionsSubject.value;
         this.transactionsSubject.next(current.filter(t => t.id !== id.toString()));
+        this.transactionChangedSubject.next();
       })
     );
   }

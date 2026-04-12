@@ -72,6 +72,16 @@ export class TransactionHistoryComponent implements OnInit, OnChanges, OnDestroy
     } else {
       this.initializeHomeMode();
     }
+
+    this.subscription.add(
+      this.transactionService.transactionChanged$.subscribe(() => {
+        if (this.mode === 'tracking') {
+          this.loadTransactionsByDateRange();
+        } else {
+          this.initializeHomeMode();
+        }
+      })
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {

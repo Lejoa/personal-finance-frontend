@@ -1,9 +1,10 @@
-import { Component, ViewChild, OnInit, OnChanges, Input, SimpleChanges, inject } from '@angular/core';
+import { Component, ViewChild, OnInit, OnChanges, OnDestroy, Input, SimpleChanges, inject } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { TransactionService } from '../../../../shared/services/transaction.service';
 import { Transaction, TransactionType } from '../../../../shared/models/transaction.model';
 import { TrackingExpensesService } from '../../../../core/services/tracking-expenses/tracking-expenses.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-charts-section',
@@ -12,9 +13,10 @@ import { TrackingExpensesService } from '../../../../core/services/tracking-expe
   templateUrl: './charts-section.component.html',
   styleUrl: './charts-section.component.scss'
 })
-export class ChartsSectionComponent implements OnInit, OnChanges {
+export class ChartsSectionComponent implements OnInit, OnChanges, OnDestroy {
   private transactionService = inject(TransactionService);
   private trackingExpensesService = inject(TrackingExpensesService);
+  private subscription = new Subscription();
 
   @Input() selectedMonth: Date = new Date();
   @ViewChild(BaseChartDirective) chart!: BaseChartDirective;
@@ -34,12 +36,19 @@ export class ChartsSectionComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadChartData();
+    this.subscription.add(
+      this.transactionService.transactionChanged$.subscribe(() => this.loadChartData())
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedMonth'] && !changes['selectedMonth'].firstChange) {
       this.loadChartData();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   toggleChartData(type: string): void {
