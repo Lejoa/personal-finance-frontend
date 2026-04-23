@@ -275,8 +275,21 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: $spacer-md;
-  
+
   @media (min-width: $breakpoint-md) {
     gap: $spacer-lg;
   }
+}
+
+.cdk-overlay-container {
+  z-index: 1100 !important;
+}
+
+.snack-success .mdc-snackbar__surface {
+  background-color: $success-color !important;
+  color: white !important;
+}
+
+.snack-success .mat-mdc-snack-bar-action {
+  color: rgba(255, 255, 255, 0.85) !important;
 }

@@ -4,6 +4,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { Transaction, TransactionAction } from '../../models/transaction.model';
 import { Category } from '../../models/category.model';
@@ -19,6 +20,7 @@ import { TransactionService } from '../../services/transaction.service';
     AsyncPipe,
     MatFormFieldModule,
     MatSelectModule,
+    MatSnackBarModule,
     FormsModule,
     ReactiveFormsModule,
     CurrencyPipe,
@@ -30,6 +32,7 @@ import { TransactionService } from '../../services/transaction.service';
 export class TransactionCardComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private transactionService = inject(TransactionService);
+  private snackBar = inject(MatSnackBar);
 
   @Input() transaction!: Transaction;
   @Input() editable: boolean = false;
@@ -112,9 +115,15 @@ export class TransactionCardComponent implements OnInit {
       .subscribe({
         next: (updated) => {
           this.transaction = updated;
-          this.isEditing = false;
           this.isSaving = false;
           this.transactionUpdated.emit(updated);
+          this.snackBar.open('Transacción actualizada correctamente', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snack-success']
+          });
+          this.isEditing = false;
         },
         error: (error) => {
           console.error('Error updating transaction:', error);

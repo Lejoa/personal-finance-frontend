@@ -1,0 +1,104 @@
+<div class="category-section">
+  <div class="section-header">
+    <h2 class="section-title">{{ title }}</h2>
+    <button class="add-btn" (click)="openCreateModal()" type="button" [attr.aria-label]="ariaLabel">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="category-list">
+    <button
+      *ngFor="let cat of categories"
+      class="category-row"
+      (click)="openEditModal(cat)"
+      type="button">
+      <div class="category-row__icon" [class.category-row__icon--income]="type === 'ingreso'" [class.category-row__icon--expense]="type === 'gasto'">
+        <svg *ngIf="type === 'ingreso'" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z" fill="currentColor"/>
+        </svg>
+        <svg *ngIf="type === 'gasto'" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 20l1.41-1.41L7.83 13H20v-2H7.83l5.58-5.59L12 4l-8 8 8 8z" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="category-row__name">{{ cat.name }}</span>
+      <svg class="category-row__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
+      </svg>
+    </button>
+    <div *ngIf="categories.length === 0" class="empty-state">
+      {{ emptyMessage }}
+    </div>
+  </div>
+</div>
+
+<!-- Modal overlay -->
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()"></div>
+
+<div class="modal" *ngIf="isModalOpen">
+  <h3 class="modal__title">
+    {{ isEditMode ? 'Editar categoría' : 'Nueva categoría' }}
+  </h3>
+
+  <div class="modal__field">
+    <label class="modal__label" for="cat-name-{{ type }}">Nombre</label>
+    <input
+      id="cat-name-{{ type }}"
+      class="modal__input"
+      type="text"
+      [(ngModel)]="form.name"
+      placeholder="Nombre de la categoría"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="modal__field">
+    <label class="modal__label" for="cat-desc-{{ type }}">Descripción</label>
+    <input
+      id="cat-desc-{{ type }}"
+      class="modal__input"
+      type="text"
+      [(ngModel)]="form.description"
+      placeholder="Descripción (opcional)"
+      autocomplete="off"
+    />
+  </div>
+
+  <!-- Error de eliminación -->
+  <div class="modal__error" *ngIf="deleteError">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+    </svg>
+    <span>{{ deleteError }}</span>
+  </div>
+
+  <!-- Delete confirmation -->
+  <div class="modal__delete-confirm" *ngIf="showDeleteConfirm">
+    <p class="modal__delete-text">¿Eliminar esta categoría? Esta acción no se puede deshacer.</p>
+    <div class="modal__actions">
+      <button class="modal__btn modal__btn--secondary" (click)="showDeleteConfirm = false" type="button">No</button>
+      <button class="modal__btn modal__btn--danger" (click)="deleteCategory()" [disabled]="isDeleting" type="button">
+        {{ isDeleting ? 'Eliminando...' : 'Sí, eliminar' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="modal__actions" *ngIf="!showDeleteConfirm">
+    <button
+      *ngIf="isEditMode"
+      class="modal__btn modal__btn--danger-outline"
+      (click)="confirmDelete()"
+      type="button">
+      Eliminar
+    </button>
+    <button class="modal__btn modal__btn--secondary" (click)="closeModal()" type="button">Cancelar</button>
+    <button
+      class="modal__btn modal__btn--primary"
+      (click)="saveCategory()"
+      [disabled]="isSaving || !form.name.trim()"
+      type="button">
+      {{ isSaving ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</div>

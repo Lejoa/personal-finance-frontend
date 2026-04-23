@@ -1,17 +1,14 @@
 <div class="budget-page">
 
-  <!-- Navegador de mes -->
   <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
 
-  <!-- Resumen financiero -->
   <app-balance [selectedMonth]="selectedMonth"></app-balance>
 
-  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-indicator">Cargando...</div>
 
   <ng-container *ngIf="!isLoading">
 
-    <!-- Resumen de presupuesto global -->
+    <!-- Resumen global -->
     <div class="budget-summary-card" *ngIf="budgetedCategories.length > 0">
       <div class="budget-summary-row">
         <span class="budget-summary__label">Presupuesto total</span>
@@ -34,74 +31,22 @@
         Categorías presupuestadas
         <span class="budget-section__month">{{ selectedMonth | date:'MMM y' }}</span>
       </h3>
-
-      <div class="category-card" *ngFor="let cat of budgetedCategories">
-        <div class="category-card__header">
-          <div class="category-card__icon-name">
-            <span class="category-icon">{{ cat.categoryName.charAt(0).toUpperCase() }}</span>
-            <span class="category-card__name">{{ cat.categoryName }}</span>
-          </div>
-          <div class="category-card__actions">
-            <button
-              class="category-card__action-btn category-card__action-btn--edit"
-              (click)="openEditBudgetModal(cat)"
-              type="button"
-              aria-label="Editar límite">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
-              </svg>
-            </button>
-            <button
-              class="category-card__action-btn category-card__action-btn--delete"
-              (click)="deleteBudgetCategory(cat)"
-              type="button"
-              aria-label="Eliminar categoría del presupuesto">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="category-card__body">
-          <div class="category-card__amounts">
-            <div class="amount-row">
-              <span class="amount-label">Límite:</span>
-              <span class="amount-value">{{ cat.limit | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-            </div>
-            <div class="amount-row">
-              <span class="amount-label">Gastado:</span>
-              <span class="amount-value amount-value--spent">{{ cat.spent | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-            </div>
-            <div class="amount-row">
-              <span class="amount-label">Restante:</span>
-              <span class="amount-value" [class.amount-value--over]="cat.isOverBudget">
-                {{ cat.remaining | currency:'COP':'symbol-narrow':'1.0-0' }}
-              </span>
-            </div>
-          </div>
-
-        </div>
-      </div>
+      <app-budget-category-card
+        *ngFor="let cat of budgetedCategories"
+        [category]="cat"
+        [selectedMonth]="selectedMonth"
+        (categoryChanged)="loadBudgetData()">
+      </app-budget-category-card>
     </section>
 
     <!-- Categorías sin presupuesto -->
-    <section class="budget-section" *ngIf="unbudgetedCategories.length > 0">
-      <h3 class="budget-section__title">Sin presupuestar este mes</h3>
-
-      <div class="unbudgeted-row" *ngFor="let cat of unbudgetedCategories">
-        <div class="unbudgeted-row__info">
-          <span class="category-icon category-icon--sm">{{ cat.categoryName.charAt(0).toUpperCase() }}</span>
-          <span class="unbudgeted-row__name">{{ cat.categoryName }}</span>
-        </div>
-        <button
-          class="btn-set-budget"
-          (click)="openSetBudgetModal(cat)"
-          type="button">
-          FIJAR LÍMITE
-        </button>
-      </div>
-    </section>
+    <app-unbudgeted-category-list
+      *ngIf="unbudgetedCategories.length > 0"
+      [categories]="unbudgetedCategories"
+      [selectedMonth]="selectedMonth"
+      [currentBudget]="currentBudget"
+      (categoryAdded)="loadBudgetData()">
+    </app-unbudgeted-category-list>
 
     <!-- Estado vacío -->
     <div class="empty-state"
@@ -111,101 +56,4 @@
 
   </ng-container>
 
-</div>
-
-<!-- Modal para editar límite de categoría presupuestada -->
-<div *ngIf="isEditModalOpen" class="modal-overlay" (click)="closeEditModal()">
-  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
-    aria-labelledby="edit-modal-title">
-
-    <h3 class="modal__title" id="edit-modal-title">Editar límite</h3>
-
-    <div class="modal__category-header">
-      <span class="category-icon category-icon--lg">
-        {{ editingBudgetCategory?.categoryName?.charAt(0)?.toUpperCase() }}
-      </span>
-      <div>
-        <div class="modal__category-name">{{ editingBudgetCategory?.categoryName }}</div>
-        <div class="modal__category-current">
-          Límite actual: {{ editingBudgetCategory?.limit | currency:'COP':'symbol-narrow':'1.0-0' }}
-        </div>
-      </div>
-    </div>
-
-    <div class="modal__field">
-      <label class="modal__label" for="edit-limit">Nuevo límite</label>
-      <input
-        id="edit-limit"
-        type="number"
-        class="modal__input"
-        [(ngModel)]="editModalLimit"
-        placeholder="0"
-        min="1"
-        inputmode="numeric"
-        autofocus>
-    </div>
-
-    <p class="modal__month-info">
-      Mes: {{ selectedMonth | date:'MMMM y' }}
-    </p>
-
-    <div class="modal__actions">
-      <button class="modal__btn modal__btn--cancel" (click)="closeEditModal()" type="button">
-        CANCELAR
-      </button>
-      <button
-        class="modal__btn modal__btn--confirm"
-        (click)="confirmEditBudget()"
-        type="button"
-        [disabled]="editModalLimit <= 0 || isEditSaving">
-        {{ isEditSaving ? 'GUARDANDO...' : 'GUARDAR' }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para fijar presupuesto -->
-<div *ngIf="isModalOpen" class="modal-overlay" (click)="closeModal()">
-  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
-    aria-labelledby="modal-title">
-
-    <h3 class="modal__title" id="modal-title">Fijar presupuesto</h3>
-
-    <div class="modal__category-header">
-      <span class="category-icon category-icon--lg">
-        {{ selectedCategoryForModal?.categoryName?.charAt(0)?.toUpperCase() }}
-      </span>
-      <span class="modal__category-name">{{ selectedCategoryForModal?.categoryName }}</span>
-    </div>
-
-    <div class="modal__field">
-      <label class="modal__label" for="budget-limit">Límite</label>
-      <input
-        id="budget-limit"
-        type="number"
-        class="modal__input"
-        [(ngModel)]="modalLimit"
-        placeholder="0"
-        min="1"
-        inputmode="numeric"
-        autofocus>
-    </div>
-
-    <p class="modal__month-info">
-      Mes: {{ selectedMonth | date:'MMMM y' }}
-    </p>
-
-    <div class="modal__actions">
-      <button class="modal__btn modal__btn--cancel" (click)="closeModal()" type="button">
-        CANCELAR
-      </button>
-      <button
-        class="modal__btn modal__btn--confirm"
-        (click)="confirmSetBudget()"
-        type="button"
-        [disabled]="modalLimit <= 0 || isSaving">
-        {{ isSaving ? 'GUARDANDO...' : 'FIJAR' }}
-      </button>
-    </div>
-  </div>
 </div>

@@ -1,0 +1,60 @@
+<section class="budget-section">
+  <h3 class="budget-section__title">Sin presupuestar este mes</h3>
+
+  <div class="unbudgeted-row" *ngFor="let cat of categories">
+    <div class="unbudgeted-row__info">
+      <span class="category-icon category-icon--sm">{{ cat.categoryName.charAt(0).toUpperCase() }}</span>
+      <span class="unbudgeted-row__name">{{ cat.categoryName }}</span>
+    </div>
+    <button
+      class="btn-set-budget"
+      (click)="openModal(cat)"
+      type="button">
+      FIJAR LÍMITE
+    </button>
+  </div>
+</section>
+
+<!-- Modal fijar presupuesto -->
+<div *ngIf="isModalOpen" class="modal-overlay" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+    aria-labelledby="modal-title">
+
+    <h3 class="modal__title" id="modal-title">Fijar presupuesto</h3>
+
+    <div class="modal__category-header">
+      <span class="category-icon category-icon--lg">
+        {{ selectedCategory?.categoryName?.charAt(0)?.toUpperCase() }}
+      </span>
+      <span class="modal__category-name">{{ selectedCategory?.categoryName }}</span>
+    </div>
+
+    <div class="modal__field">
+      <label class="modal__label" for="budget-limit">Límite</label>
+      <input
+        id="budget-limit"
+        type="number"
+        class="modal__input"
+        [(ngModel)]="modalLimit"
+        placeholder="0"
+        min="1"
+        inputmode="numeric"
+        autofocus>
+    </div>
+
+    <p class="modal__month-info">Mes: {{ selectedMonth | date:'MMMM y' }}</p>
+
+    <div class="modal__actions">
+      <button class="modal__btn modal__btn--cancel" (click)="closeModal()" type="button">
+        CANCELAR
+      </button>
+      <button
+        class="modal__btn modal__btn--confirm"
+        (click)="confirm()"
+        type="button"
+        [disabled]="modalLimit <= 0 || isSaving">
+        {{ isSaving ? 'GUARDANDO...' : 'FIJAR' }}
+      </button>
+    </div>
+  </div>
+</div>

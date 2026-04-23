@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { Budget, BudgetCategory } from '../../../../shared/models/budget.model';
 import { Category } from '../../../../shared/models/category.model';
@@ -10,33 +9,19 @@ import { BudgetService } from '../../../../shared/services/budget.service';
 import { TransactionService } from '../../../../shared/services/transaction.service';
 import { MonthNavigatorComponent } from '../../../../shared/components/month-navigator/month-navigator.component';
 import { BalanceComponent } from '../../../../shared/components/balance/balance.component';
-
-interface BudgetCategoryView {
-  categoryId: number;
-  categoryName: string;
-  limit: number;
-  spent: number;
-  remaining: number;
-  isOverBudget: boolean;
-  budgetId?: number;
-  budgetCategoryId?: number;
-}
-
-interface UnbudgetedCategory {
-  categoryId: number;
-  categoryName: string;
-  spent: number;
-}
+import { BudgetCategoryCardComponent, BudgetCategoryView } from '../budget-category-card/budget-category-card.component';
+import { UnbudgetedCategoryListComponent, UnbudgetedCategory } from '../unbudgeted-category-list/unbudgeted-category-list.component';
 
 @Component({
   selector: 'app-budget',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     CurrencyPipe,
     MonthNavigatorComponent,
-    BalanceComponent
+    BalanceComponent,
+    BudgetCategoryCardComponent,
+    UnbudgetedCategoryListComponent,
   ],
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.scss'
@@ -54,18 +39,6 @@ export class BudgetComponent implements OnInit {
   totalSpent: number = 0;
   isLoading: boolean = false;
 
-  // Modal: fijar límite (categorías sin presupuesto)
-  isModalOpen: boolean = false;
-  selectedCategoryForModal: UnbudgetedCategory | null = null;
-  modalLimit: number = 0;
-  isSaving: boolean = false;
-
-  // Modal: editar límite (categorías con presupuesto)
-  isEditModalOpen: boolean = false;
-  editingBudgetCategory: BudgetCategoryView | null = null;
-  editModalLimit: number = 0;
-  isEditSaving: boolean = false;
-
   ngOnInit(): void {
     // monthChange emits on init from MonthNavigatorComponent
   }
@@ -75,7 +48,7 @@ export class BudgetComponent implements OnInit {
     this.loadBudgetData();
   }
 
-  private loadBudgetData(): void {
+  loadBudgetData(): void {
     this.isLoading = true;
     const start = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth(), 1);
     const end = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth() + 1, 0);
@@ -90,9 +63,7 @@ export class BudgetComponent implements OnInit {
         this.buildViews(budget, categories, transactions);
         this.isLoading = false;
       },
-      error: () => {
-        this.isLoading = false;
-      }
+      error: () => { this.isLoading = false; }
     });
   }
 
@@ -110,14 +81,13 @@ export class BudgetComponent implements OnInit {
       this.budgetedCategories = budget.categories.map((bc: BudgetCategory) => {
         const spent = spentByCategory[bc.categoryId] || 0;
         const limit = bc.amount;
-        const remaining = limit - spent;
         budgetedCategoryIds.add(bc.categoryId);
         return {
           categoryId: bc.categoryId,
           categoryName: bc.categoryName,
           limit,
           spent,
-          remaining,
+          remaining: limit - spent,
           isOverBudget: spent > limit,
           budgetId: budget.id,
           budgetCategoryId: bc.id
@@ -138,74 +108,6 @@ export class BudgetComponent implements OnInit {
         spent: spentByCategory[cat.id] || 0
       }));
   }
-
-  openSetBudgetModal(cat: UnbudgetedCategory): void {
-    this.selectedCategoryForModal = cat;
-    this.modalLimit = 0;
-    this.isModalOpen = true;
-  }
-
-  closeModal(): void {
-    this.isModalOpen = false;
-    this.selectedCategoryForModal = null;
-    this.modalLimit = 0;
-    this.isSaving = false;
-  }
-
-  confirmSetBudget(): void {
-    if (!this.selectedCategoryForModal || this.modalLimit <= 0) return;
-    this.isSaving = true;
-    this.budgetService.setBudgetForCategory(
-      this.selectedCategoryForModal.categoryId,
-      this.modalLimit,
-      this.selectedMonth,
-      this.currentBudget
-    ).subscribe({
-      next: () => {
-        this.closeModal();
-        this.loadBudgetData();
-      },
-      error: () => {
-        this.isSaving = false;
-      }
-    });
-  }
-
-  openEditBudgetModal(cat: BudgetCategoryView): void {
-    this.editingBudgetCategory = cat;
-    this.editModalLimit = cat.limit;
-    this.isEditModalOpen = true;
-  }
-
-  closeEditModal(): void {
-    this.isEditModalOpen = false;
-    this.editingBudgetCategory = null;
-    this.editModalLimit = 0;
-    this.isEditSaving = false;
-  }
-
-  confirmEditBudget(): void {
-    if (!this.editingBudgetCategory?.budgetId || !this.editingBudgetCategory?.budgetCategoryId || this.editModalLimit <= 0) return;
-    this.isEditSaving = true;
-    this.budgetService.updateBudgetCategoryAmount(
-      this.editingBudgetCategory.budgetId,
-      this.editingBudgetCategory.budgetCategoryId,
-      this.editModalLimit
-    ).subscribe({
-      next: () => { this.closeEditModal(); this.loadBudgetData(); },
-      error: () => { this.isEditSaving = false; }
-    });
-  }
-
-  deleteBudgetCategory(cat: BudgetCategoryView): void {
-    if (!cat.budgetId || !cat.budgetCategoryId) return;
-    this.budgetService.deleteBudgetCategory(cat.budgetId, cat.budgetCategoryId).subscribe({
-      next: () => this.loadBudgetData(),
-      error: (err) => console.error('Error deleting budget category:', err)
-    });
-  }
-
-  
 
   get isGlobalOverBudget(): boolean {
     return this.totalSpent > this.totalBudget;
