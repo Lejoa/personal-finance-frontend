@@ -1,45 +1,57 @@
 <div class="block block--financial-literacy">
 
-  <!-- Sección: Mis análisis -->
-  <div class="section-analyses" *ngIf="analyses.length > 0">
-    <h3 class="section-title">Mis análisis</h3>
-    <app-analysis-card
-      *ngFor="let analysis of analyses"
-      [analysis]="analysis"
-      (read)="onAnalysisRead($event)">
-    </app-analysis-card>
-  </div>
-
-  <!-- Sección: Consejos -->
-  <h3 class="section-title">Consejos para ti</h3>
-  <p *ngIf="isLoading" class="tips-loading">Cargando consejos...</p>
-  <p *ngIf="!isLoading && tips.length === 0" class="tips-empty">No hay consejos disponibles por el momento.</p>
-  <div class="financial-tips-list" *ngIf="!selectedTip && !isLoading && tips.length > 0">
-    <app-financial-tips
-        *ngFor="let tip of tips"
-        [title]="tip.title"
-        [shortDescription]="tip.shortDescription"
-        [description]="tip.description"
-        [imageSrc]="tip.imageSrc"
-        [author]="tip.author"
-        [authorTitle]="tip.authorTitle"
-        [reason]="tip.reason"
-        (expand)="onExpandTip(tip)">
-    </app-financial-tips>
-  </div>
-  <div class="financial-tip-detail" *ngIf="selectedTip">
-    <button class="close-btn" (click)="closeDetail()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
-    <h2 class="detail-title">{{ selectedTip.title }}</h2>
-    <p *ngIf="selectedTip.reason" class="detail-reason">{{ selectedTip.reason }}</p>
-    <div class="author-info">
-      <span class="author">{{ selectedTip.author }}</span>
-      <span class="author-title">{{ selectedTip.authorTitle }}</span>
+  @if (analyses.length > 0) {
+    <div class="section-analyses">
+      <h3 class="section-title">Mis análisis</h3>
+      @for (analysis of analyses; track analysis.id) {
+        <app-analysis-card
+          [analysis]="analysis"
+          (read)="markAnalysisAsRead($event)">
+        </app-analysis-card>
+      }
     </div>
-    <p class="detail-description">{{ selectedTip.description }}</p>
-    <button class="learn-more-btn" (click)="learnMore(selectedTip)">Aprende más →</button>
-  </div>
+  }
+
+  <h3 class="section-title">Consejos para ti</h3>
+  @if (isLoading) {
+    <p class="tips-loading">Cargando consejos...</p>
+  }
+  @if (!isLoading && tips.length === 0) {
+    <p class="tips-empty">No hay consejos disponibles por el momento.</p>
+  }
+  @if (!selectedTip && !isLoading && tips.length > 0) {
+    <div class="financial-tips-list">
+      @for (tip of tips; track tip.id) {
+        <app-financial-tips
+            [title]="tip.title"
+            [shortDescription]="tip.shortDescription"
+            [description]="tip.description"
+            [imageSrc]="tip.imageSrc"
+            [author]="tip.author"
+            [authorTitle]="tip.authorTitle"
+            [reason]="tip.reason"
+            (expand)="selectTip(tip)">
+        </app-financial-tips>
+      }
+    </div>
+  }
+  @if (selectedTip) {
+    <div class="financial-tip-detail">
+      <button class="close-btn" (click)="clearSelectedTip()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+      </button>
+      <h2 class="detail-title">{{ selectedTip.title }}</h2>
+      @if (selectedTip.reason) {
+        <p class="detail-reason">{{ selectedTip.reason }}</p>
+      }
+      <div class="author-info">
+        <span class="author">{{ selectedTip.author }}</span>
+        <span class="author-title">{{ selectedTip.authorTitle }}</span>
+      </div>
+      <p class="detail-description">{{ selectedTip.description }}</p>
+      <button class="learn-more-btn" (click)="learnMore(selectedTip)">Aprende más →</button>
+    </div>
+  }
 </div>

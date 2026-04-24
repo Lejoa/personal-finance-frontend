@@ -2,15 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { FinancialAnalysis } from '../interfaces/learning-content.interfaces';
 
-export interface FinancialAnalysis {
-  id: number;
-  period: string;
-  checkpoint: 'mid' | 'end';
-  content: string;
-  isRead: boolean;
-  generatedAt: string;
-}
+export type { FinancialAnalysis };
 
 interface AnalysisListResponse {
   data: FinancialAnalysis[];

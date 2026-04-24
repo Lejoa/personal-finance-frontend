@@ -1,19 +1,17 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FinancialTipsComponent } from '../../../../shared/components/financial-tips/financial-tips.component';
-import { NgIf, NgFor } from '@angular/common';
-import { FinancialTip } from '../../interfaces/learning-content.interfaces';
+import { FinancialTip, FinancialAnalysis } from '../../interfaces/learning-content.interfaces';
 import { TipService } from '../../../../shared/services/tip.service';
 import { TabService } from '../../../../core/services/tab/tab.service';
 import { ChatService } from '../../../chat/services/chat.service';
-import { AnalysisService, FinancialAnalysis } from '../../services/analysis.service';
+import { AnalysisService } from '../../services/analysis.service';
 import { AnalysisCardComponent } from '../analysis-card/analysis-card.component';
 
 @Component({
   selector: 'app-learning-content',
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     FinancialTipsComponent,
     AnalysisCardComponent
   ],
@@ -25,6 +23,7 @@ export class LearningContentComponent implements OnInit {
   private tabService = inject(TabService);
   private chatService = inject(ChatService);
   private analysisService = inject(AnalysisService);
+  private destroyRef = inject(DestroyRef);
 
   tips: FinancialTip[] = [];
   analyses: FinancialAnalysis[] = [];
@@ -32,27 +31,15 @@ export class LearningContentComponent implements OnInit {
   selectedTip?: FinancialTip;
 
   ngOnInit(): void {
-    this.tipService.getRecommendedTips().subscribe({
-      next: (tips) => {
-        this.tips = tips;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-      }
-    });
-
-    this.analysisService.getAnalyses().subscribe({
-      next: (analyses) => { this.analyses = analyses; },
-      error: () => {}
-    });
+    this.loadTips();
+    this.loadAnalyses();
   }
 
-  onExpandTip(tip: FinancialTip) {
+  selectTip(tip: FinancialTip): void {
     this.selectedTip = tip;
   }
 
-  closeDetail() {
+  clearSelectedTip(): void {
     this.selectedTip = undefined;
   }
 
@@ -62,7 +49,27 @@ export class LearningContentComponent implements OnInit {
     setTimeout(() => this.chatService.sendMessage(message));
   }
 
-  onAnalysisRead(id: number): void {
-    this.analysisService.markAsRead(id).subscribe();
+  markAnalysisAsRead(id: number): void {
+    this.analysisService.markAsRead(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+  }
+
+  private loadTips(): void {
+    this.tipService.getRecommendedTips()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (tips) => { this.tips = tips; this.isLoading = false; },
+        error: () => { this.isLoading = false; }
+      });
+  }
+
+  private loadAnalyses(): void {
+    this.analysisService.getAnalyses()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (analyses) => { this.analyses = analyses; },
+        error: () => { this.analyses = []; }
+      });
   }
 }

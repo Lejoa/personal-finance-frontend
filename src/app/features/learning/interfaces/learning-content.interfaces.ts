@@ -8,3 +8,12 @@ export interface FinancialTip {
   authorTitle?: string;
   reason?: string;
 }
+
+export interface FinancialAnalysis {
+  id: number;
+  period: string;
+  checkpoint: 'mid' | 'end';
+  content: string;
+  isRead: boolean;
+  generatedAt: string;
+}

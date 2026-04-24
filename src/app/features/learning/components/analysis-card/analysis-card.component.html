@@ -1,8 +1,10 @@
 <div class="analysis-card" [class.analysis-card--expanded]="isExpanded">
-  <button class="analysis-card__header" (click)="toggle()" type="button">
+  <button class="analysis-card__header" (click)="toggleExpanded()" type="button">
     <div class="analysis-card__title-row">
       <span class="analysis-card__title">{{ title }}</span>
-      <span class="badge-new" *ngIf="!analysis.isRead">NUEVO</span>
+      @if (!analysis.isRead) {
+        <span class="badge-new">NUEVO</span>
+      }
     </div>
     <svg class="analysis-card__chevron" [class.analysis-card__chevron--open]="isExpanded"
          width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -10,8 +12,10 @@
             stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
-  <div class="analysis-card__body" *ngIf="isExpanded">
-    <div class="analysis-card__content" [innerHTML]="analysis.content | markdown"></div>
-    <p class="analysis-card__date">Generado el {{ analysis.generatedAt.slice(0, 10) }}</p>
-  </div>
+  @if (isExpanded) {
+    <div class="analysis-card__body">
+      <div class="analysis-card__content" [innerHTML]="analysis.content | markdown"></div>
+      <p class="analysis-card__date">Generado el {{ formattedDate }}</p>
+    </div>
+  }
 </div>
