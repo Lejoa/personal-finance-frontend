@@ -1,58 +1,50 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BudgetService } from '../../../../shared/services/budget.service';
-
-export interface BudgetCategoryView {
-  categoryId: number;
-  categoryName: string;
-  limit: number;
-  spent: number;
-  remaining: number;
-  isOverBudget: boolean;
-  budgetId?: number;
-  budgetCategoryId?: number;
-}
+import { BudgetCategoryView } from '../../interfaces';
 
 @Component({
   selector: 'app-budget-category-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatSnackBarModule],
+  imports: [FormsModule, CurrencyPipe, DatePipe, MatSnackBarModule],
   templateUrl: './budget-category-card.component.html',
   styleUrl: './budget-category-card.component.scss'
 })
 export class BudgetCategoryCardComponent {
   private budgetService = inject(BudgetService);
   private snackBar = inject(MatSnackBar);
+  private destroyRef = inject(DestroyRef);
 
   @Input() category!: BudgetCategoryView;
   @Input() selectedMonth!: Date;
   @Output() categoryChanged = new EventEmitter<void>();
 
-  isEditModalOpen = false;
-  editModalLimit = 0;
-  isEditSaving = false;
+  isModalOpen = false;
+  modalLimit = 0;
+  isSaving = false;
 
   openEditModal(): void {
-    this.editModalLimit = this.category.limit;
-    this.isEditModalOpen = true;
+    this.modalLimit = this.category.limit;
+    this.isModalOpen = true;
   }
 
   closeEditModal(): void {
-    this.isEditModalOpen = false;
-    this.editModalLimit = 0;
-    this.isEditSaving = false;
+    this.isModalOpen = false;
+    this.modalLimit = 0;
+    this.isSaving = false;
   }
 
-  confirmEdit(): void {
-    if (!this.category.budgetId || !this.category.budgetCategoryId || this.editModalLimit <= 0) return;
-    this.isEditSaving = true;
+  saveBudgetCategoryEdit(): void {
+    if (!this.category.budgetId || !this.category.budgetCategoryId || this.modalLimit <= 0) return;
+    this.isSaving = true;
     this.budgetService.updateBudgetCategoryAmount(
       this.category.budgetId,
       this.category.budgetCategoryId,
-      this.editModalLimit
-    ).subscribe({
+      this.modalLimit
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.snackBar.open('Límite actualizado correctamente', 'Cerrar', {
           duration: 3000,
@@ -63,16 +55,24 @@ export class BudgetCategoryCardComponent {
         this.closeEditModal();
         this.categoryChanged.emit();
       },
-      error: () => { this.isEditSaving = false; }
+      error: () => {
+        this.isSaving = false;
+        this.snackBar.open('No se pudo actualizar el límite. Intenta de nuevo.', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+          panelClass: ['snack-error']
+        });
+      }
     });
   }
 
-  delete(): void {
+  deleteBudgetCategory(): void {
     if (!this.category.budgetId || !this.category.budgetCategoryId) return;
     this.budgetService.deleteBudgetCategory(
       this.category.budgetId,
       this.category.budgetCategoryId
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.snackBar.open('Categoría eliminada del presupuesto', 'Cerrar', {
           duration: 3000,
@@ -82,7 +82,14 @@ export class BudgetCategoryCardComponent {
         });
         this.categoryChanged.emit();
       },
-      error: (err) => console.error('Error deleting budget category:', err)
+      error: () => {
+        this.snackBar.open('No se pudo eliminar la categoría. Intenta de nuevo.', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+          panelClass: ['snack-error']
+        });
+      }
     });
   }
 }

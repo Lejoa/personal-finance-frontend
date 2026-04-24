@@ -1,26 +1,23 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Budget } from '../../../../shared/models/budget.model';
 import { BudgetService } from '../../../../shared/services/budget.service';
-
-export interface UnbudgetedCategory {
-  categoryId: number;
-  categoryName: string;
-  spent: number;
-}
+import { UnbudgetedCategory } from '../../interfaces';
 
 @Component({
   selector: 'app-unbudgeted-category-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatSnackBarModule],
+  imports: [FormsModule, DatePipe, MatSnackBarModule],
   templateUrl: './unbudgeted-category-list.component.html',
   styleUrl: './unbudgeted-category-list.component.scss'
 })
 export class UnbudgetedCategoryListComponent {
   private budgetService = inject(BudgetService);
   private snackBar = inject(MatSnackBar);
+  private destroyRef = inject(DestroyRef);
 
   @Input() categories: UnbudgetedCategory[] = [];
   @Input() selectedMonth!: Date;
@@ -45,7 +42,7 @@ export class UnbudgetedCategoryListComponent {
     this.isSaving = false;
   }
 
-  confirm(): void {
+  saveBudgetCategoryLimit(): void {
     if (!this.selectedCategory || this.modalLimit <= 0) return;
     this.isSaving = true;
     this.budgetService.setBudgetForCategory(
@@ -53,7 +50,7 @@ export class UnbudgetedCategoryListComponent {
       this.modalLimit,
       this.selectedMonth,
       this.currentBudget
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.snackBar.open('Presupuesto fijado correctamente', 'Cerrar', {
           duration: 3000,
@@ -64,7 +61,15 @@ export class UnbudgetedCategoryListComponent {
         this.closeModal();
         this.categoryAdded.emit();
       },
-      error: () => { this.isSaving = false; }
+      error: () => {
+        this.isSaving = false;
+        this.snackBar.open('No se pudo fijar el presupuesto. Intenta de nuevo.', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+          panelClass: ['snack-error']
+        });
+      }
     });
   }
 }

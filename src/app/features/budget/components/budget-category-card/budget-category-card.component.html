@@ -16,7 +16,7 @@
       </button>
       <button
         class="category-card__action-btn category-card__action-btn--delete"
-        (click)="delete()"
+        (click)="deleteBudgetCategory()"
         type="button"
         aria-label="Eliminar categoría del presupuesto">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,50 +47,52 @@
 </div>
 
 <!-- Modal editar límite -->
-<div *ngIf="isEditModalOpen" class="modal-overlay" (click)="closeEditModal()">
-  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
-    aria-labelledby="edit-modal-title">
+@if (isModalOpen) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+      aria-labelledby="edit-modal-title">
 
-    <h3 class="modal__title" id="edit-modal-title">Editar límite</h3>
+      <h3 class="modal__title" id="edit-modal-title">Editar límite</h3>
 
-    <div class="modal__category-header">
-      <span class="category-icon category-icon--lg">
-        {{ category.categoryName.charAt(0).toUpperCase() }}
-      </span>
-      <div>
-        <div class="modal__category-name">{{ category.categoryName }}</div>
-        <div class="modal__category-current">
-          Límite actual: {{ category.limit | currency:'COP':'symbol-narrow':'1.0-0' }}
+      <div class="modal__category-header">
+        <span class="category-icon category-icon--lg">
+          {{ category.categoryName.charAt(0).toUpperCase() }}
+        </span>
+        <div>
+          <div class="modal__category-name">{{ category.categoryName }}</div>
+          <div class="modal__category-current">
+            Límite actual: {{ category.limit | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="modal__field">
-      <label class="modal__label" for="edit-limit">Nuevo límite</label>
-      <input
-        id="edit-limit"
-        type="number"
-        class="modal__input"
-        [(ngModel)]="editModalLimit"
-        placeholder="0"
-        min="1"
-        inputmode="numeric"
-        autofocus>
-    </div>
+      <div class="modal__field">
+        <label class="modal__label" for="edit-limit">Nuevo límite</label>
+        <input
+          id="edit-limit"
+          type="number"
+          class="modal__input"
+          [(ngModel)]="modalLimit"
+          placeholder="0"
+          min="1"
+          inputmode="numeric"
+          autofocus>
+      </div>
 
-    <p class="modal__month-info">Mes: {{ selectedMonth | date:'MMMM y' }}</p>
+      <p class="modal__month-info">Mes: {{ selectedMonth | date:'MMMM y' }}</p>
 
-    <div class="modal__actions">
-      <button class="modal__btn modal__btn--cancel" (click)="closeEditModal()" type="button">
-        CANCELAR
-      </button>
-      <button
-        class="modal__btn modal__btn--confirm"
-        (click)="confirmEdit()"
-        type="button"
-        [disabled]="editModalLimit <= 0 || isEditSaving">
-        {{ isEditSaving ? 'GUARDANDO...' : 'GUARDAR' }}
-      </button>
+      <div class="modal__actions">
+        <button class="modal__btn modal__btn--cancel" (click)="closeEditModal()" type="button">
+          CANCELAR
+        </button>
+        <button
+          class="modal__btn modal__btn--confirm"
+          (click)="saveBudgetCategoryEdit()"
+          type="button"
+          [disabled]="modalLimit <= 0 || isSaving">
+          {{ isSaving ? 'GUARDANDO...' : 'GUARDAR' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}

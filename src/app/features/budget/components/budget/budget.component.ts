@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Component, inject, DestroyRef } from '@angular/core';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Budget, BudgetCategory } from '../../../../shared/models/budget.model';
 import { Category } from '../../../../shared/models/category.model';
 import { Transaction } from '../../../../shared/models/transaction.model';
@@ -9,15 +10,16 @@ import { BudgetService } from '../../../../shared/services/budget.service';
 import { TransactionService } from '../../../../shared/services/transaction.service';
 import { MonthNavigatorComponent } from '../../../../shared/components/month-navigator/month-navigator.component';
 import { BalanceComponent } from '../../../../shared/components/balance/balance.component';
-import { BudgetCategoryCardComponent, BudgetCategoryView } from '../budget-category-card/budget-category-card.component';
-import { UnbudgetedCategoryListComponent, UnbudgetedCategory } from '../unbudgeted-category-list/unbudgeted-category-list.component';
+import { BudgetCategoryCardComponent } from '../budget-category-card/budget-category-card.component';
+import { UnbudgetedCategoryListComponent } from '../unbudgeted-category-list/unbudgeted-category-list.component';
+import { BudgetCategoryView, UnbudgetedCategory } from '../../interfaces';
 
 @Component({
   selector: 'app-budget',
   standalone: true,
   imports: [
-    CommonModule,
     CurrencyPipe,
+    DatePipe,
     MonthNavigatorComponent,
     BalanceComponent,
     BudgetCategoryCardComponent,
@@ -26,10 +28,11 @@ import { UnbudgetedCategoryListComponent, UnbudgetedCategory } from '../unbudget
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.scss'
 })
-export class BudgetComponent implements OnInit {
+export class BudgetComponent {
   private categoryService = inject(CategoryService);
   private budgetService = inject(BudgetService);
   private transactionService = inject(TransactionService);
+  private destroyRef = inject(DestroyRef);
 
   selectedMonth: Date = new Date();
   currentBudget: Budget | null = null;
@@ -39,10 +42,6 @@ export class BudgetComponent implements OnInit {
   totalSpent: number = 0;
   isLoading: boolean = false;
 
-  ngOnInit(): void {
-    // monthChange emits on init from MonthNavigatorComponent
-  }
-
   onMonthChange(month: Date): void {
     this.selectedMonth = month;
     this.loadBudgetData();
@@ -50,45 +49,38 @@ export class BudgetComponent implements OnInit {
 
   loadBudgetData(): void {
     this.isLoading = true;
-    const start = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth(), 1);
-    const end = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth() + 1, 0);
+    const monthStartDate = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth(), 1);
+    const monthEndDate = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth() + 1, 0);
 
     forkJoin({
       budget: this.budgetService.getBudgetByMonth(this.selectedMonth),
       categories: this.categoryService.getCategories({ type: 'gasto' }),
-      transactions: this.transactionService.getTransactionsByDateRange(start, end, 'gasto')
-    }).subscribe({
+      transactions: this.transactionService.getTransactionsByDateRange(monthStartDate, monthEndDate, 'gasto')
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ budget, categories, transactions }) => {
         this.currentBudget = budget;
-        this.buildViews(budget, categories, transactions);
+        this.buildCategoryViews(budget, categories, transactions);
         this.isLoading = false;
       },
       error: () => { this.isLoading = false; }
     });
   }
 
-  private buildViews(budget: Budget | null, categories: Category[], transactions: Transaction[]): void {
-    const spentByCategory: Record<number, number> = {};
-    transactions.forEach(t => {
-      if (t.categoryId != null) {
-        spentByCategory[t.categoryId] = (spentByCategory[t.categoryId] || 0) + t.amount;
-      }
-    });
-
+  private buildCategoryViews(budget: Budget | null, categories: Category[], transactions: Transaction[]): void {
+    const spentByCategoryId = this.calculateSpentByCategoryId(transactions);
     const budgetedCategoryIds = new Set<number>();
 
-    if (budget?.categories && budget.categories.length > 0) {
+    if (budget?.categories?.length) {
       this.budgetedCategories = budget.categories.map((bc: BudgetCategory) => {
-        const spent = spentByCategory[bc.categoryId] || 0;
-        const limit = bc.amount;
+        const spent = spentByCategoryId[bc.categoryId] ?? 0;
         budgetedCategoryIds.add(bc.categoryId);
         return {
           categoryId: bc.categoryId,
           categoryName: bc.categoryName,
-          limit,
+          limit: bc.amount,
           spent,
-          remaining: limit - spent,
-          isOverBudget: spent > limit,
+          remaining: bc.amount - spent,
+          isOverBudget: spent > bc.amount,
           budgetId: budget.id,
           budgetCategoryId: bc.id
         };
@@ -105,8 +97,17 @@ export class BudgetComponent implements OnInit {
       .map(cat => ({
         categoryId: cat.id,
         categoryName: cat.name,
-        spent: spentByCategory[cat.id] || 0
+        spent: spentByCategoryId[cat.id] ?? 0
       }));
+  }
+
+  private calculateSpentByCategoryId(transactions: Transaction[]): Record<number, number> {
+    return transactions.reduce((acc, t) => {
+      if (t.categoryId != null) {
+        acc[t.categoryId] = (acc[t.categoryId] ?? 0) + t.amount;
+      }
+      return acc;
+    }, {} as Record<number, number>);
   }
 
   get isGlobalOverBudget(): boolean {

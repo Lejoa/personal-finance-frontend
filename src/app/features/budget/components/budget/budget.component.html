@@ -4,56 +4,65 @@
 
   <app-balance [selectedMonth]="selectedMonth"></app-balance>
 
-  <div *ngIf="isLoading" class="loading-indicator">Cargando...</div>
+  @if (isLoading) {
+    <div class="loading-indicator">Cargando...</div>
+  }
 
-  <ng-container *ngIf="!isLoading">
+  @if (!isLoading) {
 
     <!-- Resumen global -->
-    <div class="budget-summary-card" *ngIf="budgetedCategories.length > 0">
-      <div class="budget-summary-row">
-        <span class="budget-summary__label">Presupuesto total</span>
-        <span class="budget-summary__value">
-          {{ totalBudget | currency:'COP':'symbol-narrow':'1.0-0' }}
-        </span>
+    @if (budgetedCategories.length > 0) {
+      <div class="budget-summary-card">
+        <div class="budget-summary-row">
+          <span class="budget-summary__label">Presupuesto total</span>
+          <span class="budget-summary__value">
+            {{ totalBudget | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </span>
+        </div>
+        <div class="budget-summary-row">
+          <span class="budget-summary__label">Total gastado</span>
+          <span class="budget-summary__value budget-summary__value--spent"
+            [class.budget-summary__value--over]="isGlobalOverBudget">
+            {{ totalSpent | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </span>
+        </div>
       </div>
-      <div class="budget-summary-row">
-        <span class="budget-summary__label">Total gastado</span>
-        <span class="budget-summary__value budget-summary__value--spent"
-          [class.budget-summary__value--over]="isGlobalOverBudget">
-          {{ totalSpent | currency:'COP':'symbol-narrow':'1.0-0' }}
-        </span>
-      </div>
-    </div>
+    }
 
     <!-- Categorías con presupuesto -->
-    <section class="budget-section" *ngIf="budgetedCategories.length > 0">
-      <h3 class="budget-section__title">
-        Categorías presupuestadas
-        <span class="budget-section__month">{{ selectedMonth | date:'MMM y' }}</span>
-      </h3>
-      <app-budget-category-card
-        *ngFor="let cat of budgetedCategories"
-        [category]="cat"
-        [selectedMonth]="selectedMonth"
-        (categoryChanged)="loadBudgetData()">
-      </app-budget-category-card>
-    </section>
+    @if (budgetedCategories.length > 0) {
+      <section class="budget-section">
+        <h3 class="budget-section__title">
+          Categorías presupuestadas
+          <span class="budget-section__month">{{ selectedMonth | date:'MMM y' }}</span>
+        </h3>
+        @for (cat of budgetedCategories; track cat.categoryId) {
+          <app-budget-category-card
+            [category]="cat"
+            [selectedMonth]="selectedMonth"
+            (categoryChanged)="loadBudgetData()">
+          </app-budget-category-card>
+        }
+      </section>
+    }
 
     <!-- Categorías sin presupuesto -->
-    <app-unbudgeted-category-list
-      *ngIf="unbudgetedCategories.length > 0"
-      [categories]="unbudgetedCategories"
-      [selectedMonth]="selectedMonth"
-      [currentBudget]="currentBudget"
-      (categoryAdded)="loadBudgetData()">
-    </app-unbudgeted-category-list>
+    @if (unbudgetedCategories.length > 0) {
+      <app-unbudgeted-category-list
+        [categories]="unbudgetedCategories"
+        [selectedMonth]="selectedMonth"
+        [currentBudget]="currentBudget"
+        (categoryAdded)="loadBudgetData()">
+      </app-unbudgeted-category-list>
+    }
 
     <!-- Estado vacío -->
-    <div class="empty-state"
-      *ngIf="budgetedCategories.length === 0 && unbudgetedCategories.length === 0">
-      <p>No hay categorías de gasto disponibles.</p>
-    </div>
+    @if (budgetedCategories.length === 0 && unbudgetedCategories.length === 0) {
+      <div class="empty-state">
+        <p>No hay categorías de gasto disponibles.</p>
+      </div>
+    }
 
-  </ng-container>
+  }
 
 </div>
