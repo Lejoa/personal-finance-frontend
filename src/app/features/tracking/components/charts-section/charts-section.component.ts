@@ -1,10 +1,10 @@
-import { Component, ViewChild, OnInit, OnChanges, OnDestroy, Input, SimpleChanges, inject } from '@angular/core';
+import { Component, ViewChild, OnInit, OnChanges, Input, SimpleChanges, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { TransactionService } from '../../../../shared/services/transaction.service';
 import { Transaction, TransactionType } from '../../../../shared/models/transaction.model';
 import { TrackingExpensesService } from '../../../../core/services/tracking-expenses/tracking-expenses.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-charts-section',
@@ -13,10 +13,10 @@ import { Subscription } from 'rxjs';
   templateUrl: './charts-section.component.html',
   styleUrl: './charts-section.component.scss'
 })
-export class ChartsSectionComponent implements OnInit, OnChanges, OnDestroy {
+export class ChartsSectionComponent implements OnInit, OnChanges {
   private transactionService = inject(TransactionService);
   private trackingExpensesService = inject(TrackingExpensesService);
-  private subscription = new Subscription();
+  private destroyRef = inject(DestroyRef);
 
   @Input() selectedMonth: Date = new Date();
   @ViewChild(BaseChartDirective) chart!: BaseChartDirective;
@@ -35,36 +35,34 @@ export class ChartsSectionComponent implements OnInit, OnChanges, OnDestroy {
   };
 
   ngOnInit(): void {
-    this.loadChartData();
-    this.subscription.add(
-      this.transactionService.transactionChanged$.subscribe(() => this.loadChartData())
-    );
+    this.fetchChartTransactions();
+    this.transactionService.transactionChanged$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.fetchChartTransactions());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedMonth'] && !changes['selectedMonth'].firstChange) {
-      this.loadChartData();
+      this.fetchChartTransactions();
     }
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
-
-  toggleChartData(type: string): void {
+  setChartTransactionType(type: string): void {
     this.currentTransactionType = type === 'expenses' ? 'gasto' : 'ingreso';
     this.trackingExpensesService.setTransactionType(this.currentTransactionType);
-    this.loadChartData();
+    this.fetchChartTransactions();
   }
 
-  loadChartData(): void {
+  fetchChartTransactions(): void {
     const start = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth(), 1);
     const end   = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth() + 1, 0);
 
-    this.transactionService.getTransactionsByDateRange(start, end, this.currentTransactionType).subscribe({
-      next: (transactions) => this.updateChartWithTransactions(transactions),
-      error: (error) => console.error('Error loading chart data:', error)
-    });
+    this.transactionService.getTransactionsByDateRange(start, end, this.currentTransactionType)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (transactions) => this.updateChartWithTransactions(transactions),
+        error: () => {}
+      });
   }
 
   private updateChartWithTransactions(transactions: Transaction[]): void {

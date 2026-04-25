@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { Component, EventEmitter, Input, Output, inject, DestroyRef } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,8 +16,6 @@ import { TransactionService } from '../../services/transaction.service';
   selector: 'app-transaction-card',
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     AsyncPipe,
     MatFormFieldModule,
     MatSelectModule,
@@ -29,10 +28,11 @@ import { TransactionService } from '../../services/transaction.service';
   templateUrl: './transaction-card.component.html',
   styleUrl: './transaction-card.component.scss'
 })
-export class TransactionCardComponent implements OnInit {
+export class TransactionCardComponent {
   private categoryService = inject(CategoryService);
   private transactionService = inject(TransactionService);
   private snackBar = inject(MatSnackBar);
+  private destroyRef = inject(DestroyRef);
 
   @Input() transaction!: Transaction;
   @Input() editable: boolean = false;
@@ -49,16 +49,6 @@ export class TransactionCardComponent implements OnInit {
   selectedCategory = new FormControl<number | null>(null);
   categories$: Observable<Category[]> = this.categoryService.categories$;
 
-  ngOnInit(): void {
-    this.loadCategories();
-  }
-
-  private loadCategories(): void {
-    this.categoryService.getCategories().subscribe({
-      error: (error) => console.error('Error loading categories:', error)
-    });
-  }
-
   private getActionConfig(): ActionConfig {
     const configs: Record<TransactionAction, ActionConfig> = {
       'Edit': {
@@ -72,7 +62,7 @@ export class TransactionCardComponent implements OnInit {
         cancelText: 'Descartar',
         modalTitle: 'Sincronizar Transacción',
         buttonTitle: 'Sincronizar',
-        cancelAction: () => this.cancelSyncronization(),
+        cancelAction: () => this.cancelSynchronization(),
         updateAction: () => this.saveEdit()
       }
     };
@@ -112,6 +102,7 @@ export class TransactionCardComponent implements OnInit {
     };
 
     this.transactionService.updateTransaction(Number(this.transaction.id), updatedData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updated) => {
           this.transaction = updated;
@@ -125,9 +116,14 @@ export class TransactionCardComponent implements OnInit {
           });
           this.isEditing = false;
         },
-        error: (error) => {
-          console.error('Error updating transaction:', error);
+        error: () => {
           this.isSaving = false;
+          this.snackBar.open('No se pudo actualizar la transacción. Intenta de nuevo.', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snack-error']
+          });
         }
       });
   }
@@ -141,7 +137,7 @@ export class TransactionCardComponent implements OnInit {
     this.selectedCategory.reset();
   }
 
-  private cancelSyncronization(): void {
+  private cancelSynchronization(): void {
     if (!this.transaction.id) return;
 
     this.isSaving = true;
@@ -150,6 +146,7 @@ export class TransactionCardComponent implements OnInit {
     };
 
     this.transactionService.updateTransaction(Number(this.transaction.id), updatedData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updated) => {
           this.transaction = updated;
@@ -157,8 +154,7 @@ export class TransactionCardComponent implements OnInit {
           this.isSaving = false;
           this.transactionUpdated.emit(updated);
         },
-        error: (error) => {
-          console.error('Error updating transaction:', error);
+        error: () => {
           this.isSaving = false;
         }
       });
