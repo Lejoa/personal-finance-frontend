@@ -8,6 +8,7 @@ import { TrackingContentComponent } from '../tracking/components/tracking-conten
 import { TabService } from '../../core/services/tab/tab.service';
 import { MonthStateService } from '../../core/services/month-state/month-state.service';
 import { TransactionService } from '../../shared/services/transaction.service';
+import { CategoryService } from '../../shared/services/category.service';
 import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { LearningContentComponent } from '../learning/components/learning-content/learning-content.component';
 import { ChatContentComponent } from '../chat/components/chat-content/chat-content.component';
@@ -46,6 +47,7 @@ export class MainComponent implements OnInit {
   private tabService = inject(TabService);
   private monthStateService = inject(MonthStateService);
   private transactionService = inject(TransactionService);
+  private categoryService = inject(CategoryService);
   private destroyRef = inject(DestroyRef);
 
   activeTab: TabType = 'Home';
@@ -63,6 +65,10 @@ export class MainComponent implements OnInit {
       .subscribe(tab => {
         this.activeTab = tab as TabType;
       });
+
+    this.categoryService.getCategories()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
 
     this.transactionService.transactionChanged$
       .pipe(takeUntilDestroyed(this.destroyRef))

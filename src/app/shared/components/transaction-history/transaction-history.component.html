@@ -1,17 +1,11 @@
 <div class="block block--transactions">
-  @if (isLoading) {
-    <div class="loading-state">
-      Cargando transacciones...
-    </div>
-  }
-
-  @if (!isLoading && transactions.length === 0) {
+  @if (transactions.length === 0) {
     <div class="empty-state">
       No hay transacciones para mostrar
     </div>
   }
 
-  @if (!isLoading && transactions.length > 0) {
+  @if (transactions.length > 0) {
     <div class="transactions-list">
       @for (transaction of paginatedTransactions; track transaction.id) {
         <app-transaction-card
@@ -23,7 +17,7 @@
     </div>
   }
 
-  @if (!isLoading && totalPages > 1 && showPagination) {
+  @if (totalPages > 1 && showPagination) {
     <nav class="pagination" aria-label="Paginación de transacciones">
       <button
         class="pagination__btn pagination__btn--prev"

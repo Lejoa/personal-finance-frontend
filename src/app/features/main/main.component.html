@@ -13,8 +13,7 @@
         Sincronizar SMS
       </button>
       <app-transaction-history
-        mode="home"
-        [selectedMonth]="selectedMonth"
+        [transactions]="homeTransactions"
         [showPagination]="true"
         [pageSize]="5">
       </app-transaction-history>
