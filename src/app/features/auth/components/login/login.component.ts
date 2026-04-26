@@ -1,53 +1,41 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth.service';
 
-/**
- * Componente de login que muestra la pantalla de autenticación
- * Permite iniciar sesión con Google OAuth
- */
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
-  // Mensaje de error para mostrar al usuario
   errorMessage: string | null = null;
 
   ngOnInit(): void {
-    // Verificar si hay errores en los query params
-    this.route.queryParams.subscribe(params => {
-      const error = params['error'];
-      const message = params['message'];
-
-      if (error) {
-        this.errorMessage = this.getErrorMessage(error, message);
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => this.initErrorFromQueryParams(params));
   }
 
-  /**
-   * Inicia el flujo de autenticación con Google
-   */
   loginWithGoogle(): void {
     this.authService.loginWithGoogle();
   }
 
-  /**
-   * Obtiene un mensaje de error amigable basado en el código de error
-   * @param errorCode  - Código de error
-   * @param customMessage -  Mensaje personalizado (opcional)
-   * @returns Mensaje de error para mostrar al usuario
-   */
-  private getErrorMessage(errorCode: string, customMessage?: string): string {
-    const errorMessages: { [key: string]: string } = {
+  private initErrorFromQueryParams(params: Params): void {
+    const errorCode = params['error'];
+    if (errorCode) {
+      this.errorMessage = this.resolveErrorMessage(errorCode, params['message']);
+    }
+  }
+
+  private resolveErrorMessage(errorCode: string, customMessage?: string): string {
+    const errorMessages: Record<string, string> = {
       'oauth_failed': 'Error al autenticar con Google. Por favor, intenta nuevamente.',
       'session_expired': 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
       'profile_fetch_failed': 'No se pudo obtener tu información de perfil. Intenta nuevamente.',
