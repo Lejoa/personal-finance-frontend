@@ -4,7 +4,7 @@
   <div class="main-blocks" [ngSwitch]="activeTab">
     <section class="gap-content" *ngSwitchCase="'Home'">
       <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
-      <app-balance></app-balance>
+      <app-balance [transactions]="homeTransactions"></app-balance>
       <!-- Botón Sincronizar SMS -->
       <button class="sms-sync-btn" (click)="openSheet()" type="button">
         <svg class="sms-sync-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

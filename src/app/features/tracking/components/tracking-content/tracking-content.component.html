@@ -1,6 +1,13 @@
 <div class="tracking-content">
   <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
-  <app-balance [selectedMonth]="selectedMonth"></app-balance>
-  <app-charts-section [selectedMonth]="selectedMonth"></app-charts-section>
-  <app-transaction-history mode="tracking"></app-transaction-history>
+  <app-balance [transactions]="allMonthTransactions"></app-balance>
+  <app-charts-section
+    [transactions]="filteredTransactions"
+    [selectedMonth]="selectedMonth"
+    (transactionTypeChange)="onTransactionTypeChange($event)">
+  </app-charts-section>
+  <app-transaction-history
+    mode="tracking"
+    [transactions]="filteredTransactions">
+  </app-transaction-history>
 </div>

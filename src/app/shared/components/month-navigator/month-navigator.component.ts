@@ -1,26 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { MonthStateService } from '../../../core/services/month-state/month-state.service';
 
 @Component({
   selector: 'app-month-navigator',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './month-navigator.component.html',
   styleUrl: './month-navigator.component.scss'
 })
-export class MonthNavigatorComponent implements OnInit {
-  @Input() initialMonth: Date = new Date();
+export class MonthNavigatorComponent {
+  private monthStateService = inject(MonthStateService);
+
   @Output() monthChange = new EventEmitter<Date>();
 
-  currentMonth: Date = new Date();
-
-  ngOnInit(): void {
-    this.currentMonth = new Date(
-      this.initialMonth.getFullYear(),
-      this.initialMonth.getMonth(),
-      1
-    );
-    this.monthChange.emit(new Date(this.currentMonth));
+  get currentMonth(): Date {
+    return this.monthStateService.selectedMonth;
   }
 
   get displayLabel(): string {
@@ -32,20 +26,14 @@ export class MonthNavigatorComponent implements OnInit {
   }
 
   goToPreviousMonth(): void {
-    this.currentMonth = new Date(
-      this.currentMonth.getFullYear(),
-      this.currentMonth.getMonth() - 1,
-      1
-    );
-    this.monthChange.emit(new Date(this.currentMonth));
+    const prev = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1, 1);
+    this.monthStateService.setMonth(prev);
+    this.monthChange.emit(new Date(prev));
   }
 
   goToNextMonth(): void {
-    this.currentMonth = new Date(
-      this.currentMonth.getFullYear(),
-      this.currentMonth.getMonth() + 1,
-      1
-    );
-    this.monthChange.emit(new Date(this.currentMonth));
+    const next = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
+    this.monthStateService.setMonth(next);
+    this.monthChange.emit(new Date(next));
   }
 }

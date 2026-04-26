@@ -2,7 +2,7 @@
 
   <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
 
-  <app-balance [selectedMonth]="selectedMonth"></app-balance>
+  <app-balance [transactions]="allMonthTransactions"></app-balance>
 
   @if (isLoading) {
     <div class="loading-indicator">Cargando...</div>
