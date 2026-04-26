@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, Output, inject, DestroyRef } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, CurrencyPipe, DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DatePipe, CurrencyPipe } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -49,24 +48,27 @@ export class TransactionCardComponent {
   selectedCategory = new FormControl<number | null>(null);
   categories$: Observable<Category[]> = this.categoryService.categories$;
 
+  private actionConfig: ActionConfig | null = null;
+
   private getActionConfig(): ActionConfig {
-    const configs: Record<TransactionAction, ActionConfig> = {
-      'Edit': {
-        cancelText: 'Cancelar',
-        modalTitle: 'Editar Transacción',
-        buttonTitle: 'Editar',
-        cancelAction: () => this.cancelEdit(),
-        updateAction: () => this.saveEdit()
-      },
-      'Sincronize': {
-        cancelText: 'Descartar',
-        modalTitle: 'Sincronizar Transacción',
-        buttonTitle: 'Sincronizar',
-        cancelAction: () => this.cancelSynchronization(),
-        updateAction: () => this.saveEdit()
-      }
-    };
-    return configs[this.transactionAction];
+    if (!this.actionConfig) {
+      const configs: Record<TransactionAction, ActionConfig> = {
+        'Edit': {
+          cancelText: 'Cancelar',
+          modalTitle: 'Editar Transacción',
+          buttonTitle: 'Editar',
+          cancelAction: () => this.cancelEdit(),
+        },
+        'Sincronize': {
+          cancelText: 'Descartar',
+          modalTitle: 'Sincronizar Transacción',
+          buttonTitle: 'Sincronizar',
+          cancelAction: () => this.cancelSynchronization(),
+        }
+      };
+      this.actionConfig = configs[this.transactionAction];
+    }
+    return this.actionConfig;
   }
 
   get cancelButtonText(): string {
@@ -79,6 +81,10 @@ export class TransactionCardComponent {
 
   get buttonTitle(): string {
     return this.getActionConfig().buttonTitle;
+  }
+
+  get saveButtonLabel(): string {
+    return this.isSaving ? 'Guardando...' : 'Guardar';
   }
 
   startEdit(): void {
@@ -107,6 +113,7 @@ export class TransactionCardComponent {
         next: (updated) => {
           this.transaction = updated;
           this.isSaving = false;
+          this.isEditing = false;
           this.transactionUpdated.emit(updated);
           this.snackBar.open('Transacción actualizada correctamente', 'Cerrar', {
             duration: 3000,
@@ -114,7 +121,6 @@ export class TransactionCardComponent {
             verticalPosition: 'bottom',
             panelClass: ['snack-success']
           });
-          this.isEditing = false;
         },
         error: () => {
           this.isSaving = false;
@@ -141,11 +147,7 @@ export class TransactionCardComponent {
     if (!this.transaction.id) return;
 
     this.isSaving = true;
-    const updatedData: Partial<Transaction> = {
-      status: 'rejected'
-    };
-
-    this.transactionService.updateTransaction(Number(this.transaction.id), updatedData)
+    this.transactionService.updateTransaction(Number(this.transaction.id), { status: 'rejected' })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updated) => {
@@ -156,6 +158,12 @@ export class TransactionCardComponent {
         },
         error: () => {
           this.isSaving = false;
+          this.snackBar.open('No se pudo descartar la transacción. Intenta de nuevo.', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snack-error']
+          });
         }
       });
   }
@@ -170,5 +178,4 @@ interface ActionConfig {
   modalTitle: string;
   buttonTitle: string;
   cancelAction: () => void;
-  updateAction: () => void;
 }

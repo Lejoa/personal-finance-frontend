@@ -18,7 +18,7 @@ import { environment } from '../../../../environments/environment';
 export class ChatService {
   private readonly http = inject(HttpClient);
   private readonly transactionService = inject(TransactionService);
-  private readonly apiUrl = `${environment.apiUrl}/api/chat`;
+  private readonly chatApiUrl = `${environment.apiUrl}/api/chat`;
 
   private chatStateSubject = new BehaviorSubject<ChatState>({
     messages: [],
@@ -29,18 +29,7 @@ export class ChatService {
   public chatState$: Observable<ChatState> = this.chatStateSubject.asObservable();
 
   constructor() {
-    this.initializeChat();
-  }
-
-  private initializeChat(): void {
-    const welcomeMessage: ChatMessage = {
-      id: this.generateId(),
-      content: '¡Hola! Soy tu asistente financiero. Puedo ayudarte a registrar gastos e ingresos, y responder preguntas sobre tus finanzas. ¿En qué puedo ayudarte hoy?',
-      type: 'assistant',
-      timestamp: new Date()
-    };
-
-    this.addMessage(welcomeMessage);
+    this.addWelcomeMessage();
   }
 
   public sendMessage(content: string): void {
@@ -96,15 +85,15 @@ export class ChatService {
   }
 
   public getConversations(): Observable<{ data: Conversation[]; total: number }> {
-    return this.http.get<{ data: Conversation[]; total: number }>(`${this.apiUrl}/conversations`);
+    return this.http.get<{ data: Conversation[]; total: number }>(`${this.chatApiUrl}/conversations`);
   }
 
   public loadConversation(id: number): Observable<ConversationDetail> {
-    return this.http.get<ConversationDetail>(`${this.apiUrl}/conversations/${id}`);
+    return this.http.get<ConversationDetail>(`${this.chatApiUrl}/conversations/${id}`);
   }
 
   public deleteConversation(id: number): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.apiUrl}/conversations/${id}`);
+    return this.http.delete<{ message: string }>(`${this.chatApiUrl}/conversations/${id}`);
   }
 
   public restoreConversation(detail: ConversationDetail): void {
@@ -128,41 +117,9 @@ export class ChatService {
       isTyping: false,
       currentConversationId: null
     });
-    this.initializeChat();
+    this.addWelcomeMessage();
   }
 
-  private sendToBackend(message: string, conversationId?: number): Observable<ChatResponse> {
-    return this.http.post<ChatResponse>(this.apiUrl, { message, conversationId });
-  }
-
-  private addMessage(message: ChatMessage): void {
-    const currentState = this.chatStateSubject.value;
-    this.chatStateSubject.next({
-      ...currentState,
-      messages: [...currentState.messages, message]
-    });
-  }
-
-  private setTyping(isTyping: boolean): void {
-    const currentState = this.chatStateSubject.value;
-    this.chatStateSubject.next({
-      ...currentState,
-      isTyping
-    });
-  }
-
-  private setConversationId(conversationId: number): void {
-    const currentState = this.chatStateSubject.value;
-    this.chatStateSubject.next({
-      ...currentState,
-      currentConversationId: conversationId
-    });
-  }
-
-  /**
-   * Assigns a category to a pending transaction and replaces the
-   * pending_categorization card with a transaction_created confirmation.
-   */
   public assignCategory(
     messageId: string | number,
     transactionId: number,
@@ -212,12 +169,18 @@ export class ChatService {
 
         this.chatStateSubject.next(updatedState);
       },
+      error: () => {
+        const errorMessage: ChatMessage = {
+          id: this.generateId(),
+          content: 'No se pudo asignar la categoría. Por favor, intenta de nuevo.',
+          type: 'assistant',
+          timestamp: new Date(),
+        };
+        this.addMessage(errorMessage);
+      }
     });
   }
 
-  /**
-   * Deletes a previously created transaction and adds a confirmation message.
-   */
   public undoTransaction(transactionId: number): void {
     this.transactionService.deleteTransaction(transactionId).subscribe({
       next: () => {
@@ -229,7 +192,48 @@ export class ChatService {
         };
         this.addMessage(undoMessage);
       },
+      error: () => {
+        const errorMessage: ChatMessage = {
+          id: this.generateId(),
+          content: 'No se pudo eliminar la transacción. Por favor, intenta de nuevo.',
+          type: 'assistant',
+          timestamp: new Date(),
+        };
+        this.addMessage(errorMessage);
+      }
     });
+  }
+
+  private sendToBackend(message: string, conversationId?: number): Observable<ChatResponse> {
+    return this.http.post<ChatResponse>(this.chatApiUrl, { message, conversationId });
+  }
+
+  private addWelcomeMessage(): void {
+    const welcomeMessage: ChatMessage = {
+      id: this.generateId(),
+      content: '¡Hola! Soy tu asistente financiero. Puedo ayudarte a registrar gastos e ingresos, y responder preguntas sobre tus finanzas. ¿En qué puedo ayudarte hoy?',
+      type: 'assistant',
+      timestamp: new Date()
+    };
+    this.addMessage(welcomeMessage);
+  }
+
+  private addMessage(message: ChatMessage): void {
+    const currentState = this.chatStateSubject.value;
+    this.chatStateSubject.next({
+      ...currentState,
+      messages: [...currentState.messages, message]
+    });
+  }
+
+  private setTyping(isTyping: boolean): void {
+    const currentState = this.chatStateSubject.value;
+    this.chatStateSubject.next({ ...currentState, isTyping });
+  }
+
+  private setConversationId(conversationId: number): void {
+    const currentState = this.chatStateSubject.value;
+    this.chatStateSubject.next({ ...currentState, currentConversationId: conversationId });
   }
 
   private generateId(): string {

@@ -10,146 +10,158 @@
   </div>
 
   <div class="messages-container" #messagesContainer>
-    <div
-      *ngFor="let message of chatState.messages"
-      class="message-wrapper"
-      [class.user-message]="message.type === 'user'"
-      [class.bot-message]="message.type === 'assistant'">
-      <div class="message-bubble">
-        <p class="message-content">{{ message.content }}</p>
+    @for (message of chatState.messages; track message.id) {
+      <div
+        class="message-wrapper"
+        [class.user-message]="message.type === 'user'"
+        [class.bot-message]="message.type === 'assistant'">
+        <div class="message-bubble">
+          <p class="message-content">{{ message.content }}</p>
 
-        <!-- Tarjeta: categorización pendiente -->
-        <div *ngIf="message.pendingCategorization && pendingExtras[message.id]"
-             class="transaction-card transaction-card--pending">
+          <!-- Tarjeta: categorización pendiente -->
+          @if (message.pendingCategorization && pendingFormsByMessageId[message.id]) {
+            <div class="transaction-card transaction-card--pending">
 
-          <!-- Encabezado: tipo, nombre, monto -->
-          <div class="transaction-card__header">
-            <span class="transaction-card__type"
-                  [class.transaction-card__type--gasto]="message.pendingCategorization.type === 'gasto'"
-                  [class.transaction-card__type--ingreso]="message.pendingCategorization.type === 'ingreso'">
-              {{ message.pendingCategorization.type === 'gasto' ? '−' : '+' }}
-            </span>
-            <span class="transaction-card__name">{{ message.pendingCategorization.name }}</span>
-            <span class="transaction-card__amount">{{ message.pendingCategorization.amount | number:'1.0-0' }} COP</span>
-          </div>
+              <!-- Encabezado: tipo, nombre, monto -->
+              <div class="transaction-card__header">
+                <span class="transaction-card__type"
+                      [class.transaction-card__type--gasto]="message.pendingCategorization.type === 'gasto'"
+                      [class.transaction-card__type--ingreso]="message.pendingCategorization.type === 'ingreso'">
+                  {{ message.pendingCategorization.type === 'gasto' ? '−' : '+' }}
+                </span>
+                <span class="transaction-card__name">{{ message.pendingCategorization.name }}</span>
+                <span class="transaction-card__amount">{{ message.pendingCategorization.amount | number:'1.0-0' }} COP</span>
+              </div>
 
-          <!-- Campos: fecha y nota -->
-          <div class="transaction-card__extras">
-            <label class="transaction-card__extras-label">
-              Fecha
-              <input
-                type="date"
-                class="transaction-card__extras-input"
-                [(ngModel)]="pendingExtras[message.id].date">
-            </label>
-            <label class="transaction-card__extras-label">
-              Nota
-              <input
-                type="text"
-                class="transaction-card__extras-input"
-                [(ngModel)]="pendingExtras[message.id].note"
-                placeholder="Añade una nota (opcional)">
-            </label>
-          </div>
+              <!-- Campos: fecha y nota -->
+              <div class="transaction-card__extras">
+                <label class="transaction-card__extras-label">
+                  Fecha
+                  <input
+                    type="date"
+                    class="transaction-card__extras-input"
+                    [(ngModel)]="pendingFormsByMessageId[message.id].date">
+                </label>
+                <label class="transaction-card__extras-label">
+                  Nota
+                  <input
+                    type="text"
+                    class="transaction-card__extras-input"
+                    [(ngModel)]="pendingFormsByMessageId[message.id].note"
+                    placeholder="Añade una nota (opcional)">
+                </label>
+              </div>
 
-          <!-- Selección de categoría -->
-          <p class="transaction-card__label">Categoría</p>
+              <!-- Selección de categoría -->
+              <p class="transaction-card__label">Categoría</p>
 
-          <!-- Caso 1: hay categoría sugerida -->
-          <ng-container *ngIf="message.pendingCategorization.suggestedCategory as suggestedCategory">
-            <div class="transaction-card__suggested">
-              <button
-                class="transaction-card__category-btn"
-                [class.transaction-card__category-btn--selected]="pendingExtras[message.id].selectedCategoryId === suggestedCategory.id"
-                (click)="selectCategory(message.id, suggestedCategory.id, suggestedCategory.name)">
-                {{ suggestedCategory.name }}
-              </button>
-              <span class="transaction-card__suggested-badge">Sugerida</span>
-            </div>
+              <!-- Caso 1: hay categoría sugerida -->
+              @if (message.pendingCategorization.suggestedCategory; as suggestedCategory) {
+                <div class="transaction-card__suggested">
+                  <button
+                    class="transaction-card__category-btn"
+                    [class.transaction-card__category-btn--selected]="pendingFormsByMessageId[message.id].selectedCategoryId === suggestedCategory.id"
+                    (click)="selectCategory(message.id, suggestedCategory.id, suggestedCategory.name)">
+                    {{ suggestedCategory.name }}
+                  </button>
+                  <span class="transaction-card__suggested-badge">Sugerida</span>
+                </div>
 
-            <div *ngIf="message.pendingCategorization.categories.length > 0">
-              <button
-                class="transaction-card__show-more-link"
-                (click)="pendingExtras[message.id].showMore = !pendingExtras[message.id].showMore">
-                {{ pendingExtras[message.id].showMore ? 'Ver menos' : 'Ver más' }}
-              </button>
-              <div *ngIf="pendingExtras[message.id].showMore" class="transaction-card__categories">
+                @if (message.pendingCategorization.categories.length > 0) {
+                  <button
+                    class="transaction-card__show-more-link"
+                    (click)="toggleShowMore(message.id)">
+                    {{ pendingFormsByMessageId[message.id].showMore ? 'Ver menos' : 'Ver más' }}
+                  </button>
+                  @if (pendingFormsByMessageId[message.id].showMore) {
+                    <div class="transaction-card__categories">
+                      @for (otherCategory of message.pendingCategorization.categories; track otherCategory.id) {
+                        <button
+                          class="transaction-card__category-btn"
+                          [class.transaction-card__category-btn--selected]="pendingFormsByMessageId[message.id].selectedCategoryId === otherCategory.id"
+                          (click)="selectCategory(message.id, otherCategory.id, otherCategory.name)">
+                          {{ otherCategory.name }}
+                        </button>
+                      }
+                    </div>
+                  }
+                }
+              }
+
+              <!-- Caso 2: sin categoría sugerida, mostrar todas directamente -->
+              @if (!message.pendingCategorization.suggestedCategory) {
+                <div class="transaction-card__categories">
+                  @for (availableCategory of message.pendingCategorization.categories; track availableCategory.id) {
+                    <button
+                      class="transaction-card__category-btn"
+                      [class.transaction-card__category-btn--selected]="pendingFormsByMessageId[message.id].selectedCategoryId === availableCategory.id"
+                      (click)="selectCategory(message.id, availableCategory.id, availableCategory.name)">
+                      {{ availableCategory.name }}
+                    </button>
+                  }
+                </div>
+              }
+
+              <!-- Resumen de selección -->
+              @if (pendingFormsByMessageId[message.id].selectedCategoryName) {
+                <p class="transaction-card__selection-summary">
+                  Seleccionada: <strong>{{ pendingFormsByMessageId[message.id].selectedCategoryName }}</strong>
+                </p>
+              }
+
+              <!-- Botones Aceptar / Cancelar -->
+              <div class="transaction-card__actions">
                 <button
-                  *ngFor="let otherCategory of message.pendingCategorization.categories"
-                  class="transaction-card__category-btn"
-                  [class.transaction-card__category-btn--selected]="pendingExtras[message.id].selectedCategoryId === otherCategory.id"
-                  (click)="selectCategory(message.id, otherCategory.id, otherCategory.name)">
-                  {{ otherCategory.name }}
+                  class="transaction-card__action-btn transaction-card__action-btn--confirm"
+                  [disabled]="!pendingFormsByMessageId[message.id].selectedCategoryId"
+                  (click)="confirmTransaction(message.id, message.pendingCategorization.transactionId)">
+                  Aceptar
+                </button>
+                <button
+                  class="transaction-card__action-btn transaction-card__action-btn--cancel"
+                  (click)="cancelTransaction(message.id, message.pendingCategorization.transactionId)">
+                  Cancelar
                 </button>
               </div>
             </div>
-          </ng-container>
+          }
 
-          <!-- Caso 2: sin categoría sugerida, mostrar todas directamente -->
-          <div *ngIf="!message.pendingCategorization.suggestedCategory"
-               class="transaction-card__categories">
-            <button
-              *ngFor="let availableCategory of message.pendingCategorization.categories"
-              class="transaction-card__category-btn"
-              [class.transaction-card__category-btn--selected]="pendingExtras[message.id].selectedCategoryId === availableCategory.id"
-              (click)="selectCategory(message.id, availableCategory.id, availableCategory.name)">
-              {{ availableCategory.name }}
-            </button>
-          </div>
+          <!-- Tarjeta: transacción confirmada -->
+          @if (message.transactionCreated) {
+            <div class="transaction-card transaction-card--confirmed">
+              <div class="transaction-card__header">
+                <span class="transaction-card__type"
+                      [class.transaction-card__type--gasto]="message.transactionCreated.type === 'gasto'"
+                      [class.transaction-card__type--ingreso]="message.transactionCreated.type === 'ingreso'">
+                  {{ message.transactionCreated.type === 'gasto' ? '−' : '+' }}
+                </span>
+                <span class="transaction-card__name">{{ message.transactionCreated.name }}</span>
+                <span class="transaction-card__amount">{{ message.transactionCreated.amount | number:'1.0-0' }} COP</span>
+              </div>
+              <div class="transaction-card__meta">
+                <span class="transaction-card__category">{{ message.transactionCreated.categoryName }}</span>
+                <span class="transaction-card__date">{{ message.transactionCreated.date }}</span>
+              </div>
+              <button class="transaction-card__undo" (click)="undoTransaction(message.transactionCreated.id)">
+                Deshacer
+              </button>
+            </div>
+          }
 
-          <!-- Resumen de selección -->
-          <p *ngIf="pendingExtras[message.id].selectedCategoryName"
-             class="transaction-card__selection-summary">
-            Seleccionada: <strong>{{ pendingExtras[message.id].selectedCategoryName }}</strong>
-          </p>
-
-          <!-- Botones Aceptar / Cancelar -->
-          <div class="transaction-card__actions">
-            <button
-              class="transaction-card__action-btn transaction-card__action-btn--confirm"
-              [disabled]="!pendingExtras[message.id].selectedCategoryId"
-              (click)="confirmTransaction(message.id, message.pendingCategorization.transactionId)">
-              Aceptar
-            </button>
-            <button
-              class="transaction-card__action-btn transaction-card__action-btn--cancel"
-              (click)="cancelTransaction(message.id, message.pendingCategorization.transactionId)">
-              Cancelar
-            </button>
-          </div>
+          <span class="message-timestamp">{{ message.timestamp | date:'short' }}</span>
         </div>
+      </div>
+    }
 
-        <!-- Tarjeta: transacción confirmada -->
-        <div *ngIf="message.transactionCreated" class="transaction-card transaction-card--confirmed">
-          <div class="transaction-card__header">
-            <span class="transaction-card__type"
-                  [class.transaction-card__type--gasto]="message.transactionCreated.type === 'gasto'"
-                  [class.transaction-card__type--ingreso]="message.transactionCreated.type === 'ingreso'">
-              {{ message.transactionCreated.type === 'gasto' ? '−' : '+' }}
-            </span>
-            <span class="transaction-card__name">{{ message.transactionCreated.name }}</span>
-            <span class="transaction-card__amount">{{ message.transactionCreated.amount | number:'1.0-0' }} COP</span>
-          </div>
-          <div class="transaction-card__meta">
-            <span class="transaction-card__category">{{ message.transactionCreated.categoryName }}</span>
-            <span class="transaction-card__date">{{ message.transactionCreated.date }}</span>
-          </div>
-          <button class="transaction-card__undo" (click)="undoTransaction(message.transactionCreated.id)">
-            Deshacer
-          </button>
+    @if (chatState.isTyping) {
+      <div class="message-wrapper bot-message">
+        <div class="message-bubble typing-indicator">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
         </div>
-
-        <span class="message-timestamp">{{ message.timestamp | date:'short' }}</span>
       </div>
-    </div>
-
-    <div *ngIf="chatState.isTyping" class="message-wrapper bot-message">
-      <div class="message-bubble typing-indicator">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-      </div>
-    </div>
+    }
   </div>
 
   <div class="chat-input-container">
@@ -159,11 +171,11 @@
       [(ngModel)]="userInput"
       (keypress)="onKeyPress($event)"
       placeholder="Escribe tu mensaje aquí..."
-      [disabled]="chatState.isTyping">
+      [disabled]="chatState?.isTyping ?? false">
     <button
       class="send-btn"
-      (click)="sendMessage()"
-      [disabled]="!userInput.trim() || chatState.isTyping">
+      (click)="submitMessage()"
+      [disabled]="!canSendMessage">
       ➤
     </button>
   </div>
