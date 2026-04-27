@@ -1,20 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FinancialTipsComponent } from '../financial-tips/financial-tips.component';
 import { TipService } from '../../services/tip.service';
 import { FinancialTip } from '../../../features/learning/interfaces/learning-content.interfaces';
 import { TabService } from '../../../core/services/tab/tab.service';
 import { ChatService } from '../../../features/chat/services/chat.service';
 
-
 @Component({
   selector: 'app-financial-literacy',
   standalone: true,
-  imports: [
-    NgIf,
-    NgFor,
-    FinancialTipsComponent
-  ],
+  imports: [FinancialTipsComponent],
   templateUrl: './financial-literacy.component.html',
   styleUrl: './financial-literacy.component.scss'
 })
@@ -22,28 +17,31 @@ export class FinancialLiteracyComponent implements OnInit {
   private tipService = inject(TipService);
   private tabService = inject(TabService);
   private chatService = inject(ChatService);
+  private destroyRef = inject(DestroyRef);
 
   tips: FinancialTip[] = [];
   isLoading = true;
   selectedTip?: FinancialTip;
 
   ngOnInit(): void {
-    this.tipService.getRecommendedTips().subscribe({
-      next: (tips) => {
-        this.tips = tips;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-      }
-    });
+    this.tipService.getRecommendedTips()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (tips) => {
+          this.tips = tips;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.isLoading = false;
+        }
+      });
   }
 
-  onExpandTip(tip: FinancialTip) {
+  selectTip(tip: FinancialTip): void {
     this.selectedTip = tip;
   }
 
-  closeDetail() {
+  clearSelectedTip(): void {
     this.selectedTip = undefined;
   }
 

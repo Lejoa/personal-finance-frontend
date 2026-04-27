@@ -1,10 +1,14 @@
-<div class="financial-tip" (click)="onExpand()">
+<div class="financial-tip" (click)="emitExpand()">
   <div class="tip-content" [class.has-image]="imageSrc">
     <div class="tip-header">
-      <h5 class="tip-title">{{ title }} </h5>
-      <img *ngIf="imageSrc" [src]="imageSrc" alt="tip-image" class="tip-image"/>
+      <h5 class="tip-title">{{ title }}</h5>
+      @if (imageSrc) {
+        <img [src]="imageSrc" alt="tip-image" class="tip-image"/>
+      }
     </div>
-    <p *ngIf="reason" class="tip-reason">{{ reason }}</p>
+    @if (reason) {
+      <p class="tip-reason">{{ reason }}</p>
+    }
     <p>{{ shortDescription }}</p>
   </div>
 </div>

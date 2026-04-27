@@ -1,45 +1,44 @@
-import { Component, EventEmitter,OnInit, OnDestroy, Output } from '@angular/core';
+import { Component, OnInit, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TabService } from '../../../core/services/tab/tab.service';
-import { NgIf, NgFor } from '@angular/common';
-import { Subscription } from 'rxjs';
+
+interface Tab {
+  name: string;
+  icon: string;
+}
 
 @Component({
   selector: 'app-footer-tabs',
   standalone: true,
-  imports: [NgFor, NgIf],
+  imports: [],
   templateUrl: './footer-tabs.component.html',
   styleUrl: './footer-tabs.component.scss'
 })
-export class FooterTabsComponent implements OnInit, OnDestroy {
+export class FooterTabsComponent implements OnInit {
+  private tabService = inject(TabService);
+  private destroyRef = inject(DestroyRef);
 
-  @Output() tabChange = new EventEmitter<string>(); // <-- Agrega esto
+  @Output() tabChange = new EventEmitter<string>();
 
-  tabs = [
-    { name: 'Home', icon: 'home'},
+  tabs: Tab[] = [
+    { name: 'Home', icon: 'home' },
     { name: 'Tracking', icon: 'pie_chart' },
     { name: 'Budgets', icon: 'account_balance_wallet' },
-    { name: 'Aprende', icon: 'school'},
-    { name: 'Categories', icon: 'label'}
+    { name: 'Aprende', icon: 'school' },
+    { name: 'Categories', icon: 'label' }
   ];
 
   activeTab = 'Home';
-  private tabSubscription: Subscription = new Subscription();
 
-  constructor(private tabService: TabService) {}
-  
   ngOnInit(): void {
-    this.tabSubscription = this.tabService.activeTab$.subscribe( tab => {
-      this.activeTab = tab;
-    })
-  }
-
-  ngOnDestroy(): void {
-    this.tabSubscription.unsubscribe();
+    this.tabService.activeTab$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(tab => { this.activeTab = tab; });
   }
 
   onTabChange(tab: string): void {
     this.activeTab = tab;
     this.tabService.setActiveTab(tab);
-    this.tabChange.emit(tab); // <-- Emite el evento al padre
+    this.tabChange.emit(tab);
   }
 }

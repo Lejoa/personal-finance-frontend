@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { TabService } from '../../../core/services/tab/tab.service';
 import { NotificationService } from '../../../core/services/notification/notification.service';
@@ -7,31 +8,34 @@ import { NotificationService } from '../../../core/services/notification/notific
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-    AsyncPipe,
-    NgIf
-  ],
+  imports: [AsyncPipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit {
-  activeTab$: Observable<String>;
-  unreadCount$: Observable<number>;
+  private tabService = inject(TabService);
+  private notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
 
-  constructor(
-    private tabService: TabService,
-    private notificationService: NotificationService
-  ) {
-    this.activeTab$ = this.tabService.activeTab$;
-    this.unreadCount$ = this.notificationService.unreadCount$;
-  }
+  activeTab$: Observable<string> = this.tabService.activeTab$;
+  unreadCount$: Observable<number> = this.notificationService.unreadCount$;
 
   ngOnInit(): void {
-    this.notificationService.loadUnread().subscribe();
+    this.notificationService.loadUnread()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   onBellClick(): void {
+    this.markNotificationsAsRead();
+    this.navigateToLearning();
+  }
+
+  private markNotificationsAsRead(): void {
     this.notificationService.markAllRead().subscribe();
+  }
+
+  private navigateToLearning(): void {
     this.tabService.setActiveTab('Aprende');
   }
 }

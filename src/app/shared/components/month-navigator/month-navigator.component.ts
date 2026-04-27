@@ -26,13 +26,16 @@ export class MonthNavigatorComponent {
   }
 
   goToPreviousMonth(): void {
-    const prev = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1, 1);
-    this.monthStateService.setMonth(prev);
-    this.monthChange.emit(new Date(prev));
+    this.navigateToMonth(-1);
   }
 
   goToNextMonth(): void {
-    const next = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
+    this.navigateToMonth(1);
+  }
+
+  private navigateToMonth(offset: number): void {
+    const current = this.currentMonth;
+    const next = new Date(current.getFullYear(), current.getMonth() + offset, 1);
     this.monthStateService.setMonth(next);
     this.monthChange.emit(new Date(next));
   }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TabService } from '../../../core/services/tab/tab.service';
 
 @Component({
@@ -9,9 +9,9 @@ import { TabService } from '../../../core/services/tab/tab.service';
   styleUrl: './register-button.component.scss'
 })
 export class RegisterButtonComponent {
-  constructor(private tabService: TabService) {}
+  private tabService = inject(TabService);
 
-  navigateToChat(): void {
+  navigateToCreate(): void {
     this.tabService.setActiveTab('Create');
   }
 }

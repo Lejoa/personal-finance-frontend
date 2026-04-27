@@ -1,12 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-financial-tips',
   standalone: true,
-  imports: [
-    NgIf
-  ],
+  imports: [],
   templateUrl: './financial-tips.component.html',
   styleUrl: './financial-tips.component.scss'
 })
@@ -21,7 +18,7 @@ export class FinancialTipsComponent {
 
   @Output() expand = new EventEmitter<void>();
 
-  onExpand() {
+  emitExpand(): void {
     this.expand.emit();
   }
 }
