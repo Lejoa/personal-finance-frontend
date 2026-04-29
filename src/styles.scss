@@ -29,6 +29,7 @@ $primary-color:       #E53935;
 $primary-color-light: #EF9A9A;
 $primary-color-dark:  #C62828;
 $success-color:       #43A047;
+$info-color:          #1565C0;
 $danger-color:        #E53935;
 $text-primary:        #212121;
 $text-secondary:      #757575;
@@ -291,5 +292,14 @@ textarea {
 }
 
 .snack-success .mat-mdc-snack-bar-action {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.snack-info .mdc-snackbar__surface {
+  background-color: $info-color !important;
+  color: white !important;
+}
+
+.snack-info .mat-mdc-snack-bar-action {
   color: rgba(255, 255, 255, 0.85) !important;
 }

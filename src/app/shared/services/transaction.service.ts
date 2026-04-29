@@ -99,6 +99,16 @@ export class TransactionService {
     });
   }
 
+  /** Obtiene transacciones por rango de fechas sin actualizar el BehaviorSubject compartido */
+  getTransactionsQuiet(filters?: TransactionFilters): Observable<Transaction[]> {
+    let params = new HttpParams();
+    if (filters?.type) params = params.set('type', filters.type);
+    if (filters?.startDate) params = params.set('startDate', filters.startDate);
+    if (filters?.endDate) params = params.set('endDate', filters.endDate);
+    return this.http.get<TransactionsResponse>(this.apiUrl, { params })
+      .pipe(map(response => response.data.map(dto => this.mapDtoToTransaction(dto))));
+  }
+
   /** Obtiene una transacción por ID */
   getTransactionById(id: number): Observable<Transaction> {
     return this.http.get<TransactionResponse>(`${this.apiUrl}/${id}`)

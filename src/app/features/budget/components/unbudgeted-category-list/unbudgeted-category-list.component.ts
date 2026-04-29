@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, catchError, switchMap, take, timer } from 'rxjs';
 import { Budget } from '../../../../shared/models/budget.model';
 import { BudgetService } from '../../../../shared/services/budget.service';
 import { UnbudgetedCategory } from '../../interfaces';
@@ -45,31 +46,68 @@ export class UnbudgetedCategoryListComponent {
   saveBudgetCategoryLimit(): void {
     if (!this.selectedCategory || this.modalLimit <= 0) return;
     this.isSaving = true;
+
+    const capturedCategoryId = this.selectedCategory.categoryId;
+    const capturedLimit = this.modalLimit;
+
     this.budgetService.setBudgetForCategory(
-      this.selectedCategory.categoryId,
-      this.modalLimit,
+      capturedCategoryId,
+      capturedLimit,
       this.selectedMonth,
       this.currentBudget
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.snackBar.open('Presupuesto fijado correctamente', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-          panelClass: ['snack-success']
-        });
+      next: (budget) => {
         this.closeModal();
         this.categoryAdded.emit();
+        this.showSuccessSnackBar('Presupuesto fijado correctamente');
+        this.showDelayedFeedback(budget.id!, capturedCategoryId, budget);
       },
       error: () => {
         this.isSaving = false;
-        this.snackBar.open('No se pudo fijar el presupuesto. Intenta de nuevo.', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-          panelClass: ['snack-error']
-        });
+        this.showErrorSnackBar('No se pudo fijar el presupuesto. Intenta de nuevo.');
       }
+    });
+  }
+
+  private showDelayedFeedback(budgetId: number, categoryId: number, budget: Budget): void {
+    const budgetCategoryId = budget.categories?.find(c => c.categoryId === categoryId)?.id;
+    if (!budgetId || !budgetCategoryId) return;
+
+    timer(3200).pipe(
+      switchMap(() =>
+        this.budgetService.getBudgetCategoryFeedback(budgetId, budgetCategoryId)
+          .pipe(catchError(() => EMPTY))
+      ),
+      take(1)
+    ).subscribe(feedback => {
+      if (feedback) this.showInfoSnackBar(feedback);
+    });
+  }
+
+  private showSuccessSnackBar(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: ['snack-success']
+    });
+  }
+
+  private showInfoSnackBar(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: ['snack-info']
+    });
+  }
+
+  private showErrorSnackBar(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: ['snack-error']
     });
   }
 }

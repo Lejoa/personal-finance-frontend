@@ -51,6 +51,15 @@ export class BudgetService {
         return this.http.delete<void>(`${this.apiUrl}/${budgetId}/categories/${budgetCategoryId}`);
     }
 
+    getBudgetCategoryFeedback(budgetId: number, budgetCategoryId: number): Observable<string | null> {
+        return this.http
+            .post<{ feedback: string | null }>(
+                `${this.apiUrl}/${budgetId}/categories/${budgetCategoryId}/feedback`,
+                {}
+            )
+            .pipe(map(response => response.feedback));
+    }
+
     updateBudgetCategoryAmount(budgetId: number, budgetCategoryId: number, amount: number): Observable<void> {
         return this.http.patch<void>(`${this.apiUrl}/${budgetId}/categories/${budgetCategoryId}`, { amount });
     }

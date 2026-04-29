@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, catchError, switchMap, take, timer } from 'rxjs';
 import { BudgetService } from '../../../../shared/services/budget.service';
 import { BudgetCategoryView } from '../../interfaces';
 
@@ -40,29 +41,25 @@ export class BudgetCategoryCardComponent {
   saveBudgetCategoryEdit(): void {
     if (!this.category.budgetId || !this.category.budgetCategoryId || this.modalLimit <= 0) return;
     this.isSaving = true;
+
+    const capturedBudgetId = this.category.budgetId;
+    const capturedBudgetCategoryId = this.category.budgetCategoryId;
+    const capturedLimit = this.modalLimit;
+
     this.budgetService.updateBudgetCategoryAmount(
-      this.category.budgetId,
-      this.category.budgetCategoryId,
-      this.modalLimit
+      capturedBudgetId,
+      capturedBudgetCategoryId,
+      capturedLimit
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.snackBar.open('Límite actualizado correctamente', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-          panelClass: ['snack-success']
-        });
         this.closeEditModal();
         this.categoryChanged.emit();
+        this.showSuccessSnackBar('Límite actualizado correctamente');
+        this.showDelayedFeedback(capturedBudgetId, capturedBudgetCategoryId);
       },
       error: () => {
         this.isSaving = false;
-        this.snackBar.open('No se pudo actualizar el límite. Intenta de nuevo.', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-          panelClass: ['snack-error']
-        });
+        this.showErrorSnackBar('No se pudo actualizar el límite. Intenta de nuevo.');
       }
     });
   }
@@ -74,22 +71,49 @@ export class BudgetCategoryCardComponent {
       this.category.budgetCategoryId
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.snackBar.open('Categoría eliminada del presupuesto', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-          panelClass: ['snack-success']
-        });
+        this.showSuccessSnackBar('Categoría eliminada del presupuesto');
         this.categoryChanged.emit();
       },
-      error: () => {
-        this.snackBar.open('No se pudo eliminar la categoría. Intenta de nuevo.', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-          panelClass: ['snack-error']
-        });
-      }
+      error: () => this.showErrorSnackBar('No se pudo eliminar la categoría. Intenta de nuevo.')
+    });
+  }
+
+  private showDelayedFeedback(budgetId: number, budgetCategoryId: number): void {
+    timer(3200).pipe(
+      switchMap(() =>
+        this.budgetService.getBudgetCategoryFeedback(budgetId, budgetCategoryId)
+          .pipe(catchError(() => EMPTY))
+      ),
+      take(1)
+    ).subscribe(feedback => {
+      if (feedback) this.showInfoSnackBar(feedback);
+    });
+  }
+
+  private showSuccessSnackBar(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: ['snack-success']
+    });
+  }
+
+  private showInfoSnackBar(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: ['snack-info']
+    });
+  }
+
+  private showErrorSnackBar(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: ['snack-error']
     });
   }
 }
