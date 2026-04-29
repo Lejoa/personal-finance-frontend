@@ -18,8 +18,9 @@ import { CategoryContentComponent } from '../categories/components/category-cont
 import { SmsSyncSheetComponent } from '../sms-sync/components/sms-sync-sheet/sms-sync-sheet.component';
 import { MonthNavigatorComponent } from '../../shared/components/month-navigator/month-navigator.component';
 import { Transaction } from '../../shared/models/transaction.model';
+import { ToolsContentComponent } from '../tools/components/tools-content/tools-content.component';
 
-export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 'Categories';
+export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 'Categories' | 'Tools';
 
 @Component({
   selector: 'app-main',
@@ -37,6 +38,7 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 
     CategoryContentComponent,
     SmsSyncSheetComponent,
     MonthNavigatorComponent,
+    ToolsContentComponent,
     NgSwitch,
     NgSwitchCase,
   ],

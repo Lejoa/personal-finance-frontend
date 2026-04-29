@@ -1,0 +1,14 @@
+.block--tools {
+  padding: 1rem;
+
+  .tools-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .tools-empty {
+    color: var(--color-text-secondary, #888);
+    font-size: 0.95rem;
+  }
+}
