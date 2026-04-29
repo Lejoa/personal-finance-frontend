@@ -15,6 +15,7 @@ export class ProfileMenuComponent {
   @Input() isOpen = false;
 
   @Output() menuClosed = new EventEmitter<void>();
+  @Output() categoriesClicked = new EventEmitter<void>();
 
   private authService = inject(AuthService);
 
@@ -22,5 +23,10 @@ export class ProfileMenuComponent {
 
   close(): void {
     this.menuClosed.emit();
+  }
+
+  openCategories(): void {
+    this.categoriesClicked.emit();
+    this.close();
   }
 }

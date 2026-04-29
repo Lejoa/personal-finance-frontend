@@ -19,5 +19,6 @@
 
 <app-profile-menu
   [isOpen]="(isMenuOpen$ | async) ?? false"
-  (menuClosed)="closeMenu()">
+  (menuClosed)="closeMenu()"
+  (categoriesClicked)="onCategoriesClicked()">
 </app-profile-menu>

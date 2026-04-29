@@ -24,8 +24,7 @@ export class FooterTabsComponent implements OnInit {
     { name: 'Home', icon: 'home' },
     { name: 'Tracking', icon: 'pie_chart' },
     { name: 'Budgets', icon: 'account_balance_wallet' },
-    { name: 'Aprende', icon: 'school' },
-    { name: 'Categories', icon: 'label' }
+    { name: 'Aprende', icon: 'school' }
   ];
 
   activeTab = 'Home';

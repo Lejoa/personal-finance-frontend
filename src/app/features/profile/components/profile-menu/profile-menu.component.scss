@@ -121,6 +121,10 @@
   &:active {
     background-color: $gray-200;
   }
+
+  &--clickable {
+    cursor: pointer;
+  }
 }
 
 .profile-menu__item-icon {

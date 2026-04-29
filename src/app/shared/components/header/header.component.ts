@@ -38,6 +38,10 @@ export class HeaderComponent implements OnInit {
     this.isMenuOpenSubject.next(false);
   }
 
+  onCategoriesClicked(): void {
+    this.tabService.setActiveTab('Categories');
+  }
+
   onBellClick(): void {
     this.markNotificationsAsRead();
     this.navigateToLearning();
