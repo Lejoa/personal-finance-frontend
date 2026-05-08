@@ -24,7 +24,12 @@ describe('BudgetCategoryCardComponent', () => {
   let snackBar: MatSnackBar;
 
   beforeEach(async () => {
-    budgetServiceSpy = jasmine.createSpyObj('BudgetService', ['updateBudgetCategoryAmount', 'deleteBudgetCategory']);
+    budgetServiceSpy = jasmine.createSpyObj('BudgetService', [
+      'updateBudgetCategoryAmount',
+      'deleteBudgetCategory',
+      'getBudgetCategoryFeedback'
+    ]);
+    budgetServiceSpy.getBudgetCategoryFeedback.and.returnValue(of(null));
 
     await TestBed.configureTestingModule({
       imports: [BudgetCategoryCardComponent, NoopAnimationsModule],
@@ -38,7 +43,6 @@ describe('BudgetCategoryCardComponent', () => {
     component.category = MOCK_CATEGORY;
     component.selectedMonth = new Date('2026-04-01');
 
-    // Obtener MatSnackBar del injector del fixture y espiar su método open
     snackBar = fixture.debugElement.injector.get(MatSnackBar);
     spyOn(snackBar, 'open');
 
@@ -76,7 +80,7 @@ describe('BudgetCategoryCardComponent', () => {
       component.modalLimit = 600000;
 
       component.saveBudgetCategoryEdit();
-      tick();
+      tick(3200);
 
       expect(budgetServiceSpy.updateBudgetCategoryAmount).toHaveBeenCalledWith(10, 20, 600000);
     }));
@@ -88,7 +92,7 @@ describe('BudgetCategoryCardComponent', () => {
       component.modalLimit = 600000;
 
       component.saveBudgetCategoryEdit();
-      tick();
+      tick(3200);
 
       expect(emitSpy).toHaveBeenCalled();
       expect(component.isModalOpen).toBeFalse();
@@ -100,7 +104,7 @@ describe('BudgetCategoryCardComponent', () => {
       component.modalLimit = 600000;
 
       component.saveBudgetCategoryEdit();
-      tick();
+      tick(3200);
 
       expect(snackBar.open).toHaveBeenCalledWith(
         jasmine.stringContaining('actualizado'),

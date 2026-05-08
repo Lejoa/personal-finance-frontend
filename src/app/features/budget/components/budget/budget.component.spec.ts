@@ -1,13 +1,16 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of, throwError } from 'rxjs';
+import { BehaviorSubject, of, throwError } from 'rxjs';
 import { BudgetComponent } from './budget.component';
 import { BudgetService } from '../../../../shared/services/budget.service';
 import { CategoryService } from '../../../../shared/services/category.service';
 import { TransactionService } from '../../../../shared/services/transaction.service';
+import { MonthStateService } from '../../../../core/services/month-state/month-state.service';
 import { Budget } from '../../../../shared/models/budget.model';
 import { Category } from '../../../../shared/models/category.model';
 import { Transaction } from '../../../../shared/models/transaction.model';
+
+const FIXED_MONTH = new Date('2026-04-01');
 
 const MOCK_BUDGET: Budget = {
   id: 1,
@@ -35,11 +38,19 @@ describe('BudgetComponent', () => {
   let budgetServiceSpy: jasmine.SpyObj<BudgetService>;
   let categoryServiceSpy: jasmine.SpyObj<CategoryService>;
   let transactionServiceSpy: jasmine.SpyObj<TransactionService>;
+  let monthStateServiceSpy: jasmine.SpyObj<MonthStateService>;
+  let selectedMonthSubject: BehaviorSubject<Date>;
 
   beforeEach(async () => {
-    budgetServiceSpy     = jasmine.createSpyObj('BudgetService',     ['getBudgetByMonth']);
-    categoryServiceSpy   = jasmine.createSpyObj('CategoryService',   ['getCategories']);
+    selectedMonthSubject = new BehaviorSubject<Date>(FIXED_MONTH);
+
+    budgetServiceSpy      = jasmine.createSpyObj('BudgetService',      ['getBudgetByMonth']);
+    categoryServiceSpy    = jasmine.createSpyObj('CategoryService',    ['getCategories']);
     transactionServiceSpy = jasmine.createSpyObj('TransactionService', ['getTransactionsByDateRange']);
+    monthStateServiceSpy  = jasmine.createSpyObj('MonthStateService',  ['setMonth'], {
+      selectedMonth:  FIXED_MONTH,
+      selectedMonth$: selectedMonthSubject.asObservable()
+    });
 
     budgetServiceSpy.getBudgetByMonth.and.returnValue(of(MOCK_BUDGET));
     categoryServiceSpy.getCategories.and.returnValue(of(MOCK_CATEGORIES));
@@ -50,7 +61,8 @@ describe('BudgetComponent', () => {
       providers: [
         { provide: BudgetService,      useValue: budgetServiceSpy },
         { provide: CategoryService,    useValue: categoryServiceSpy },
-        { provide: TransactionService, useValue: transactionServiceSpy }
+        { provide: TransactionService, useValue: transactionServiceSpy },
+        { provide: MonthStateService,  useValue: monthStateServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -65,19 +77,16 @@ describe('BudgetComponent', () => {
   });
 
   describe('onMonthChange', () => {
-    it('sets selectedMonth and triggers data load', fakeAsync(() => {
+    it('calls monthStateService.setMonth with the new month', () => {
       const month = new Date('2026-04-01');
       component.onMonthChange(month);
-      tick();
-
-      expect(component.selectedMonth).toBe(month);
-      expect(budgetServiceSpy.getBudgetByMonth).toHaveBeenCalledWith(month);
-    }));
+      expect(monthStateServiceSpy.setMonth).toHaveBeenCalledOnceWith(month);
+    });
   });
 
   describe('loadBudgetData', () => {
     it('populates budgetedCategories from budget response', fakeAsync(() => {
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.budgetedCategories.length).toBe(1);
@@ -91,7 +100,7 @@ describe('BudgetComponent', () => {
     }));
 
     it('populates unbudgetedCategories with categories not in budget', fakeAsync(() => {
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.unbudgetedCategories.length).toBe(1);
@@ -100,7 +109,7 @@ describe('BudgetComponent', () => {
     }));
 
     it('calculates totalBudget and totalSpent correctly', fakeAsync(() => {
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.totalBudget).toBe(500000);
@@ -115,7 +124,7 @@ describe('BudgetComponent', () => {
         ]
       }));
 
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.budgetedCategories[0].isOverBudget).toBeTrue();
@@ -124,7 +133,7 @@ describe('BudgetComponent', () => {
     it('handles null budget response — all categories go to unbudgeted', fakeAsync(() => {
       budgetServiceSpy.getBudgetByMonth.and.returnValue(of(null));
 
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.budgetedCategories.length).toBe(0);
@@ -132,8 +141,7 @@ describe('BudgetComponent', () => {
     }));
 
     it('sets isLoading to false after success', fakeAsync(() => {
-      budgetServiceSpy.getBudgetByMonth.and.returnValue(of(MOCK_BUDGET));
-      component.loadBudgetData();
+      fixture.detectChanges();
       tick();
       expect(component.isLoading).toBeFalse();
     }));
@@ -141,7 +149,7 @@ describe('BudgetComponent', () => {
     it('sets isLoading to false after error', fakeAsync(() => {
       budgetServiceSpy.getBudgetByMonth.and.returnValue(throwError(() => new Error('HTTP error')));
 
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.isLoading).toBeFalse();
@@ -157,14 +165,14 @@ describe('BudgetComponent', () => {
         ]
       }));
 
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.isGlobalOverBudget).toBeTrue();
     }));
 
     it('returns false when totalSpent is within totalBudget', fakeAsync(() => {
-      component.onMonthChange(new Date('2026-04-01'));
+      fixture.detectChanges();
       tick();
 
       expect(component.isGlobalOverBudget).toBeFalse();
