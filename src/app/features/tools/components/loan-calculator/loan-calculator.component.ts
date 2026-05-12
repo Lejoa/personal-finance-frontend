@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  AfterViewInit,
   OnDestroy,
   inject,
   DestroyRef,
@@ -31,7 +30,7 @@ Chart.register(...registerables);
   templateUrl: './loan-calculator.component.html',
   styleUrl: './loan-calculator.component.scss',
 })
-export class LoanCalculatorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LoanCalculatorComponent implements OnInit, OnDestroy {
   private loanService = inject(LoanCalculatorService);
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
@@ -55,18 +54,18 @@ export class LoanCalculatorComponent implements OnInit, AfterViewInit, OnDestroy
   savedCalculations: SavedLoanCalculation[] = [];
   showSaved = false;
 
-  // El registro guardado asociado al resultado actual (si fue cargado desde lista)
+  // Saved record associated with the current result (set when loaded from the list)
   currentSavedId: number | null = null;
 
-  // Modal de guardar
+  // Save modal
   showSaveModal = false;
   saveName = '';
   isSaving = false;
 
-  // Eliminar desde resultados
+  // Delete from results view
   isDeletingCurrent = false;
 
-  // Eliminar desde lista
+  // Delete from the saved list
   isDeleting: number | null = null;
 
   errorMessage: string | null = null;
@@ -80,11 +79,10 @@ export class LoanCalculatorComponent implements OnInit, AfterViewInit, OnDestroy
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (calcs) => (this.savedCalculations = calcs),
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         error: () => {},
       });
   }
-
-  ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
     this.destroyCharts();
@@ -167,7 +165,7 @@ export class LoanCalculatorComponent implements OnInit, AfterViewInit, OnDestroy
     }, 50);
   }
 
-  // Abre el modal pidiendo nombre
+  // Opens the name-entry modal
   openSaveModal(): void {
     this.saveName = '';
     this.showSaveModal = true;
@@ -221,7 +219,7 @@ export class LoanCalculatorComponent implements OnInit, AfterViewInit, OnDestroy
       });
   }
 
-  // Elimina el registro que se está visualizando actualmente
+  // Deletes the calculation currently being displayed
   deleteCurrentCalculation(): void {
     if (!this.currentSavedId || this.isDeletingCurrent) return;
     this.isDeletingCurrent = true;
@@ -256,7 +254,7 @@ export class LoanCalculatorComponent implements OnInit, AfterViewInit, OnDestroy
       });
   }
 
-  // Elimina desde la lista de guardados
+  // Deletes from the saved calculations list
   deleteCalculation(id: number): void {
     this.isDeleting = id;
     this.loanService

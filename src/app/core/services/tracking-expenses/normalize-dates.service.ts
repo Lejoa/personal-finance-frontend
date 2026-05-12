@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class NormalizeDatesService {
 
-  constructor() { }
+  constructor() { /* no-op */ }
 
   /**
    * Method to parse date string in local timezone

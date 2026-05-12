@@ -37,7 +37,7 @@ describe('TransactionService', () => {
 
   describe('getTransactions', () => {
     it('should GET transactions and map DTOs', () => {
-      let result: any;
+      let result: { id: string; transactionType: string }[] | undefined;
       service.getTransactions().subscribe(r => result = r);
 
       http.expectOne(req => req.url === API && req.method === 'GET')
@@ -78,7 +78,7 @@ describe('TransactionService', () => {
     });
 
     it('should update transactions$ BehaviorSubject', () => {
-      let emitted: any;
+      let emitted: { length: number }[] | undefined;
       service.transactions$.subscribe(v => emitted = v);
 
       service.getTransactions().subscribe();
@@ -129,7 +129,7 @@ describe('TransactionService', () => {
 
   describe('getTransactionById', () => {
     it('should GET a single transaction by id', () => {
-      let result: any;
+      let result: { id: string } | undefined;
       service.getTransactionById(1).subscribe(r => result = r);
 
       http.expectOne(`${API}/1`).flush({ transaction: makeDto(1) });
@@ -149,7 +149,7 @@ describe('TransactionService', () => {
 
   describe('createTransaction', () => {
     it('should POST and return mapped transaction', () => {
-      let result: any;
+      let result: { id: string; name: string } | undefined;
       service.createTransaction({ name: 'Compra', amount: 50, transactionType: 'gasto', date: new Date('2024-05-10') })
         .subscribe(r => result = r);
 
@@ -172,7 +172,7 @@ describe('TransactionService', () => {
     });
 
     it('should map ingreso type correctly', () => {
-      let result: any;
+      let result: { transactionType: string } | undefined;
       service.createTransaction({ name: 'Ingreso', amount: 1000, transactionType: 'ingreso', date: new Date() })
         .subscribe(r => result = r);
       http.expectOne(r => r.method === 'POST').flush({ message: 'ok', transaction: makeDto(2, { type: 'ingreso' }) });
@@ -182,7 +182,7 @@ describe('TransactionService', () => {
 
   describe('updateTransaction', () => {
     it('should PATCH and return mapped transaction', () => {
-      let result: any;
+      let result: { name: string } | undefined;
       service.updateTransaction(1, { name: 'Updated' }).subscribe(r => result = r);
 
       http.expectOne(r => r.url === `${API}/1` && r.method === 'PATCH')
@@ -239,7 +239,7 @@ describe('TransactionService', () => {
 
   describe('getFeedback', () => {
     it('should POST to feedback endpoint', () => {
-      let result: any;
+      let result: { feedback: string } | undefined;
       service.getFeedback(1).subscribe(r => result = r);
       http.expectOne(r => r.url === `${API}/1/feedback` && r.method === 'POST')
         .flush({ feedback: 'Buen gasto' });

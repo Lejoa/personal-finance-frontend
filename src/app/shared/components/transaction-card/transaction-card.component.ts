@@ -34,7 +34,7 @@ export class TransactionCardComponent {
   private destroyRef = inject(DestroyRef);
 
   @Input() transaction!: Transaction;
-  @Input() editable: boolean = false;
+  @Input() editable = false;
   @Input() transactionAction!: TransactionAction;
   @Output() transactionUpdated = new EventEmitter<Transaction>();
 

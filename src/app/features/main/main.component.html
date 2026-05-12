@@ -1,41 +1,57 @@
 <app-header></app-header>
 
 <main class="main-content">
-  <div class="main-blocks" [ngSwitch]="activeTab">
-    <section class="gap-content" *ngSwitchCase="'Home'">
-      <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
-      <app-balance [transactions]="homeTransactions"></app-balance>
-      <!-- Botón Sincronizar SMS -->
-      <button class="sms-sync-btn" (click)="openSheet()" type="button">
-        <svg class="sms-sync-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
-        </svg>
-        Sincronizar SMS
-      </button>
-      <app-transaction-history
-        [transactions]="homeTransactions"
-        [showPagination]="true"
-        [pageSize]="5">
-      </app-transaction-history>
-    </section>
-    <section class="gap-content" *ngSwitchCase="'Tracking'">
-      <app-tracking-content></app-tracking-content>
-    </section>
-    <section class="gap-content" *ngSwitchCase="'Create'">
-      <app-chat-content></app-chat-content>
-    </section>
-    <section class="gap-content" *ngSwitchCase="'Budgets'">
-      <app-budget></app-budget>
-    </section>
-    <section class="gap-content" *ngSwitchCase="'Aprende'">
-      <app-learning-content></app-learning-content>
-    </section>
-    <section class="gap-content" *ngSwitchCase="'Categories'">
-      <app-category-content></app-category-content>
-    </section>
-    <section class="gap-content" *ngSwitchCase="'Tools'">
-      <app-tools-content></app-tools-content>
-    </section>
+  <div class="main-blocks">
+    @switch (activeTab) {
+      @case ('Home') {
+        <section class="gap-content">
+          <app-month-navigator (monthChange)="onMonthChange($event)"></app-month-navigator>
+          <app-balance [transactions]="homeTransactions"></app-balance>
+          <!-- Sync SMS button -->
+          <button class="sms-sync-btn" (click)="openSheet()" type="button">
+            <svg class="sms-sync-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+            </svg>
+            Sincronizar SMS
+          </button>
+          <app-transaction-history
+            [transactions]="homeTransactions"
+            [showPagination]="true"
+            [pageSize]="5">
+          </app-transaction-history>
+        </section>
+      }
+      @case ('Tracking') {
+        <section class="gap-content">
+          <app-tracking-content></app-tracking-content>
+        </section>
+      }
+      @case ('Create') {
+        <section class="gap-content">
+          <app-chat-content></app-chat-content>
+        </section>
+      }
+      @case ('Budgets') {
+        <section class="gap-content">
+          <app-budget></app-budget>
+        </section>
+      }
+      @case ('Learning') {
+        <section class="gap-content">
+          <app-learning-content></app-learning-content>
+        </section>
+      }
+      @case ('Categories') {
+        <section class="gap-content">
+          <app-category-content></app-category-content>
+        </section>
+      }
+      @case ('Tools') {
+        <section class="gap-content">
+          <app-tools-content></app-tools-content>
+        </section>
+      }
+    }
   </div>
 </main>
 
@@ -43,7 +59,7 @@
 <app-footer-tabs></app-footer-tabs>
 
 
-<!-- Bottom sheet: revisión de transacciones SMS pendientes -->
+<!-- Bottom sheet: pending SMS transaction review -->
 <app-sms-sync-sheet
   [isOpen]="isSheetOpen"
   (sheetClosed)="closeSheet()"

@@ -80,6 +80,7 @@ export class TrackingContentComponent implements OnInit {
           this.allMonthTransactions = all;
           this.filteredTransactions = filtered;
         },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         error: () => {}
       });
   }

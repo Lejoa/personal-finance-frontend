@@ -14,7 +14,7 @@ export class AuthService {
   private router = inject(Router);
   private platform = inject(PlatformService);
 
-  // Lazy getter para HttpClient para evitar dependencia circular con el interceptor
+  // Lazy getter for HttpClient to break the circular dependency with the JWT interceptor
   private get http(): HttpClient {
     return this.injector.get(HttpClient);
   }
@@ -24,7 +24,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
 
-  // Flag para evitar múltiples refresh simultáneos
+  // Guard against concurrent refresh calls
   private isRefreshing = false;
 
   constructor() {
@@ -32,8 +32,8 @@ export class AuthService {
   }
 
   /**
-   * Verifica si hay sesión activa al cargar la aplicación.
-   * Si hay token, intenta cargar el perfil; si falla, intenta refrescar.
+   * Checks for an active session on application startup.
+   * If a token exists, attempts to load the profile; on failure, attempts a token refresh.
    */
   private checkAuthStatus(): void {
     if (!this.getToken()) return;
@@ -42,6 +42,7 @@ export class AuthService {
 
   private loadUserProfileOrRefresh(): void {
     this.getUserProfile().subscribe({
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       next: () => {},
       error: () => this.tryRefreshAndReloadProfile()
     });
@@ -56,16 +57,17 @@ export class AuthService {
     this.refreshAccessToken().pipe(
       switchMap(() => this.getUserProfile())
     ).subscribe({
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       next: () => {},
       error: () => this.logout(false)
     });
   }
 
   /**
-   * Dispatcher de autenticación OAuth: delega al flujo web o nativo según la plataforma.
+   * OAuth authentication dispatcher: delegates to the web or native flow based on the platform.
    *
-   * En web: redirige el browser al endpoint OAuth del backend (flujo original).
-   * En nativo: abre un Chrome Custom Tab y escucha el deep link del callback.
+   * Web: redirects the browser to the backend OAuth endpoint (standard flow).
+   * Native: opens a Chrome Custom Tab and listens for the deep-link callback.
    */
   loginWithGoogle(): void {
     if (this.platform.isNative) {
@@ -76,19 +78,19 @@ export class AuthService {
   }
 
   /**
-   * Flujo OAuth nativo para Android usando Capacitor.
+   * Native OAuth flow for Android using Capacitor.
    *
-   * Usa imports dinámicos para evitar que el código de Capacitor se incluya
-   * en la build web. El bundler (esbuild) hace tree-shaking de estos imports
-   * cuando están dentro de un branch que nunca se ejecuta en web.
+   * Dynamic imports are used so that Capacitor code is not bundled into the web build.
+   * The bundler (esbuild) tree-shakes these imports when they are inside a branch
+   * that never executes on web.
    *
-   * Pasos:
-   * 1. Registrar listener 'appUrlOpen' ANTES de abrir el browser.
-   *    Cuando el backend redirige a personalfinance://auth/callback?token=X,
-   *    Android enruta la URL a MainActivity y Capacitor dispara este evento.
-   * 2. Abrir Chrome Custom Tab apuntando al endpoint OAuth del backend,
-   *    con ?client=android para que el backend sepa a qué scheme redirigir.
-   * 3. Al recibir appUrlOpen: cerrar el browser y procesar los tokens.
+   * Steps:
+   * 1. Register the 'appUrlOpen' listener BEFORE opening the browser.
+   *    When the backend redirects to personalfinance://auth/callback?token=X,
+   *    Android routes the URL to MainActivity and Capacitor fires this event.
+   * 2. Open a Chrome Custom Tab pointing to the backend OAuth endpoint,
+   *    with ?client=android so the backend knows which scheme to redirect to.
+   * 3. On receiving appUrlOpen: close the browser and process the tokens.
    */
   private loginWithGoogleNative(): void {
     Promise.all([
@@ -96,7 +98,7 @@ export class AuthService {
       import('@capacitor/browser')
     ]).then(([{ App }, { Browser }]) => {
 
-      // Registrar el listener del deep link antes de abrir el browser
+      // Register the deep-link listener before opening the browser
       App.addListener('appUrlOpen', async (event) => {
         const url = new URL(event.url);
         const token = url.searchParams.get('token');
@@ -108,7 +110,7 @@ export class AuthService {
         if (token) {
           this.handleOAuthCallback(token, refreshToken ?? undefined);
         } else if (error) {
-          console.error('[AuthService] Error en callback nativo:', error);
+          console.error('[AuthService] Native callback error:', error);
           this.router.navigate(['/login']);
         }
       });
@@ -118,7 +120,7 @@ export class AuthService {
   }
 
   /**
-   * Persiste los tokens recibidos del callback OAuth en localStorage.
+   * Persists tokens received from the OAuth callback to localStorage.
    */
   private persistTokens(token: string, refreshToken?: string): void {
     this.saveToken(token);
@@ -128,7 +130,7 @@ export class AuthService {
   }
 
   /**
-   * Procesa el callback de OAuth: guarda los tokens y carga el perfil del usuario.
+   * Handles the OAuth callback: saves tokens and loads the user profile.
    */
   handleOAuthCallback(token: string, refreshToken?: string): void {
     this.persistTokens(token, refreshToken);
@@ -139,7 +141,7 @@ export class AuthService {
         this.router.navigate(['/']);
       },
       error: (error) => {
-        console.error('[AuthService] Error al obtener perfil después del callback:', error);
+        console.error('[AuthService] Failed to load profile after OAuth callback:', error);
         this.logout();
         this.router.navigate(['/login'], {
           queryParams: { error: 'profile_fetch_failed' }
@@ -149,20 +151,20 @@ export class AuthService {
   }
 
   /**
-   * Obtiene el perfil del usuario autenticado desde el backend.
+   * Fetches the authenticated user's profile from the backend.
    */
   getUserProfile(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/api/me`).pipe(
       tap(user => this.currentUserSubject.next(user)),
       catchError(error => {
-        console.error('[AuthService] Error al obtener perfil:', error);
+        console.error('[AuthService] Failed to fetch user profile:', error);
         return throwError(() => error);
       })
     );
   }
 
   /**
-   * Refresca el access token usando el refresh token almacenado.
+   * Refreshes the access token using the stored refresh token.
    */
   refreshAccessToken(): Observable<RefreshTokenResponse> {
     const refreshToken = this.getRefreshToken();
@@ -186,7 +188,7 @@ export class AuthService {
         this.isRefreshing = false;
       }),
       catchError(error => {
-        console.error('[AuthService] Error al refrescar token:', error);
+        console.error('[AuthService] Failed to refresh token:', error);
         this.isRefreshing = false;
         this.logout(false);
         return throwError(() => error);
@@ -195,17 +197,17 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesión del usuario. Limpia tokens locales y redirige al login.
-   * @param revokeOnBackend Si es true, revoca el refresh token en el backend (default: true).
-   *   Se omite cuando ya estamos offline o en flujos internos para evitar dependencia circular.
+   * Logs out the user. Clears local tokens and redirects to the login page.
+   * @param revokeOnBackend When true, revokes the refresh token on the backend (default: true).
+   *   Skipped when already offline or in internal flows to avoid circular dependencies.
    */
-  logout(revokeOnBackend: boolean = true): void {
+  logout(revokeOnBackend = true): void {
     const refreshToken = this.getRefreshToken();
 
     if (refreshToken && revokeOnBackend) {
       this.http.post(`${this.apiUrl}/api/auth/logout`, { refreshToken }).subscribe({
-        next: () => console.log('[AuthService] Logout exitoso en el backend'),
-        error: (error) => console.error('[AuthService] Error al hacer logout en el backend:', error)
+        next: () => console.log('[AuthService] Backend logout successful'),
+        error: (error) => console.error('[AuthService] Backend logout failed:', error)
       });
     }
 

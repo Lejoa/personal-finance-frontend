@@ -50,17 +50,17 @@ export class SmsSyncSheetComponent implements OnChanges {
 
   selectedDays = 1;
   transactions: PendingSmsTransaction[] = [];
-  cardStates: Map<string, SmsCardState> = new Map();
+  cardStates = new Map<string, SmsCardState>();
 
   isFetching  = false;
   isApproving = false;
-  hasFetched  = false;   // true después del primer "Obtener"
+  hasFetched  = false;   // true after the first "Fetch" action
   categories: Category[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']) {
       if (this.isOpen) {
-        // Resetear estado al abrir
+        // Reset state when the sheet opens
         this.transactions = [];
         this.cardStates   = new Map();
         this.hasFetched   = false;
@@ -72,7 +72,7 @@ export class SmsSyncSheetComponent implements OnChanges {
     }
   }
 
-  /** Carga los SMS del período seleccionado sin guardar nada en BD. */
+  /** Loads SMS messages for the selected period without persisting anything to the database. */
   async fetch(): Promise<void> {
     if (this.isFetching) return;
     this.isFetching = true;

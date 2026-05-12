@@ -31,7 +31,7 @@ describe('CategoryService', () => {
 
   describe('getCategories', () => {
     it('should GET and map categories', () => {
-      let result: any;
+      let result: { id: number; type: string }[] | undefined;
       service.getCategories().subscribe(r => result = r);
       http.expectOne(req => req.url === API).flush({ data: [makeDto(1)], total: 1 });
 
@@ -55,7 +55,7 @@ describe('CategoryService', () => {
     });
 
     it('should update categories$ BehaviorSubject', () => {
-      let emitted: any;
+      let emitted: { length: number }[] | undefined;
       service.categories$.subscribe(v => emitted = v);
 
       service.getCategories().subscribe();
@@ -67,7 +67,7 @@ describe('CategoryService', () => {
 
   describe('getCategoryById', () => {
     it('should GET a single category', () => {
-      let result: any;
+      let result: { id: number } | undefined;
       service.getCategoryById(1).subscribe(r => result = r);
       http.expectOne(`${API}/1`).flush({ category: makeDto(1) });
       expect(result.id).toBe(1);

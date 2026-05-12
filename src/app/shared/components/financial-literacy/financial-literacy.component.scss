@@ -2,18 +2,18 @@
 @import 'styles.scss';
 
 /* ============================================================
-    BLOQUE PRINCIPAL
-    - Hereda .block del global, solo personalizar lo necesario
+    MAIN BLOCK
+    - Inherits .block from the global stylesheet; only customise as needed
     ============================================================ */
 .block--financial-literacy {
-  // No redefinir propiedades que ya vienen de .block
-  // Solo agregar lo específico de este componente
+  // Do not redefine properties already provided by .block
+  // Only add what is specific to this component
 }
 
 /* ============================================================
-    VISTA DE DETALLE — pantalla completa
-    Se superpone al layout del Home para dar la misma
-    experiencia que en la sección Learning dedicada.
+    DETAIL VIEW — full screen
+    Overlays the Home layout to provide the same experience
+    as the dedicated Learning section.
     ============================================================ */
 .financial-tip-detail {
   position: fixed;

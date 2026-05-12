@@ -23,7 +23,7 @@ export class ChatContentComponent implements OnInit, AfterViewChecked {
   private destroyRef = inject(DestroyRef);
 
   chatState!: ChatState;
-  userInput: string = '';
+  userInput = '';
   pendingFormsByMessageId: Record<string | number, {
     date: string;
     note: string;

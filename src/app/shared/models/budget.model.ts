@@ -23,17 +23,17 @@ export interface Budget {
 export interface CreateBudgetRequest {
   startDate: string;
   endDate: string;
-  categories: Array<{
+  categories: {
     categoryId: number;
     amount: number;
-  }>;
+  }[];
 }
 
 export interface UpdateBudgetRequest {
   startDate?: string;
   endDate?: string;
-  categories?: Array<{
+  categories?: {
     categoryId: number;
     amount: number;
-  }>;
+  }[];
 }

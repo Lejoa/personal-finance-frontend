@@ -51,10 +51,10 @@ export class TransactionService {
   public transactions$ = this.transactionsSubject.asObservable();
 
   private transactionChangedSubject = new Subject<void>();
-  /** Emite cuando una transacción es creada, actualizada o eliminada */
+  /** Emits whenever a transaction is created, updated or deleted */
   public transactionChanged$ = this.transactionChangedSubject.asObservable();
 
-  /** Obtiene transacciones con filtros opcionales */
+  /** Fetches transactions with optional filters */
   getTransactions(filters?: TransactionFilters): Observable<Transaction[]> {
     let params = new HttpParams();
 
@@ -81,12 +81,12 @@ export class TransactionService {
             );
   }
 
-  /** Obtiene las últimas N transacciones */
-  getLatestTransactions(limit: number = 3): Observable<Transaction[]> {
+  /** Fetches the latest N transactions */
+  getLatestTransactions(limit = 3): Observable<Transaction[]> {
     return this.getTransactions({ limit });
   }
 
-  /** Obtiene transacciones por rango de fechas */
+  /** Fetches transactions within a date range */
   getTransactionsByDateRange(
     startDate: Date,
     endDate: Date,
@@ -99,7 +99,7 @@ export class TransactionService {
     });
   }
 
-  /** Obtiene transacciones por rango de fechas sin actualizar el BehaviorSubject compartido */
+  /** Fetches transactions within a date range without updating the shared BehaviorSubject */
   getTransactionsQuiet(filters?: TransactionFilters): Observable<Transaction[]> {
     let params = new HttpParams();
     if (filters?.type) params = params.set('type', filters.type);
@@ -109,7 +109,7 @@ export class TransactionService {
       .pipe(map(response => response.data.map(dto => this.mapDtoToTransaction(dto))));
   }
 
-  /** Obtiene una transacción por ID */
+  /** Fetches a transaction by ID */
   getTransactionById(id: number): Observable<Transaction> {
     return this.http.get<TransactionResponse>(`${this.apiUrl}/${id}`)
             .pipe(
@@ -121,7 +121,7 @@ export class TransactionService {
     return this.getTransactions({ sync: 'pending' });
   }
 
-  /** Marca todas las transacciones del array como synchronized='done' en paralelo */
+  /** Sets synchronized='done' on every transaction in the array, in parallel */
   approveAllPending(transactions: Transaction[]): Observable<Transaction[]> {
     const updates = transactions.map(t =>
       this.updateTransaction(Number(t.id), { synchronized: 'done' })
@@ -130,8 +130,8 @@ export class TransactionService {
   }
 
   /**
-   * Aprueba o rechaza transacciones según el set de IDs aprobados.
-   * Los IDs en approvedIds → synchronized='done', el resto → synchronized='rejected'.
+   * Approves or rejects transactions based on the set of approved IDs.
+   * IDs in approvedIds → synchronized='done'; all others → synchronized='rejected'.
    */
   batchApprove(transactions: Transaction[], approvedIds: Set<string>): Observable<Transaction[]> {
     const updates = transactions.map(t =>
@@ -142,7 +142,7 @@ export class TransactionService {
     return forkJoin(updates);
   }
 
-  /** Crea una nueva transacción */
+  /** Creates a new transaction */
   createTransaction(transaction: Partial<Transaction>): Observable<Transaction> {
     const payload = this.mapTransactionToDto(transaction);
     return this.http.post<TransactionCreateResponse>(this.apiUrl, payload).pipe(
@@ -155,7 +155,7 @@ export class TransactionService {
     );
   }
 
-  /** Actualiza una transacción existente */
+  /** Updates an existing transaction */
   updateTransaction(id: number, transaction: Partial<Transaction>): Observable<Transaction> {
     const payload = this.mapTransactionToDto(transaction);
     return this.http.patch<TransactionCreateResponse>(`${this.apiUrl}/${id}`, payload).pipe(
@@ -172,12 +172,12 @@ export class TransactionService {
     );
   }
 
-  /** Solicita el mensaje de retroalimentación formativa para una transacción confirmada */
+  /** Requests the formative feedback message for a confirmed transaction */
   getFeedback(transactionId: number): Observable<{ feedback: string | null }> {
     return this.http.post<{ feedback: string | null }>(`${this.apiUrl}/${transactionId}/feedback`, {});
   }
 
-  /** Elimina una transacción */
+  /** Deletes a transaction */
   deleteTransaction(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
@@ -188,7 +188,7 @@ export class TransactionService {
     );
   }
 
-  /** Obtiene el estado actual sin llamada HTTP */
+  /** Returns the current cached transactions without making an HTTP call */
   getCurrentTransactions(): Transaction[] {
     return this.transactionsSubject.value;
   }
@@ -223,7 +223,7 @@ export class TransactionService {
     if (transaction.note !== undefined) dto['note'] = transaction.note;
     const sync = transaction.synchronized ?? transaction.status;
     if (sync) dto['synchronized'] = sync;
-    // Propaga el origen al backend ('manual' | 'sms') para trazabilidad
+    // Forward the source to the backend ('manual' | 'sms') for traceability
     if (transaction.source) dto['source'] = transaction.source;
 
     return dto;

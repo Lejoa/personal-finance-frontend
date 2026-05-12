@@ -35,7 +35,9 @@
               "src/styles.scss"
             ],
             "stylePreprocessorOptions": {
-              "includePaths": ["src"]
+              "includePaths": [
+                "src"
+              ]
             },
             "scripts": []
           },
@@ -123,7 +125,9 @@
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {
-              "includePaths": ["src"]
+              "includePaths": [
+                "src"
+              ]
             },
             "assets": [
               {
@@ -138,11 +142,23 @@
             "karmaConfig": "karma.conf.js",
             "codeCoverage": true
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "520a0960-56ff-411c-b0be-5a2209195a80"
+    "analytics": "520a0960-56ff-411c-b0be-5a2209195a80",
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }

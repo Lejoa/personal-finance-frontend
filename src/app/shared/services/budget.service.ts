@@ -83,7 +83,7 @@ export class BudgetService {
         const endDate = this.formatDate(new Date(month.getFullYear(), month.getMonth() + 1, 0));
 
         if (existingBudget?.id) {
-            // Ya existe un budget para este mes: agregar la nueva categoría a las existentes
+            // A budget already exists for this month: append the new category to the existing ones
             const existingCategories = (existingBudget.categories ?? []).map(c => ({
                 categoryId: c.categoryId,
                 amount: c.amount
@@ -94,7 +94,7 @@ export class BudgetService {
             return this.updateBudget(existingBudget.id, request);
         }
 
-        // No existe budget para este mes: crear uno nuevo
+        // No budget exists for this month: create a new one
         const request: CreateBudgetRequest = {
             startDate,
             endDate,

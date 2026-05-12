@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 
 /**
- * Servicio centralizado para detectar la plataforma en runtime.
+ * Centralised service for runtime platform detection.
  *
- * Capacitor.isNativePlatform() verifica en tiempo de ejecución si el bridge
- * nativo (JS ↔ Java/Kotlin) está activo. Es más confiable que environment.isNative
- * porque ese valor es fijo en compile-time: si por error se carga un build de
- * Android en un browser web, environment.isNative diría true pero el bridge no
- * existiría, causando errores al llamar cualquier API nativa.
+ * Capacitor.isNativePlatform() checks at runtime whether the native bridge
+ * (JS ↔ Java/Kotlin) is active. This is more reliable than environment.isNative,
+ * which is a compile-time constant: if an Android build were accidentally loaded
+ * in a regular browser, environment.isNative would be true but the bridge would
+ * not exist, causing errors on any native API call.
  *
- * Capacitor.getPlatform() retorna: 'android' | 'ios' | 'web'
+ * Capacitor.getPlatform() returns: 'android' | 'ios' | 'web'
  */
 @Injectable({
   providedIn: 'root'

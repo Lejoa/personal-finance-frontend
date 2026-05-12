@@ -42,7 +42,8 @@
 
 <!-- Modal overlay -->
 @if (isModalOpen) {
-  <div class="modal-overlay" (click)="closeModal()"></div>
+  <div class="modal-overlay" role="button" tabindex="0"
+    (click)="closeModal()" (keydown.escape)="closeModal()"></div>
 }
 
 @if (isModalOpen) {

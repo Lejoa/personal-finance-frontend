@@ -18,11 +18,11 @@
         <div class="message-bubble">
           <p class="message-content">{{ message.content }}</p>
 
-          <!-- Tarjeta: categorización pendiente -->
+          <!-- Card: pending categorisation -->
           @if (message.pendingCategorization && pendingFormsByMessageId[message.id]) {
             <div class="transaction-card transaction-card--pending">
 
-              <!-- Encabezado: tipo, nombre, monto -->
+              <!-- Header: type, name, amount -->
               <div class="transaction-card__header">
                 <span class="transaction-card__type"
                       [class.transaction-card__type--gasto]="message.pendingCategorization.type === 'gasto'"
@@ -33,7 +33,7 @@
                 <span class="transaction-card__amount">{{ message.pendingCategorization.amount | number:'1.0-0' }} COP</span>
               </div>
 
-              <!-- Campos: fecha y nota -->
+              <!-- Fields: date and note -->
               <div class="transaction-card__extras">
                 <label class="transaction-card__extras-label">
                   Fecha
@@ -52,10 +52,10 @@
                 </label>
               </div>
 
-              <!-- Selección de categoría -->
+              <!-- Category selection -->
               <p class="transaction-card__label">Categoría</p>
 
-              <!-- Caso 1: hay categoría sugerida -->
+              <!-- Case 1: a suggested category is available -->
               @if (message.pendingCategorization.suggestedCategory; as suggestedCategory) {
                 <div class="transaction-card__suggested">
                   <button
@@ -88,7 +88,7 @@
                 }
               }
 
-              <!-- Caso 2: sin categoría sugerida, mostrar todas directamente -->
+              <!-- Case 2: no suggested category — show all categories directly -->
               @if (!message.pendingCategorization.suggestedCategory) {
                 <div class="transaction-card__categories">
                   @for (availableCategory of message.pendingCategorization.categories; track availableCategory.id) {
@@ -102,14 +102,14 @@
                 </div>
               }
 
-              <!-- Resumen de selección -->
+              <!-- Selection summary -->
               @if (pendingFormsByMessageId[message.id].selectedCategoryName) {
                 <p class="transaction-card__selection-summary">
                   Seleccionada: <strong>{{ pendingFormsByMessageId[message.id].selectedCategoryName }}</strong>
                 </p>
               }
 
-              <!-- Botones Aceptar / Cancelar -->
+              <!-- Confirm / Cancel buttons -->
               <div class="transaction-card__actions">
                 <button
                   class="transaction-card__action-btn transaction-card__action-btn--confirm"
@@ -126,7 +126,7 @@
             </div>
           }
 
-          <!-- Tarjeta: transacción confirmada -->
+          <!-- Card: confirmed transaction -->
           @if (message.transactionCreated) {
             <div class="transaction-card transaction-card--confirmed">
               <div class="transaction-card__header">

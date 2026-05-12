@@ -27,9 +27,11 @@ describe('TransactionCardComponent', () => {
   let component: TransactionCardComponent;
   let fixture: ComponentFixture<TransactionCardComponent>;
   let transactionServiceSpy: jasmine.SpyObj<TransactionService>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let categoriesSubject: BehaviorSubject<any[]>;
 
   beforeEach(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     categoriesSubject = new BehaviorSubject<any[]>([]);
     transactionServiceSpy = jasmine.createSpyObj('TransactionService', ['updateTransaction']);
     transactionServiceSpy.updateTransaction.and.returnValue(of(mockUpdatedTransaction));
@@ -74,6 +76,7 @@ describe('TransactionCardComponent', () => {
   describe('getters with transactionAction Sincronize', () => {
     beforeEach(() => {
       component.transactionAction = 'Sincronize';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (component as any).actionConfig = null;
     });
 
@@ -179,6 +182,7 @@ describe('TransactionCardComponent', () => {
 
     it('should call updateTransaction with status rejected when transactionAction is Sincronize', () => {
       component.transactionAction = 'Sincronize';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (component as any).actionConfig = null;
 
       component.handleCancel();

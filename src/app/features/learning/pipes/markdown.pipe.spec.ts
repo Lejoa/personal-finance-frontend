@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { MarkdownPipe } from './markdown.pipe';
 
 describe('MarkdownPipe', () => {
@@ -8,6 +8,7 @@ describe('MarkdownPipe', () => {
   const html = (value: string): string => {
     const result = pipe.transform(value);
     // SafeHtml wraps the string — extract it via the internal property
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (result as any).changingThisBreaksApplicationSecurity ?? String(result);
   };
 

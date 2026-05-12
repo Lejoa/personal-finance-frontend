@@ -36,7 +36,7 @@ describe('TipService', () => {
 
   describe('getRecommendedTips', () => {
     it('should GET recommended tips and map DTOs', () => {
-      let result: any;
+      let result: { id: number; title: string; authorTitle?: string; reason?: string }[] | undefined;
       service.getRecommendedTips().subscribe(r => result = r);
       http.expectOne(`${API}/recommended`).flush({ data: [makeDto(1)], total: 1 });
 
@@ -48,7 +48,7 @@ describe('TipService', () => {
     });
 
     it('should map null fields to undefined', () => {
-      let result: any;
+      let result: { imageSrc?: string; authorTitle?: string; reason?: string }[] | undefined;
       service.getRecommendedTips().subscribe(r => result = r);
       http.expectOne(`${API}/recommended`).flush({
         data: [{ ...makeDto(2), imageSrc: null, authorTitle: null, reason: null }],
@@ -62,7 +62,7 @@ describe('TipService', () => {
 
   describe('getAllTips', () => {
     it('should GET all tips', () => {
-      let result: any;
+      let result: { length: number }[] | undefined;
       service.getAllTips().subscribe(r => result = r);
       http.expectOne(API).flush({ data: [makeDto(1), makeDto(2)], total: 2 });
       expect(result.length).toBe(2);

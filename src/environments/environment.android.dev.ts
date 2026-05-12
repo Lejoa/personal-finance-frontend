@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  // Túnel ngrok para desarrollo con dispositivo físico.
-  // ngrok expone el backend local con un dominio HTTPS público que Google OAuth acepta.
-  // Esta URL cambia cada vez que se reinicia ngrok (plan gratuito) — actualizar y rebuild.
+  // ngrok tunnel for development with a physical device.
+  // ngrok exposes the local backend under a public HTTPS domain accepted by Google OAuth.
+  // This URL changes every time ngrok restarts (free plan) — update and rebuild after each restart.
   apiUrl: 'https://338a-186-86-52-17.ngrok-free.app',
   isNative: true,
   platform: 'android' as const

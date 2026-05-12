@@ -1,154 +1,179 @@
 <!-- Overlay -->
-<div class="sheet-overlay" *ngIf="isOpen" (click)="close()"></div>
+@if (isOpen) {
+  <div class="sheet-overlay" role="button" tabindex="0"
+    (click)="close()" (keydown.escape)="close()"></div>
+}
 
 <!-- Bottom Sheet -->
-<div class="sms-sheet" *ngIf="isOpen" role="dialog" aria-modal="true" aria-labelledby="sms-sheet-title">
+@if (isOpen) {
+  <div class="sms-sheet" role="dialog" aria-modal="true" aria-labelledby="sms-sheet-title">
 
-  <div class="sms-sheet__handle"></div>
+    <div class="sms-sheet__handle"></div>
 
-  <!-- Header -->
-  <div class="sms-sheet__header">
-    <div class="sms-sheet__title-group">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/>
-      </svg>
-      <h2 class="sms-sheet__title" id="sms-sheet-title">Sincronizar SMS</h2>
-    </div>
-    <div class="sms-sheet__header-right">
-      <span class="sms-sheet__count" *ngIf="hasFetched">{{ transactions.length }}</span>
-      <button class="sms-sheet__close-btn" type="button" (click)="close()" aria-label="Cerrar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <!-- Header -->
+    <div class="sms-sheet__header">
+      <div class="sms-sheet__title-group">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/>
         </svg>
+        <h2 class="sms-sheet__title" id="sms-sheet-title">Sincronizar SMS</h2>
+      </div>
+      <div class="sms-sheet__header-right">
+        @if (hasFetched) {
+          <span class="sms-sheet__count">{{ transactions.length }}</span>
+        }
+        <button class="sms-sheet__close-btn" type="button" (click)="close()" aria-label="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Range selector + Fetch button -->
+    <div class="sms-sheet__fetch-bar">
+      <select class="sms-fetch__select" [(ngModel)]="selectedDays">
+        @for (opt of rangeOptions; track opt.days) {
+          <option [value]="opt.days">{{ opt.label }}</option>
+        }
+      </select>
+      <button
+        class="sms-fetch__btn"
+        type="button"
+        (click)="fetch()"
+        [disabled]="isFetching">
+        @if (isFetching) {
+          <svg class="sms-fetch__spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+          </svg>
+        }
+        {{ isFetching ? 'Buscando...' : 'Obtener' }}
       </button>
     </div>
-  </div>
 
-  <!-- Selector de rango + botón Obtener -->
-  <div class="sms-sheet__fetch-bar">
-    <select class="sms-fetch__select" [(ngModel)]="selectedDays">
-      <option *ngFor="let opt of rangeOptions" [value]="opt.days">{{ opt.label }}</option>
-    </select>
-    <button
-      class="sms-fetch__btn"
-      type="button"
-      (click)="fetch()"
-      [disabled]="isFetching">
-      <svg *ngIf="isFetching" class="sms-fetch__spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
-      </svg>
-      {{ isFetching ? 'Buscando...' : 'Obtener' }}
-    </button>
-  </div>
-
-  <!-- Estado vacío tras buscar -->
-  <div class="sms-sheet__empty" *ngIf="hasFetched && transactions.length === 0 && !isFetching">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <p>No se encontraron SMS bancarios en este período.</p>
-  </div>
-
-  <!-- Card list -->
-  <div class="sms-sheet__list" *ngIf="transactions.length > 0">
-    <div
-      class="sms-card"
-      *ngFor="let tx of transactions"
-      [class.sms-card--checked]="getState(tx.note).checked"
-      [class.sms-card--expanded]="getState(tx.note).expanded">
-
-      <!-- Collapsed row -->
-      <div class="sms-card__row" (click)="toggleExpand(tx.note)">
-        <label class="sms-card__check" (click)="$event.stopPropagation()">
-          <input
-            type="checkbox"
-            [checked]="getState(tx.note).checked"
-            (change)="toggleCheck(tx.note)" />
-          <span class="sms-card__checkmark"></span>
-        </label>
-
-        <div class="sms-card__summary">
-          <span class="sms-card__name">{{ getState(tx.note).name }}</span>
-          <span class="sms-card__meta">
-            {{ formatDate(tx.date) }}
-            <span class="sms-card__type" [class.sms-card__type--income]="tx.transactionType === 'ingreso'">
-              {{ tx.transactionType === 'ingreso' ? 'Ingreso' : 'Gasto' }}
-            </span>
-          </span>
-        </div>
-
-        <div class="sms-card__right">
-          <span class="sms-card__amount" [class.sms-card__amount--income]="tx.transactionType === 'ingreso'">
-            {{ formatAmount(getState(tx.note).amount) }}
-          </span>
-          <svg class="sms-card__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+    <!-- Empty state after fetch -->
+    @if (hasFetched && transactions.length === 0 && !isFetching) {
+      <div class="sms-sheet__empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p>No se encontraron SMS bancarios en este período.</p>
       </div>
+    }
 
-      <!-- Expanded: inline edit form -->
-      <div class="sms-card__detail" *ngIf="getState(tx.note).expanded">
-        <div class="sms-card__fields">
-          <div class="sms-field">
-            <label class="sms-field__label">Nombre</label>
-            <input class="sms-field__input" type="text" [(ngModel)]="getState(tx.note).name" placeholder="Nombre del comercio" />
-          </div>
+    <!-- Card list -->
+    @if (transactions.length > 0) {
+      <div class="sms-sheet__list">
+        @for (tx of transactions; track tx.note) {
+          <div
+            class="sms-card"
+            [class.sms-card--checked]="getState(tx.note).checked"
+            [class.sms-card--expanded]="getState(tx.note).expanded">
 
-          <div class="sms-field">
-            <label class="sms-field__label">Monto</label>
-            <input class="sms-field__input" type="number" inputmode="numeric" [(ngModel)]="getState(tx.note).amount" placeholder="0" />
-          </div>
+            <!-- Collapsed row -->
+            <div class="sms-card__row" role="button" tabindex="0"
+              (click)="toggleExpand(tx.note)" (keydown.enter)="toggleExpand(tx.note)">
+              <label class="sms-card__check" tabindex="0" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+                <input
+                  type="checkbox"
+                  [checked]="getState(tx.note).checked"
+                  (change)="toggleCheck(tx.note)" />
+                <span class="sms-card__checkmark"></span>
+              </label>
 
-          <div class="sms-field">
-            <label class="sms-field__label">Fecha</label>
-            <input class="sms-field__input" type="date" [(ngModel)]="getState(tx.note).date" />
-          </div>
+              <div class="sms-card__summary">
+                <span class="sms-card__name">{{ getState(tx.note).name }}</span>
+                <span class="sms-card__meta">
+                  {{ formatDate(tx.date) }}
+                  <span class="sms-card__type" [class.sms-card__type--income]="tx.transactionType === 'ingreso'">
+                    {{ tx.transactionType === 'ingreso' ? 'Ingreso' : 'Gasto' }}
+                  </span>
+                </span>
+              </div>
 
-          <div class="sms-field">
-            <label class="sms-field__label">Tipo</label>
-            <select class="sms-field__select" [(ngModel)]="getState(tx.note).transactionType">
-              <option value="gasto">Gasto</option>
-              <option value="ingreso">Ingreso</option>
-            </select>
-          </div>
+              <div class="sms-card__right">
+                <span class="sms-card__amount" [class.sms-card__amount--income]="tx.transactionType === 'ingreso'">
+                  {{ formatAmount(getState(tx.note).amount) }}
+                </span>
+                <svg class="sms-card__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
 
-          <div class="sms-field">
-            <label class="sms-field__label">Categoría</label>
-            <select class="sms-field__select" [(ngModel)]="getState(tx.note).categoryId">
-              <option [ngValue]="undefined">Sin categoría</option>
-              <option *ngFor="let cat of getCategoriesForType(tx.note)" [ngValue]="cat.id">{{ cat.name }}</option>
-            </select>
-          </div>
+            <!-- Expanded: inline edit form -->
+            @if (getState(tx.note).expanded) {
+              <div class="sms-card__detail">
+                <div class="sms-card__fields">
+                  <div class="sms-field">
+                    <label class="sms-field__label" [for]="'name-' + tx.note">Nombre</label>
+                    <input [id]="'name-' + tx.note" class="sms-field__input" type="text" [(ngModel)]="getState(tx.note).name" placeholder="Nombre del comercio" />
+                  </div>
 
-          <div class="sms-field sms-field--full">
-            <label class="sms-field__label">SMS original</label>
-            <p class="sms-field__note">{{ tx.note }}</p>
+                  <div class="sms-field">
+                    <label class="sms-field__label" [for]="'amount-' + tx.note">Monto</label>
+                    <input [id]="'amount-' + tx.note" class="sms-field__input" type="number" inputmode="numeric" [(ngModel)]="getState(tx.note).amount" placeholder="0" />
+                  </div>
+
+                  <div class="sms-field">
+                    <label class="sms-field__label" [for]="'date-' + tx.note">Fecha</label>
+                    <input [id]="'date-' + tx.note" class="sms-field__input" type="date" [(ngModel)]="getState(tx.note).date" />
+                  </div>
+
+                  <div class="sms-field">
+                    <label class="sms-field__label" [for]="'type-' + tx.note">Tipo</label>
+                    <select [id]="'type-' + tx.note" class="sms-field__select" [(ngModel)]="getState(tx.note).transactionType">
+                      <option value="gasto">Gasto</option>
+                      <option value="ingreso">Ingreso</option>
+                    </select>
+                  </div>
+
+                  <div class="sms-field">
+                    <label class="sms-field__label" [for]="'cat-' + tx.note">Categoría</label>
+                    <select [id]="'cat-' + tx.note" class="sms-field__select" [(ngModel)]="getState(tx.note).categoryId">
+                      <option [ngValue]="undefined">Sin categoría</option>
+                      @for (cat of getCategoriesForType(tx.note); track cat.id) {
+                        <option [ngValue]="cat.id">{{ cat.name }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="sms-field sms-field--full">
+                    <span class="sms-field__label">SMS original</span>
+                    <p class="sms-field__note">{{ tx.note }}</p>
+                  </div>
+                </div>
+              </div>
+            }
           </div>
-        </div>
+        }
       </div>
-    </div>
-  </div>
+    }
 
-  <!-- Footer actions -->
-  <div class="sms-sheet__actions" *ngIf="transactions.length > 0">
-    <button class="sms-sheet__btn sms-sheet__btn--close" type="button" (click)="close()">
-      Cerrar
-    </button>
-    <button
-      class="sms-sheet__btn sms-sheet__btn--approve"
-      type="button"
-      (click)="approve()"
-      [disabled]="isApproving">
-      {{ isApproving ? 'Aprobando...' : 'Aprobar (' + checkedCount + ')' }}
-    </button>
-  </div>
+    <!-- Footer actions -->
+    @if (transactions.length > 0) {
+      <div class="sms-sheet__actions">
+        <button class="sms-sheet__btn sms-sheet__btn--close" type="button" (click)="close()">
+          Cerrar
+        </button>
+        <button
+          class="sms-sheet__btn sms-sheet__btn--approve"
+          type="button"
+          (click)="approve()"
+          [disabled]="isApproving">
+          {{ isApproving ? 'Aprobando...' : 'Aprobar (' + checkedCount + ')' }}
+        </button>
+      </div>
+    }
 
-  <!-- Footer solo cerrar cuando no hay transacciones -->
-  <div class="sms-sheet__actions" *ngIf="transactions.length === 0">
-    <button class="sms-sheet__btn sms-sheet__btn--close sms-sheet__btn--full" type="button" (click)="close()">
-      Cerrar
-    </button>
-  </div>
+    <!-- Footer close-only when there are no transactions -->
+    @if (transactions.length === 0) {
+      <div class="sms-sheet__actions">
+        <button class="sms-sheet__btn sms-sheet__btn--close sms-sheet__btn--full" type="button" (click)="close()">
+          Cerrar
+        </button>
+      </div>
+    }
 
-</div>
+  </div>
+}

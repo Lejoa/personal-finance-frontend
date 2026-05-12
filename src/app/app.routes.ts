@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './features/auth/guards/auth.guard';
 
 export const routes: Routes = [
-    // Rutas públicas (sin autenticación)
+    // Public routes (no authentication required)
     {
         path: 'login',
         loadComponent: () => import('./features/auth/components/login/login.component').then( m => m.LoginComponent)
@@ -12,7 +12,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/auth/components/callback/callback.component').then( m => m.CallbackComponent)
     },
 
-    // Rutas protegidas (requieren autenticación)
+    // Protected routes (authentication required)
     {
         path: '',
         canActivate: [AuthGuard],
@@ -24,7 +24,7 @@ export const routes: Routes = [
         ]
     },
 
-    // Redirección por defecto
+    // Default redirect
     {
         path: '**',
         redirectTo: 'login'

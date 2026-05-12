@@ -41,7 +41,7 @@ export class CategoryService {
   private categoriesSubject = new BehaviorSubject<Category[]>([]);
   public categories$ = this.categoriesSubject.asObservable();
 
-  /** Obtiene todas las categorías del backend y actualiza el estado */
+  /** Fetches all categories from the backend and updates the local state */
   getCategories(filters?: CategoryFilters): Observable<Category[]> {
     let params = new HttpParams();
 
@@ -58,14 +58,14 @@ export class CategoryService {
             );
   }
 
-  /** Obtiene una categoría por ID */
+  /** Fetches a category by ID */
   getCategoryById(id: number): Observable<Category> {
     return this.http.get<CategoryResponse>(`${this.apiUrl}/${id}`).pipe(
       map(response => this.mapDtoToCategory(response.category))
     );
   }
 
-  /** Crea una nueva categoría */
+  /** Creates a new category */
   createCategory(request: CreateCategoryRequest): Observable<Category> {
     return this.http.post<CategoryCreateResponse>(this.apiUrl, request).pipe(
       map(response => this.mapDtoToCategory(response.category)),
@@ -76,7 +76,7 @@ export class CategoryService {
     );
   }
 
-  /** Actualiza una categoría existente */
+  /** Updates an existing category */
   updateCategory(id: number, request: UpdateCategoryRequest): Observable<Category> {
     return this.http.patch<CategoryCreateResponse>(`${this.apiUrl}/${id}`, request).pipe(
       map(response => this.mapDtoToCategory(response.category)),
@@ -91,7 +91,7 @@ export class CategoryService {
     );
   }
 
-  /** Elimina una categoría */
+  /** Deletes a category */
   deleteCategory(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
@@ -101,7 +101,7 @@ export class CategoryService {
     );
   }
 
-  /** Obtiene el estado actual de categorías sin hacer una llamada HTTP */
+  /** Returns the current cached categories without making an HTTP call */
   getCurrentCategories(): Category[] {
     return this.categoriesSubject.value;
   }

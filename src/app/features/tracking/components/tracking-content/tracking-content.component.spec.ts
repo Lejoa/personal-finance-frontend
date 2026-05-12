@@ -6,8 +6,10 @@ import { ChartsSectionComponent } from '../charts-section/charts-section.compone
 
 @Component({ selector: 'app-charts-section', template: '', standalone: true })
 class MockChartsSectionComponent {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() transactions: any[] = [];
   @Input() selectedMonth: Date = new Date();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Output() transactionTypeChange = new EventEmitter<any>();
 }
 import { TrackingExpensesService } from '../../../../core/services/tracking-expenses/tracking-expenses.service';

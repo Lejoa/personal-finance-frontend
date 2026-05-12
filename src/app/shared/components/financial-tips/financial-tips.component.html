@@ -1,4 +1,5 @@
-<div class="financial-tip" (click)="emitExpand()">
+<div class="financial-tip" role="button" tabindex="0"
+  (click)="emitExpand()" (keydown.enter)="emitExpand()">
   <div class="tip-content" [class.has-image]="imageSrc">
     <div class="tip-header">
       <h5 class="tip-title">{{ title }}</h5>

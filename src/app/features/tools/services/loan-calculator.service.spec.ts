@@ -37,7 +37,7 @@ describe('LoanCalculatorService', () => {
 
   describe('getCalculations', () => {
     it('should GET and return the data array', () => {
-      let result: any;
+      let result: { id: number }[] | undefined;
       service.getCalculations().subscribe(r => result = r);
       http.expectOne(API).flush({ data: [mockCalc], total: 1 });
       expect(result.length).toBe(1);
@@ -47,7 +47,7 @@ describe('LoanCalculatorService', () => {
 
   describe('saveCalculation', () => {
     it('should POST and return the calculation', () => {
-      let result: any;
+      let result: { id: number } | undefined;
       const req = { name: 'Test', amount: 5000000, annualRate: 10, termMonths: 12, extraPayment: 0, frequency: 'monthly' as const, periodicPayment: 439583, totalInterest: 274996, totalPaid: 5274996 };
       service.saveCalculation(req).subscribe(r => result = r);
       http.expectOne(r => r.method === 'POST' && r.url === API)

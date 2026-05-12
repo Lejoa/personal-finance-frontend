@@ -3,12 +3,8 @@ import { SmsDeduplicationService } from './sms-deduplication.service';
 
 // Mock @capacitor/preferences
 const preferencesStore: Record<string, string> = {};
-const preferencesMock = {
-  get: async ({ key }: { key: string }) => ({ value: preferencesStore[key] ?? null }),
-  set: async ({ key, value }: { key: string; value: string }) => { preferencesStore[key] = value; }
-};
 
-jest: {/* placeholder — Karma uses jasmine */}
+{/* placeholder — Karma uses jasmine */}
 
 describe('SmsDeduplicationService', () => {
   let service: SmsDeduplicationService;
@@ -24,12 +20,14 @@ describe('SmsDeduplicationService', () => {
     service = TestBed.inject(SmsDeduplicationService);
 
     // Stub the private computeHash so tests are deterministic and don't need real SubtleCrypto
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     spyOn<any>(service, 'computeHash').and.callFake(
       (address: string, body: string, date: number) =>
         Promise.resolve(`hash_${address}_${date}`)
     );
 
     // Stub loadHashes and the Preferences store calls
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     spyOn<any>(service, 'loadHashes').and.callFake(() =>
       Promise.resolve(preferencesStore['sms_processed_hashes']
         ? JSON.parse(preferencesStore['sms_processed_hashes'])
@@ -39,7 +37,6 @@ describe('SmsDeduplicationService', () => {
 
     // Stub Preferences.set via the service's markAsProcessed indirectly —
     // we override markAsProcessed to write to our in-memory store.
-    const originalMark = service.markAsProcessed.bind(service);
     spyOn(service, 'markAsProcessed').and.callFake(async (address: string, body: string, date: number) => {
       const hash = `hash_${address}_${date}`;
       const current: string[] = preferencesStore['sms_processed_hashes']

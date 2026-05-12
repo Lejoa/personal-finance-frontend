@@ -5,8 +5,8 @@
 @import 'styles.scss';
 
 /* ============================================================
-    ESTRUCTURA PRINCIPAL DE LA APLICACIÓN
-    - Define el layout general (header, contenido, footer)
+    MAIN APPLICATION STRUCTURE
+    - Defines the general layout (header, content, footer)
     ============================================================ */
 .main-content {
   display: flex;
@@ -19,7 +19,7 @@
 }
 
 /* ============================================================
-    CONTENEDOR DE BLOQUES
+    BLOCK CONTAINER
    ============================================================= */
 .main-blocks {
   display: flex;
@@ -32,11 +32,11 @@
 }
 
 /* ============================================================
-    RESPONSIVE DESIGN (TABLET / DESKTOP)
+    RESPONSIVE (TABLET / DESKTOP)
     ============================================================ */
 @media (min-width: $breakpoint-md) {
   .main-content {
-    align-items: center; /* centra verticalmente el contenido */
+    align-items: center; /* vertically centres the content */
   }
 
   .main-blocks {
@@ -44,6 +44,6 @@
   }
 
   .block {
-    flex: 1; /* cada bloque ocupa la misma proporción */
+    flex: 1; /* each block takes up equal proportional space */
   }
 }

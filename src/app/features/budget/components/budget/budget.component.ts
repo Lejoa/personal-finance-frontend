@@ -40,9 +40,9 @@ export class BudgetComponent implements OnInit {
   budgetedCategories: BudgetCategoryView[] = [];
   unbudgetedCategories: UnbudgetedCategory[] = [];
   allMonthTransactions: Transaction[] = [];
-  totalBudget: number = 0;
-  totalSpent: number = 0;
-  isLoading: boolean = false;
+  totalBudget = 0;
+  totalSpent = 0;
+  isLoading = false;
 
   get selectedMonth(): Date {
     return this.monthStateService.selectedMonth;

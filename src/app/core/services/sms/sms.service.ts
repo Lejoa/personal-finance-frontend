@@ -9,7 +9,7 @@ import { SmsDeduplicationService } from './sms-deduplication.service';
 import { TransactionType } from '../../../shared/models/transaction.model';
 
 /**
- * Interfaz del SMS tal como lo retorna el plugin nativo SmsPlugin.java.
+ * SMS shape as returned by the native SmsPlugin.java plugin.
  */
 interface NativeSms {
   id: number;
@@ -28,29 +28,29 @@ interface SmsPluginInterface {
 }
 
 /**
- * Transacción parseada desde un SMS, aún no guardada en BD.
- * El usuario la revisa en el sheet y decide si aprobarla.
+ * Transaction parsed from an SMS, not yet persisted to the database.
+ * The user reviews it in the bottom sheet and decides whether to approve it.
  */
 export interface PendingSmsTransaction {
   name: string;
   amount: number;
   date: Date;
   transactionType: TransactionType;
-  note: string;        // SMS original completo — se guarda en `note` al aprobar
-  smsAddress: string;  // para marcar dedup al confirmar
-  smsDate: number;     // para marcar dedup al confirmar
+  note: string;        // full original SMS — stored in `note` when the user approves
+  smsAddress: string;  // used to mark deduplication on confirmation
+  smsDate: number;     // used to mark deduplication on confirmation
 }
 
 /**
- * SmsService — Orquestador de la sincronización de SMS bancarios.
+ * SmsService — Orchestrator for banking SMS synchronisation.
  *
- * Nuevo flujo (controlado por usuario):
- * 1. El usuario presiona el botón "Sincronizar SMS"
- * 2. parseBankSms() lee, filtra, deduplica y parsea los SMS → devuelve PendingSmsTransaction[]
- *    sin crear ninguna transacción en BD
- * 3. MainComponent muestra el sheet con los datos en memoria
- * 4. El usuario aprueba → SmsSyncSheetComponent llama createTransaction() solo para las chequeadas
- * 5. markAsProcessed() se llama desde el sheet al confirmar, no aquí
+ * User-controlled flow:
+ * 1. The user presses the "Sync SMS" button.
+ * 2. parseBankSms() reads, filters, deduplicates and parses SMS messages → returns PendingSmsTransaction[]
+ *    without creating any transaction in the database.
+ * 3. MainComponent displays the bottom sheet with the in-memory data.
+ * 4. The user approves → SmsSyncSheetComponent calls createTransaction() only for checked items.
+ * 5. markAsProcessed() is called from the sheet on confirmation, not here.
  */
 @Injectable({ providedIn: 'root' })
 export class SmsService {
@@ -65,18 +65,18 @@ export class SmsService {
   private readonly DEFAULT_SYNC_WINDOW_DAYS = 20;
 
   /**
-   * Emite el array de transacciones parseadas cuando el parseo completa con resultados.
-   * MainComponent se suscribe para abrir el bottom sheet de revisión.
-   * Las transacciones AÚN NO han sido guardadas en BD.
+   * Emits the parsed transaction array when parsing completes with results.
+   * MainComponent subscribes to this to open the review bottom sheet.
+   * Transactions have NOT yet been persisted to the database.
    */
   readonly syncResult$ = new Subject<PendingSmsTransaction[]>();
 
   /**
-   * Lee el buzón de SMS nativo, filtra por bancos conocidos, deduplica y parsea.
-   * NO crea transacciones en BD — devuelve los datos parseados para que el usuario los revise.
+   * Reads the native SMS inbox, filters by known banks, deduplicates and parses.
+   * Does NOT create transactions in the database — returns parsed data for user review.
    *
-   * @returns Array de PendingSmsTransaction listas para mostrar en el sheet.
-   *          Vacío si no hay permisos, no es nativo, o no hubo SMS nuevos.
+   * @returns Array of PendingSmsTransaction ready to display in the sheet.
+   *          Empty if permissions are missing, not running natively, or no new SMS found.
    */
   async parseBankSms(days?: number): Promise<PendingSmsTransaction[]> {
     if (!this.platform.isNative) return [];
@@ -126,68 +126,61 @@ export class SmsService {
   }
 
   /**
-   * Marca un SMS como procesado en el sistema de deduplicación.
-   * Debe llamarse desde SmsSyncSheetComponent después de que el usuario apruebe,
-   * solo para las transacciones efectivamente creadas en BD.
+   * Marks an SMS as processed in the deduplication system.
+   * Must be called from SmsSyncSheetComponent after the user approves,
+   * only for transactions that were actually created in the database.
    */
   async markSmsAsProcessed(smsAddress: string, smsBody: string, smsDate: number): Promise<void> {
     await this.dedup.markAsProcessed(smsAddress, smsBody, smsDate);
   }
 
   /**
-   * Dataset de SMS mock con offsets relativos a `now` en horas.
-   * Las fechas se recalculan en cada llamada para que siempre sean recientes.
+   * Mock SMS dataset with fixed epoch timestamps.
+   * Dates in the SMS body and sms.date are consistent with each other so that the
+   * SHA-256 hash computed by SmsDeduplicationService is stable across calls.
    *
-   * Distribución por selector:
-   *   Hace 1 día  (≤24 h): SMS 1 (12 h)
-   *   Hace 3 días (≤72 h): SMS 1 + 2 (12 h, 48 h)
-   *   Hace 7 días (≤168h): SMS 1–5 (12 h, 48 h, 108 h, 132 h, 156 h)
+   * Distribution by selector (reference date: 2026-04-10):
+   *   Last 1 day  (≤24 h):  SMS 1 (2026-04-09)
+   *   Last 3 days (≤72 h):  SMS 1-2 (2026-04-09, 2026-04-08)
+   *   Last 7 days (≤168 h): SMS 1-5 (2026-04-09 to 2026-04-04)
    *
-   * Para eliminar los mocks cuando vayas a pruebas reales:
-   * 1. Borra este método privado `getMockSms()`
-   * 2. Elimina `triggerMockSync()` y `triggerMockFetch()`
-   * 3. En `SmsSyncSheetComponent.fetch()` borra la rama `triggerMockFetch`
+   * To remove mocks when moving to real-device testing:
+   * 1. Delete this private `getMockSms()` method.
+   * 2. Delete `triggerMockSync()` and `triggerMockFetch()`.
+   * 3. In `SmsSyncSheetComponent.fetch()` remove the `triggerMockFetch` branch.
    */
-  // --- MOCK DATA (remover para pruebas con dispositivo real) ---
+  // --- MOCK DATA (remove before real-device testing) ---
   private getMockSms() {
-    // Timestamps fijos (epoch ms) para que el hash SHA-256 de SmsDeduplicationService
-    // sea siempre el mismo para el mismo SMS, independientemente de cuándo se llame.
-    // Las fechas en el cuerpo del SMS y en sms.date son coherentes entre sí.
-    //
-    // Distribución por selector (referencia: 2026-04-10):
-    //   Hace 1 día  (≤24 h):  SMS 1 (2026-04-09)
-    //   Hace 3 días (≤72 h):  SMS 1-2 (2026-04-09, 2026-04-08)
-    //   Hace 7 días (≤168 h): SMS 1-5 (2026-04-09 al 2026-04-04)
     return [
       {
         address: '85540',
         body: 'Bancolombia: Recibiste una transferencia por $431,991 de MARIA SOTO en tu cuenta **9514, el 09/04/2026 a las 18:51. Si tienes dudas, hablemos: 018000931987. Siempre a tu lado.',
-        date: 1744228260000,   // 2026-04-09 18:51 UTC fijo
+        date: 1744228260000,   // 2026-04-09 18:51 UTC (fixed)
       },
       {
         address: '85540',
         body: 'Bancolombia: Compraste COP40.900,00 en APPLE.COM/BILL, el 13:36 a las 08/04/2026. Esta compra esta asociada a T.Cred *8564. Si tienes dudas, encuentranos aqui: 01800931987. Siempre contigo.',
-        date: 1744118160000,   // 2026-04-08 13:36 UTC fijo
+        date: 1744118160000,   // 2026-04-08 13:36 UTC (fixed)
       },
       {
         address: '85540',
         body: 'Bancolombia: Transferiste $2,500.00 por QR desde tu cuenta 9514 a la cuenta 0163, el 2026/04/06 15:03. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
-        date: 1743951780000,   // 2026-04-06 15:03 UTC fijo
+        date: 1743951780000,   // 2026-04-06 15:03 UTC (fixed)
       },
       {
         address: '85540',
         body: 'Bancolombia: Pagaste $200,000.00 a CINE COLOMBIA S.A. desde tu producto *9514 el 05/04/2026 10:11:14. ¿Dudas? Llamanos al 6045109095. Estamos cerca',
-        date: 1743847874000,   // 2026-04-05 10:11 UTC fijo
+        date: 1743847874000,   // 2026-04-05 10:11 UTC (fixed)
       },
       {
         address: '85540',
         body: 'Bancolombia: Transferiste $100,000.00 desde tu cuenta 9514 a la cuenta *3001230523 el 04/04/2026 a las 14:27. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
-        date: 1743774420000,   // 2026-04-04 14:27 UTC fijo
+        date: 1743774420000,   // 2026-04-04 14:27 UTC (fixed)
       },
     ];
   }
 
-  /** @deprecated Solo para desarrollo web — usar parseBankSms() en producción */
+  /** @deprecated Web development only — use parseBankSms() in production */
   async triggerMockSync(): Promise<void> {
     const pending = await this.triggerMockFetch(7);
     if (pending.length > 0) {
@@ -196,12 +189,12 @@ export class SmsService {
   }
 
   /**
-   * Versión mock de parseBankSms() para desarrollo en web.
-   * Filtra los mock SMS por el rango de días seleccionado usando la fecha parseada
-   * del cuerpo del SMS (no sms.date, que ahora es un timestamp fijo del pasado).
-   * Integra SmsDeduplicationService igual que parseBankSms() para que la dedup
-   * funcione correctamente en el flujo web/mock.
-   * @deprecated Reemplazar por parseBankSms(days) en pruebas reales
+   * Mock version of parseBankSms() for web development.
+   * Filters mock SMS messages by the selected day range using the date parsed from
+   * the SMS body (not sms.date, which is a fixed past timestamp).
+   * Integrates SmsDeduplicationService the same way as parseBankSms() so that
+   * deduplication works correctly in the web/mock flow.
+   * @deprecated Replace with parseBankSms(days) for real-device testing
    */
   async triggerMockFetch(days: number): Promise<PendingSmsTransaction[]> {
     const minDate = Date.now() - days * 24 * 60 * 60 * 1000;
@@ -214,7 +207,7 @@ export class SmsService {
       const parsed = this.parser.parse(sms.body, sms.date);
       if (!parsed) continue;
 
-      // Filtrar por la fecha parseada del cuerpo del SMS (no por sms.date fijo)
+      // Filter by the date parsed from the SMS body (not the fixed sms.date timestamp)
       if (parsed.date.getTime() < minDate) continue;
 
       pending.push({
@@ -229,7 +222,7 @@ export class SmsService {
     }
     return pending;
   }
-  // --- FIN MOCK DATA ---
+  // --- END MOCK DATA ---
 
   async requestPermission(): Promise<boolean> {
     try {
@@ -244,7 +237,7 @@ export class SmsService {
     try {
       const { value } = await Preferences.get({ key: this.SYNC_FROM_DATE_KEY });
       if (value) return parseInt(value, 10);
-    } catch { /* usa el default */ }
+    } catch { /* use default */ }
     return Date.now() - (this.DEFAULT_SYNC_WINDOW_DAYS * 24 * 60 * 60 * 1000);
   }
 
@@ -259,7 +252,7 @@ export class SmsService {
     try {
       const { value } = await Preferences.get({ key: this.SYNC_FROM_DATE_KEY });
       if (value) return new Date(parseInt(value, 10));
-    } catch { /* silencioso */ }
+    } catch { /* silent */ }
     return null;
   }
 }

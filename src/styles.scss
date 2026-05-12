@@ -51,7 +51,7 @@ $gray-900: #212529;
 $font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
   "Segoe UI Symbol";
-$font-size-xs:   0.75rem;    // 12px — labels compactos
+$font-size-xs:   0.75rem;    // 12px — compact labels
 $font-size-sm:   0.875rem;   // 14px
 $font-size-base: 1rem;       // 16px
 $font-size-md:   1rem;       // 16px
@@ -80,7 +80,7 @@ $touch-target: 44px;
 // Border Radius
 $border-radius:    0.5rem;    // 8px
 $border-radius-sm: 0.25rem;
-$border-radius-lg: 0.75rem;   // 12px para cards
+$border-radius-lg: 0.75rem;   // 12px for cards
 
 // Shadows
 $box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -120,7 +120,7 @@ $breakpoint-xl: 1200px;
   box-sizing: border-box;
 }
 
-// Mixin para card/block común
+// Mixin for the shared card/block base
 @mixin card-base {
   position: relative;
   display: flex;
@@ -137,7 +137,7 @@ $breakpoint-xl: 1200px;
   box-sizing: border-box;
 }
 
-// Mixin para efectos hover en cards
+// Mixin for card hover effects
 @mixin card-hover {
   transition: $transition-fast;
   
@@ -179,7 +179,7 @@ $breakpoint-xl: 1200px;
   }
 }
 
-// Mixin para focus visible
+// Mixin for visible focus rings
 @mixin focus-outline {
   &:focus,
   &:focus-visible {
@@ -254,16 +254,16 @@ textarea {
 }
 
 /* ============================================================
-    UTILITY CLASSES (Compartidas globalmente)
+    UTILITY CLASSES (Shared globally)
    ============================================================ */
 
-// Clase .block compartida para todos los componentes
+// Shared .block class used by all components
 .block {
   @include card-base;
   text-align: left;
 }
 
-// Título de bloque estándar
+// Standard block title
 .block-title {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;

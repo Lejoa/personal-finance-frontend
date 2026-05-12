@@ -11,9 +11,9 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../features/auth/services/auth.service';
 
 /**
- * Interceptor HTTP que agrega automáticamente el token JWT
- * a todas las peticiones salientes y maneja errores de autenticación.
- * Intenta refrescar el token automáticamente cuando recibe un error 401.
+ * HTTP interceptor that automatically attaches the JWT access token
+ * to every outgoing request and handles authentication errors.
+ * Attempts a transparent token refresh when a 401 response is received.
  */
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -24,7 +24,7 @@ export class JwtInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-  // Lazy getter para AuthService para evitar dependencia circular con el interceptor
+  // Lazy getter to break the circular dependency between the interceptor and AuthService
   private get authService(): AuthService {
     return this.injector.get(AuthService);
   }
@@ -40,7 +40,7 @@ export class JwtInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           if (request.url.includes('api/token/refresh')) {
-            console.error('[JwtInterceptor] Refresh token expirado, haciendo logout');
+            console.error('[JwtInterceptor] Refresh token expired, logging out');
             this.authService.logout(false);
             return throwError(() => error);
           }
@@ -53,13 +53,13 @@ export class JwtInterceptor implements HttpInterceptor {
     );
   }
 
-  private addTokenToRequest(request: HttpRequest<any>, token: string): HttpRequest<any> {
+  private addTokenToRequest(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
     return request.clone({
       setHeaders: { Authorization: `Bearer ${token}` }
     });
   }
 
-  private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  private handle401Error(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
@@ -71,7 +71,7 @@ export class JwtInterceptor implements HttpInterceptor {
           return next.handle(this.addTokenToRequest(request, response.accessToken));
         }),
         catchError((error) => {
-          console.error('[JwtInterceptor] Error al refrescar el token, haciendo logout');
+          console.error('[JwtInterceptor] Failed to refresh token, logging out');
           this.isRefreshing = false;
           this.authService.logout(false);
           this.router.navigate(['/login'], { queryParams: { error: 'session_expired' } });

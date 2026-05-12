@@ -10,7 +10,7 @@ export interface Transaction {
   status?: TransactionStatus;
   transactionType: TransactionType;
   synchronized?: 'pending' | 'done' | 'rejected';
-  /** Origen de la transacción: 'manual' (entrada manual) o 'sms' (detectada de SMS bancario) */
+  /** Transaction source: 'manual' (entered by the user) or 'sms' (detected from a banking SMS) */
   source?: 'manual' | 'sms';
   createdAt?: Date;
   updatedAt?: Date;

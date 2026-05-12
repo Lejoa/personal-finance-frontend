@@ -40,18 +40,18 @@
     flex-direction: column;
     justify-content: center;
 
-    /* nuevo contenedor de cabecera */
+    /* header container */
     .tip-header {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        /* por defecto (sin imagen) centramos título */
+        /* default (no image): centre the title */
         justify-content: center;
         width: 100%;
         margin-bottom: 0.5rem;
     }
 
-    /* cuando hay imagen la cabecera reparte espacio */
+    /* when an image is present, the header distributes space */
     &.has-image .tip-header {
         text-align: left;
     }
@@ -61,7 +61,7 @@
         font-weight: 600;
         color: #343a40;
         margin: 0;
-        /* cuando hay imagen, permitir alineamiento a la izquierda */
+        /* when an image is present, allow left alignment */
         text-align: center;
         flex: 1;
     }

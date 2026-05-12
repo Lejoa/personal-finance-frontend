@@ -86,6 +86,7 @@ describe('MonthNavigatorComponent', () => {
       monthStateServiceSpy = jasmine.createSpyObj('MonthStateService', ['setMonth'], {
         selectedMonth: new Date(2024, 11, 1) // diciembre
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (component as any).monthStateService = monthStateServiceSpy;
 
       component.goToNextMonth();

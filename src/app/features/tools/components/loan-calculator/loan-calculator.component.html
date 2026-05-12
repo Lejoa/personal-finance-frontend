@@ -25,7 +25,7 @@
   @if (isPanelOpen) {
     <div class="tool-card__panel loan-panel">
 
-      <!-- ── FORMULARIO ── -->
+      <!-- ── FORM ── -->
       @if (!showResults) {
         <div class="export-field">
           <label class="export-field__label" for="loan-amount">Monto del préstamo</label>
@@ -114,7 +114,7 @@
         }
       }
 
-      <!-- ── RESULTADOS ── -->
+      <!-- ── RESULTS ── -->
       @if (showResults && result) {
         <div class="loan-results">
 
@@ -129,7 +129,7 @@
             <span class="loan-results__title">RESULTADOS</span>
 
             <div class="loan-results__actions">
-              <!-- Botón eliminar: solo visible si ya está guardado -->
+              <!-- Delete button: only visible when the calculation is already saved -->
               @if (currentSavedId !== null) {
                 <button class="loan-results__btn-delete" type="button"
                   [disabled]="isDeletingCurrent"
@@ -147,7 +147,7 @@
                 </button>
               }
 
-              <!-- Botón guardar: solo visible si NO está guardado aún -->
+              <!-- Save button: only visible when the calculation has NOT been saved yet -->
               @if (currentSavedId === null) {
                 <button class="loan-results__btn-save" type="button"
                   (click)="openSaveModal()"
@@ -243,7 +243,7 @@
   }
 </div>
 
-<!-- ── MODAL GUARDAR ── -->
+<!-- ── SAVE MODAL ── -->
 @if (showSaveModal) {
   <div class="loan-modal-backdrop" (click)="closeSaveModal()" aria-hidden="true"></div>
   <div class="loan-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">

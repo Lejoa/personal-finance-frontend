@@ -1,7 +1,7 @@
 // src/main.ts
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideNativeDateAdapter } from '@angular/material/core'; // ✅ Agregar DateAdapter
+import { provideNativeDateAdapter } from '@angular/material/core'; // Required DateAdapter for Angular Material date inputs
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';

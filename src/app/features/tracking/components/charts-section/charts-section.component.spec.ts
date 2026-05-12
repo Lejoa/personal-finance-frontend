@@ -4,11 +4,16 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartsSectionComponent } from './charts-section.component';
 import { Transaction } from '../../../../shared/models/transaction.model';
 
+// eslint-disable-next-line @angular-eslint/component-selector
 @Component({ selector: 'canvas[baseChart]', template: '', standalone: true })
 class MockBaseChartDirective {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() type: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() data: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() options: any;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   update(): void {}
 }
 

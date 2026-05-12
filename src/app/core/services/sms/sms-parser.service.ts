@@ -1,41 +1,42 @@
 import { Injectable } from '@angular/core';
 
 /**
- * Resultado del parsing de un SMS bancario.
- * Si el SMS no puede ser parseado, el servicio retorna null.
+ * Result of parsing a banking SMS.
+ * If the SMS cannot be parsed, the service returns null.
  */
 export interface ParsedSmsTransaction {
   type: 'ingreso' | 'gasto';
   amount: number;
-  merchant: string;   // nombre del comercio o descripción
+  merchant: string;   // merchant name or description
   date: Date;
-  rawText: string;    // texto original para referencia y deduplicación
+  rawText: string;    // original text kept for reference and deduplication
 }
 
 /**
- * SmsParserService — Extrae datos de transacción del texto de un SMS bancario.
+ * SmsParserService — Extracts transaction data from the text of a banking SMS.
  *
- * Responsabilidad única: parsing de texto. No sabe nada de storage ni de HTTP.
+ * Single responsibility: text parsing. Knows nothing about storage or HTTP.
  *
- * Estrategia de parsing:
- * Se usan regex con grupos de captura nombrados para cada dato de la transacción.
- * Los patrones cubren los formatos más comunes de los SMS bancarios colombianos.
- * Si ningún patrón coincide, el método parse() retorna null — el llamador decide
- * si ignorar o registrar el SMS no reconocido.
+ * Parsing strategy:
+ * Named-capture-group regexes are used for each transaction field.
+ * Patterns cover the most common Colombian banking SMS formats.
+ * If no pattern matches, parse() returns null — the caller decides whether
+ * to ignore or log the unrecognised SMS.
  *
- * Extensibilidad: para agregar un banco nuevo, agregar una entrada en BANK_PATTERNS.
+ * Extensibility: to add a new bank, add an entry to BANK_PATTERNS.
  */
 @Injectable({ providedIn: 'root' })
 export class SmsParserService {
 
   /**
-   * Remitentes bancarios conocidos.
-   * Se usan para filtrar el buzón antes de parsear — evita procesar SMS irrelevantes.
-   * Coincidencia parcial, case-insensitive (el plugin Java usa LIKE %value%).
+   * Known banking senders.
+   * Used to filter the inbox before parsing — avoids processing irrelevant SMS messages.
+   * Partial match, case-insensitive (the Java plugin uses LIKE %value%).
+   *
+   * Keywords that must appear in the SMS body to identify it as a banking message.
+   * Partial case-insensitive match on the message body is used because the address
+   * field is a short code (e.g. 85540), not the bank name.
    */
-  // Palabras clave que deben aparecer en el BODY del SMS para identificarlo como bancario.
-  // Se usa coincidencia parcial case-insensitive sobre el cuerpo del mensaje,
-  // porque el campo address es un número corto (ej: 85540) no el nombre del banco.
   readonly KNOWN_BANK_SENDERS = [
     'Bancolombia',
     'Davivienda',
@@ -51,16 +52,16 @@ export class SmsParserService {
   ];
 
   /**
-   * Patrones de SMS bancarios ajustados al formato real de Bancolombia.
+   * Banking SMS patterns tuned to Bancolombia's real message format.
    *
-   * Formatos de monto soportados:
-   * - $2,500.00   → separador de miles: coma, decimal: punto
-   * - COP40.900,00 → separador de miles: punto, decimal: coma
+   * Supported amount formats:
+   * - $2,500.00    → thousands separator: comma, decimal: period
+   * - COP40.900,00 → thousands separator: period, decimal: comma
    * - $200,000.00
    *
-   * Cada entrada: [patrón, tipo de transacción]
+   * Each entry: [pattern, transaction type]
    */
-  private readonly PATTERNS: Array<[RegExp, 'ingreso' | 'gasto']> = [
+  private readonly PATTERNS: [RegExp, 'ingreso' | 'gasto'][] = [
     // "Compraste COP40.900,00 en COMERCIO" o "Compraste $X en COMERCIO"
     [/Compraste\s+(?:COP)?\s*\$?([\d.,]+)\s+en\s+(.+?)(?:,\s*el|\s+el\s+\d|\s+Esta\s+compra|$)/i, 'gasto'],
 
@@ -84,13 +85,13 @@ export class SmsParserService {
   ];
 
   /**
-   * Patrones de fecha soportados (en orden de prioridad):
+   * Supported date patterns (in priority order):
    * 1. "el 2026/03/11 15:03"        → YYYY/MM/DD HH:MM
-   * 2. "el 14/03/2026"              → DD/MM/YYYY (sin hora)
+   * 2. "el 14/03/2026"              → DD/MM/YYYY (no time)
    * 3. "el 07/03/2026 a las 14:27"  → DD/MM/YYYY a las HH:MM
-   * 4. "el 04/03/2026 10:11:14"     → DD/MM/YYYY HH:MM:SS (sin "a las")
+   * 4. "el 04/03/2026 10:11:14"     → DD/MM/YYYY HH:MM:SS (no "a las")
    */
-  private readonly DATE_PATTERNS: Array<(body: string) => Date | null> = [
+  private readonly DATE_PATTERNS: ((body: string) => Date | null)[] = [
     // YYYY/MM/DD HH:MM  — ej: "2026/03/11 15:03"
     (body) => {
       const m = body.match(/\b(\d{4})\/(\d{2})\/(\d{2})\s+(\d{2}):(\d{2})/);
@@ -124,11 +125,11 @@ export class SmsParserService {
   ];
 
   /**
-   * Intenta parsear el texto de un SMS bancario.
+   * Attempts to parse the text of a banking SMS.
    *
-   * @param body  Texto completo del SMS
-   * @param smsTimestamp  Timestamp Unix (ms) del SMS — usado como fallback si no hay fecha en el texto
-   * @returns ParsedSmsTransaction si el SMS es reconocido, null si no aplica ningún patrón
+   * @param body          Full SMS body text
+   * @param smsTimestamp  Unix timestamp (ms) of the SMS — used as fallback when no date is found in the text
+   * @returns ParsedSmsTransaction if the SMS is recognised, null if no pattern matches
    */
   parse(body: string, smsTimestamp: number): ParsedSmsTransaction | null {
     for (const [pattern, type] of this.PATTERNS) {
@@ -149,23 +150,23 @@ export class SmsParserService {
   }
 
   /**
-   * Parsea el monto eliminando puntos de miles y reemplazando coma decimal.
-   * Formato colombiano: $1.200.000,50 → 1200000.50
+   * Parses the amount by stripping thousands separators and normalising the decimal separator.
+   * Colombian format: $1.200.000,50 → 1200000.50
    */
   private parseAmount(raw: string): number {
-    // Detectar el formato según el separador final:
-    // - "2,500.00" → coma=miles, punto=decimal  → eliminar comas
-    // - "40.900,00" → punto=miles, coma=decimal → eliminar puntos, coma→punto
-    // - "200,000.00" → coma=miles, punto=decimal → eliminar comas
+    // Detect the format by looking at the last separator:
+    // - "2,500.00"  → comma=thousands, period=decimal  → strip commas
+    // - "40.900,00" → period=thousands, comma=decimal  → strip periods, comma→period
+    // - "200,000.00"→ comma=thousands, period=decimal  → strip commas
     let normalized: string;
     const lastComma  = raw.lastIndexOf(',');
     const lastPeriod = raw.lastIndexOf('.');
 
     if (lastPeriod > lastComma) {
-      // el punto es el separador decimal → coma es miles
+      // period is the decimal separator → comma is thousands
       normalized = raw.replace(/,/g, '');
     } else {
-      // la coma es el separador decimal → punto es miles
+      // comma is the decimal separator → period is thousands
       normalized = raw.replace(/\./g, '').replace(',', '.');
     }
 
@@ -174,18 +175,18 @@ export class SmsParserService {
   }
 
   /**
-   * Limpia el nombre del comercio eliminando texto residual.
+   * Cleans the merchant name by removing residual text.
    */
   private cleanMerchant(raw: string): string {
     return raw
       .trim()
-      .replace(/\s+/g, ' ')  // colapsar espacios múltiples
-      .substring(0, 100);    // truncar para no exceder el campo name del backend (255 chars)
+      .replace(/\s+/g, ' ')  // collapse multiple spaces
+      .substring(0, 100);    // truncate to stay well under the backend name field limit (255 chars)
   }
 
   /**
-   * Extrae la fecha del texto del SMS. Si no encuentra el patrón, usa el timestamp del SMS.
-   * Formato en el texto: "el 02/02/2026 a las 17:40"
+   * Extracts the date from the SMS text. Falls back to the SMS timestamp if no pattern matches.
+   * Expected text format: "el 02/02/2026 a las 17:40"
    */
   private parseDate(body: string, fallbackTimestamp: number): Date {
     for (const extractor of this.DATE_PATTERNS) {

@@ -23,7 +23,7 @@ describe('NotificationService', () => {
 
   describe('loadUnread', () => {
     it('should GET unread notifications', () => {
-      let result: any;
+      let result: { count: number; notifications: unknown[] } | undefined;
       service.loadUnread().subscribe(r => result = r);
       http.expectOne(`${API}/unread`).flush({ count: 3, notifications: [] });
       expect(result.count).toBe(3);

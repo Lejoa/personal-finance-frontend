@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Pipe({
@@ -6,7 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   standalone: true,
 })
 export class MarkdownPipe implements PipeTransform {
-  constructor(private sanitizer: DomSanitizer) {}
+  private sanitizer = inject(DomSanitizer);
 
   transform(value: string): SafeHtml {
     if (!value) return '';
@@ -22,7 +22,7 @@ export class MarkdownPipe implements PipeTransform {
     for (const raw of lines) {
       const line = raw.trimEnd();
 
-      // Encabezado: **Texto** en línea sola
+      // Heading: **Text** on its own line
       const headingMatch = line.match(/^\*\*(.+?)\*\*\s*$/);
       if (headingMatch) {
         if (inList) { result.push('</ul>'); inList = false; }
@@ -30,7 +30,7 @@ export class MarkdownPipe implements PipeTransform {
         continue;
       }
 
-      // Ítem de lista: - texto
+      // List item: - text
       if (line.startsWith('- ')) {
         if (!inList) { result.push('<ul class="analysis-list">'); inList = true; }
         const content = this.inlineFormat(line.slice(2));
@@ -38,13 +38,13 @@ export class MarkdownPipe implements PipeTransform {
         continue;
       }
 
-      // Línea vacía
+      // Empty line
       if (line.trim() === '') {
         if (inList) { result.push('</ul>'); inList = false; }
         continue;
       }
 
-      // Párrafo normal
+      // Regular paragraph
       if (inList) { result.push('</ul>'); inList = false; }
       result.push(`<p class="analysis-paragraph">${this.inlineFormat(line)}</p>`);
     }
@@ -53,7 +53,7 @@ export class MarkdownPipe implements PipeTransform {
     return result.join('');
   }
 
-  /** Convierte **texto** → <strong> dentro de una línea */
+  /** Converts **text** → <strong> within a single line */
   private inlineFormat(text: string): string {
     return this.escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   }

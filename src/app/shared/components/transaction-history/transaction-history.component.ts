@@ -10,11 +10,11 @@ import { Transaction } from '../../models/transaction.model';
   styleUrl: './transaction-history.component.scss'
 })
 export class TransactionHistoryComponent implements OnChanges {
-  @Input() pageSize: number = 5;
-  @Input() showPagination: boolean = true;
+  @Input() pageSize = 5;
+  @Input() showPagination = true;
   @Input() transactions: Transaction[] = [];
 
-  currentPage: number = 1;
+  currentPage = 1;
 
   get totalPages(): number {
     return Math.ceil(this.transactions.length / this.pageSize);

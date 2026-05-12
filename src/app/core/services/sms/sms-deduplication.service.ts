@@ -2,26 +2,25 @@ import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 
 /**
- * SmsDeduplicationService — Previene el registro duplicado de transacciones de SMS.
+ * SmsDeduplicationService — Prevents duplicate registration of SMS-sourced transactions.
  *
- * Estrategia:
- * Cada SMS se identifica por un hash SHA-256 calculado sobre (address + body + date_ms).
- * Los hashes procesados se almacenan en @capacitor/preferences bajo la clave
- * 'sms_processed_hashes' como un array JSON.
+ * Strategy:
+ * Each SMS is identified by a SHA-256 hash computed over (address + body + date_ms).
+ * Processed hashes are stored in @capacitor/preferences under the key
+ * 'sms_processed_hashes' as a JSON array.
  *
- * ¿Por qué SHA-256 y no SHA-1?
- * SubtleCrypto (Web Crypto API) está disponible en el WebView porque usamos
- * androidScheme: 'https' — requiere un contexto seguro. SHA-256 es el algoritmo
- * mínimo recomendado por la W3C para nuevas implementaciones.
+ * Why SHA-256 instead of SHA-1?
+ * SubtleCrypto (Web Crypto API) is available in the WebView because we use
+ * androidScheme: 'https', which requires a secure context. SHA-256 is the minimum
+ * algorithm recommended by the W3C for new implementations.
  *
- * ¿Por qué @capacitor/preferences y no localStorage?
- * @capacitor/preferences persiste en SharedPreferences de Android — sobrevive
- * a limpiezas de caché del navegador. localStorage puede ser borrado por el
- * sistema cuando hay presión de memoria.
+ * Why @capacitor/preferences instead of localStorage?
+ * @capacitor/preferences persists to Android SharedPreferences — it survives
+ * browser cache clears. localStorage can be wiped by the OS under memory pressure.
  *
- * Límite de 500 hashes con rotación FIFO:
- * Cada hash ocupa ~64 chars. 500 hashes ≈ 32KB — un límite razonable que
- * cubre el historial de varios meses sin crecer indefinidamente.
+ * 500-hash cap with FIFO rotation:
+ * Each hash is ~64 chars. 500 hashes ≈ 32 KB — a reasonable limit that covers
+ * several months of history without growing indefinitely.
  */
 @Injectable({ providedIn: 'root' })
 export class SmsDeduplicationService {
@@ -30,10 +29,10 @@ export class SmsDeduplicationService {
   private readonly MAX_HASHES = 500;
 
   /**
-   * Verifica si un SMS ya fue procesado.
-   * @param address Remitente del SMS (número o nombre del banco)
-   * @param body    Texto del SMS
-   * @param date    Timestamp Unix en ms del SMS
+   * Returns true if the given SMS has already been processed.
+   * @param address SMS sender (short code or bank name)
+   * @param body    SMS body text
+   * @param date    Unix timestamp in ms of the SMS
    */
   async isProcessed(address: string, body: string, date: number): Promise<boolean> {
     const hash = await this.computeHash(address, body, date);
@@ -42,18 +41,18 @@ export class SmsDeduplicationService {
   }
 
   /**
-   * Marca un SMS como procesado guardando su hash.
-   * Aplica rotación FIFO si se supera MAX_HASHES.
+   * Marks an SMS as processed by persisting its hash.
+   * Applies FIFO rotation when the MAX_HASHES cap is exceeded.
    */
   async markAsProcessed(address: string, body: string, date: number): Promise<void> {
     const hash = await this.computeHash(address, body, date);
     const hashes = await this.loadHashes();
 
-    if (hashes.includes(hash)) return; // ya estaba, no duplicar en el store
+    if (hashes.includes(hash)) return; // already recorded — skip to avoid store duplication
 
     hashes.push(hash);
 
-    // Rotación FIFO: si supera el límite, eliminar los más antiguos (al inicio del array)
+    // FIFO rotation: if the cap is exceeded, drop the oldest entries (front of the array)
     const trimmed = hashes.length > this.MAX_HASHES
       ? hashes.slice(hashes.length - this.MAX_HASHES)
       : hashes;
@@ -65,8 +64,8 @@ export class SmsDeduplicationService {
   }
 
   /**
-   * Carga el array de hashes desde Preferences.
-   * Retorna array vacío si no existe o hay error de parseo.
+   * Loads the hash array from Preferences.
+   * Returns an empty array if the key does not exist or the value cannot be parsed.
    */
   private async loadHashes(): Promise<string[]> {
     try {
@@ -79,13 +78,13 @@ export class SmsDeduplicationService {
   }
 
   /**
-   * Calcula SHA-256 de (address + body + date) usando Web Crypto API.
+   * Computes the SHA-256 hash of (address + body + date) using the Web Crypto API.
    *
-   * Web Crypto API (window.crypto.subtle) está disponible en:
-   * - Browsers modernos en contexto HTTPS
-   * - Android WebView con androidScheme: 'https' — nuestro caso
+   * Web Crypto API (window.crypto.subtle) is available in:
+   * - Modern browsers running in an HTTPS context
+   * - Android WebView with androidScheme: 'https' — our case
    *
-   * El resultado es un hex string de 64 caracteres.
+   * Returns a 64-character hex string.
    */
   private async computeHash(address: string, body: string, date: number): Promise<string> {
     const input = `${address}|${body}|${date}`;

@@ -9,7 +9,7 @@ import { TabService } from '../../core/services/tab/tab.service';
 import { MonthStateService } from '../../core/services/month-state/month-state.service';
 import { TransactionService } from '../../shared/services/transaction.service';
 import { CategoryService } from '../../shared/services/category.service';
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+
 import { LearningContentComponent } from '../learning/components/learning-content/learning-content.component';
 import { ChatContentComponent } from '../chat/components/chat-content/chat-content.component';
 import { BudgetComponent } from '../budget/components/budget/budget.component';
@@ -39,8 +39,6 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 
     SmsSyncSheetComponent,
     MonthNavigatorComponent,
     ToolsContentComponent,
-    NgSwitch,
-    NgSwitchCase,
   ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
@@ -102,6 +100,7 @@ export class MainComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: transactions => { this.homeTransactions = transactions; },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         error: () => {}
       });
   }

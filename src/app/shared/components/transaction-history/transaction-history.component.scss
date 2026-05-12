@@ -1,13 +1,12 @@
-// Importar variables globales
 @import 'styles.scss';
 
 /* ============================================================
-    BLOQUE PRINCIPAL
-    - Hereda .block del global
+    MAIN BLOCK
+    - Inherits .block from the global stylesheet
     ============================================================ */
 .block--transactions {
-  // No redefinir propiedades innecesarias
-  // .block ya maneja display, padding, width, etc.
+  // Do not redefine properties already handled by .block
+  // .block manages display, padding, width, etc.
 }
 
 /* ============================================================

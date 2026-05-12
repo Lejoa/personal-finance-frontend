@@ -10,7 +10,7 @@
 
   @if (!isLoading) {
 
-    <!-- Resumen global -->
+    <!-- Global summary -->
     @if (budgetedCategories.length > 0) {
       <div class="budget-summary-card">
         <div class="budget-summary-row">
@@ -29,7 +29,7 @@
       </div>
     }
 
-    <!-- Categorías con presupuesto -->
+    <!-- Budgeted categories -->
     @if (budgetedCategories.length > 0) {
       <section class="budget-section">
         <h3 class="budget-section__title">
@@ -46,7 +46,7 @@
       </section>
     }
 
-    <!-- Categorías sin presupuesto -->
+    <!-- Unbudgeted categories -->
     @if (unbudgetedCategories.length > 0) {
       <app-unbudgeted-category-list
         [categories]="unbudgetedCategories"
@@ -56,7 +56,7 @@
       </app-unbudgeted-category-list>
     }
 
-    <!-- Estado vacío -->
+    <!-- Empty state -->
     @if (budgetedCategories.length === 0 && unbudgetedCategories.length === 0) {
       <div class="empty-state">
         <p>No hay categorías de gasto disponibles.</p>

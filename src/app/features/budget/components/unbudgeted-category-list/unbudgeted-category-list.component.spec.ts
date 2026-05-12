@@ -42,7 +42,7 @@ describe('UnbudgetedCategoryListComponent', () => {
     component.selectedMonth = new Date('2026-04-01');
     component.currentBudget = MOCK_BUDGET;
 
-    // Obtener MatSnackBar del injector del fixture y espiar su método open
+    // Get MatSnackBar from the fixture injector and spy on its open method
     snackBar = fixture.debugElement.injector.get(MatSnackBar);
     spyOn(snackBar, 'open');
 

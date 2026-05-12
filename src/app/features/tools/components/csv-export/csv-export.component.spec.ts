@@ -98,6 +98,7 @@ describe('CsvExportComponent', () => {
     it('should reset selectedCategoryId to empty', () => {
       component.selectedCategoryId = 5;
       component.onTypeChange();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(component.selectedCategoryId).toEqual('' as any);
     });
   });
