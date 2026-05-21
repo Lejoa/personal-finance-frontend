@@ -40,8 +40,8 @@ describe('LoanCalculatorService', () => {
       let result: { id: number }[] | undefined;
       service.getCalculations().subscribe(r => result = r);
       http.expectOne(API).flush({ data: [mockCalc], total: 1 });
-      expect(result.length).toBe(1);
-      expect(result[0].id).toBe(1);
+      expect(result!.length).toBe(1);
+      expect(result![0].id).toBe(1);
     });
   });
 
@@ -52,7 +52,7 @@ describe('LoanCalculatorService', () => {
       service.saveCalculation(req).subscribe(r => result = r);
       http.expectOne(r => r.method === 'POST' && r.url === API)
         .flush({ message: 'ok', calculation: mockCalc });
-      expect(result.id).toBe(1);
+      expect(result!.id).toBe(1);
     });
   });
 

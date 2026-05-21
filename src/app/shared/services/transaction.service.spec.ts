@@ -37,15 +37,15 @@ describe('TransactionService', () => {
 
   describe('getTransactions', () => {
     it('should GET transactions and map DTOs', () => {
-      let result: { id: string; transactionType: string }[] | undefined;
+      let result: { id?: string; transactionType: string }[] | undefined;
       service.getTransactions().subscribe(r => result = r);
 
       http.expectOne(req => req.url === API && req.method === 'GET')
         .flush({ data: [makeDto(1)], total: 1 });
 
-      expect(result.length).toBe(1);
-      expect(result[0].id).toBe('1');
-      expect(result[0].transactionType).toBe('gasto');
+      expect(result!.length).toBe(1);
+      expect(result![0].id).toBe('1');
+      expect(result![0].transactionType).toBe('gasto');
     });
 
     it('should pass type filter as query param', () => {
@@ -78,13 +78,13 @@ describe('TransactionService', () => {
     });
 
     it('should update transactions$ BehaviorSubject', () => {
-      let emitted: { length: number }[] | undefined;
+      let emitted: unknown[] | undefined;
       service.transactions$.subscribe(v => emitted = v);
 
       service.getTransactions().subscribe();
       http.expectOne(r => r.url === API).flush({ data: [makeDto(1)], total: 1 });
 
-      expect(emitted.length).toBe(1);
+      expect(emitted!.length).toBe(1);
     });
   });
 
@@ -129,12 +129,12 @@ describe('TransactionService', () => {
 
   describe('getTransactionById', () => {
     it('should GET a single transaction by id', () => {
-      let result: { id: string } | undefined;
+      let result: { id?: string } | undefined;
       service.getTransactionById(1).subscribe(r => result = r);
 
       http.expectOne(`${API}/1`).flush({ transaction: makeDto(1) });
 
-      expect(result.id).toBe('1');
+      expect(result!.id).toBe('1');
     });
   });
 
@@ -149,15 +149,15 @@ describe('TransactionService', () => {
 
   describe('createTransaction', () => {
     it('should POST and return mapped transaction', () => {
-      let result: { id: string; name: string } | undefined;
+      let result: { id?: string; name: string } | undefined;
       service.createTransaction({ name: 'Compra', amount: 50, transactionType: 'gasto', date: new Date('2024-05-10') })
         .subscribe(r => result = r);
 
       const req = http.expectOne(r => r.url === API && r.method === 'POST');
       req.flush({ message: 'ok', transaction: makeDto(99, { name: 'Compra' }) });
 
-      expect(result.id).toBe('99');
-      expect(result.name).toBe('Compra');
+      expect(result!.id).toBe('99');
+      expect(result!.name).toBe('Compra');
     });
 
     it('should prepend to transactions$ and emit transactionChanged$', () => {
@@ -176,7 +176,7 @@ describe('TransactionService', () => {
       service.createTransaction({ name: 'Ingreso', amount: 1000, transactionType: 'ingreso', date: new Date() })
         .subscribe(r => result = r);
       http.expectOne(r => r.method === 'POST').flush({ message: 'ok', transaction: makeDto(2, { type: 'ingreso' }) });
-      expect(result.transactionType).toBe('ingreso');
+      expect(result!.transactionType).toBe('ingreso');
     });
   });
 
@@ -188,7 +188,7 @@ describe('TransactionService', () => {
       http.expectOne(r => r.url === `${API}/1` && r.method === 'PATCH')
         .flush({ message: 'ok', transaction: makeDto(1, { name: 'Updated' }) });
 
-      expect(result.name).toBe('Updated');
+      expect(result!.name).toBe('Updated');
     });
 
     it('should update the item in transactions$ when it exists', () => {
@@ -239,11 +239,11 @@ describe('TransactionService', () => {
 
   describe('getFeedback', () => {
     it('should POST to feedback endpoint', () => {
-      let result: { feedback: string } | undefined;
+      let result: { feedback: string | null } | undefined;
       service.getFeedback(1).subscribe(r => result = r);
       http.expectOne(r => r.url === `${API}/1/feedback` && r.method === 'POST')
         .flush({ feedback: 'Buen gasto' });
-      expect(result.feedback).toBe('Buen gasto');
+      expect(result!.feedback).toBe('Buen gasto');
     });
   });
 

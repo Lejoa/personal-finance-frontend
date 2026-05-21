@@ -35,9 +35,9 @@ describe('CategoryService', () => {
       service.getCategories().subscribe(r => result = r);
       http.expectOne(req => req.url === API).flush({ data: [makeDto(1)], total: 1 });
 
-      expect(result.length).toBe(1);
-      expect(result[0].id).toBe(1);
-      expect(result[0].type).toBe('gasto');
+      expect(result!.length).toBe(1);
+      expect(result![0].id).toBe(1);
+      expect(result![0].type).toBe('gasto');
     });
 
     it('should pass type filter', () => {
@@ -55,13 +55,13 @@ describe('CategoryService', () => {
     });
 
     it('should update categories$ BehaviorSubject', () => {
-      let emitted: { length: number }[] | undefined;
+      let emitted: unknown[] | undefined;
       service.categories$.subscribe(v => emitted = v);
 
       service.getCategories().subscribe();
       http.expectOne(r => r.url === API).flush({ data: [makeDto(1), makeDto(2)], total: 2 });
 
-      expect(emitted.length).toBe(2);
+      expect(emitted!.length).toBe(2);
     });
   });
 
@@ -70,7 +70,7 @@ describe('CategoryService', () => {
       let result: { id: number } | undefined;
       service.getCategoryById(1).subscribe(r => result = r);
       http.expectOne(`${API}/1`).flush({ category: makeDto(1) });
-      expect(result.id).toBe(1);
+      expect(result!.id).toBe(1);
     });
   });
 

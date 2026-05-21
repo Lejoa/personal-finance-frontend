@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { DomSanitizer } from '@angular/platform-browser';
 import { MarkdownPipe } from './markdown.pipe';
 
 describe('MarkdownPipe', () => {
@@ -14,8 +13,7 @@ describe('MarkdownPipe', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    const sanitizer = TestBed.inject(DomSanitizer);
-    pipe = new MarkdownPipe(sanitizer);
+    pipe = TestBed.runInInjectionContext(() => new MarkdownPipe());
   });
 
   it('should create', () => {
