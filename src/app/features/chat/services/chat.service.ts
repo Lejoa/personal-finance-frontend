@@ -181,16 +181,21 @@ export class ChatService {
     });
   }
 
-  public undoTransaction(transactionId: number): void {
+  public undoTransaction(transactionId: number, messageId?: string | number): void {
     this.transactionService.deleteTransaction(transactionId).subscribe({
       next: () => {
+        const currentState = this.chatStateSubject.value;
+        const messages = currentState.messages.map(msg => {
+          if (msg.id !== messageId) return msg;
+          return { ...msg, transactionCreated: undefined };
+        });
         const undoMessage: ChatMessage = {
           id: this.generateId(),
           content: 'La transacción fue eliminada.',
           type: 'assistant',
           timestamp: new Date(),
         };
-        this.addMessage(undoMessage);
+        this.chatStateSubject.next({ ...currentState, messages: [...messages, undoMessage] });
       },
       error: () => {
         const errorMessage: ChatMessage = {

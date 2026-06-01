@@ -155,20 +155,20 @@ describe('ChatContentComponent', () => {
   });
 
   describe('cancelTransaction', () => {
-    it('should call undoTransaction and remove the pending form', () => {
+    it('should call undoTransaction with transactionId and messageId, and remove the pending form', () => {
       component.pendingFormsByMessageId[1] = {
         date: '', note: '', selectedCategoryId: null, selectedCategoryName: null, showMore: false
       };
       component.cancelTransaction(1, 42);
-      expect(chatServiceSpy.undoTransaction).toHaveBeenCalledOnceWith(42);
+      expect(chatServiceSpy.undoTransaction).toHaveBeenCalledOnceWith(42, 1);
       expect(component.pendingFormsByMessageId[1]).toBeUndefined();
     });
   });
 
   describe('undoTransaction', () => {
-    it('should call chatService.undoTransaction', () => {
-      component.undoTransaction(99);
-      expect(chatServiceSpy.undoTransaction).toHaveBeenCalledOnceWith(99);
+    it('should call chatService.undoTransaction with transactionId and messageId', () => {
+      component.undoTransaction('msg-1', 99);
+      expect(chatServiceSpy.undoTransaction).toHaveBeenCalledOnceWith(99, 'msg-1');
     });
   });
 });

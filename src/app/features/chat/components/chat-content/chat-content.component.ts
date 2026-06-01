@@ -101,12 +101,12 @@ export class ChatContentComponent implements OnInit, AfterViewChecked {
   }
 
   cancelTransaction(messageId: string | number, transactionId: number): void {
-    this.chatService.undoTransaction(transactionId);
+    this.chatService.undoTransaction(transactionId, messageId);
     delete this.pendingFormsByMessageId[messageId];
   }
 
-  undoTransaction(transactionId: number): void {
-    this.chatService.undoTransaction(transactionId);
+  undoTransaction(messageId: string | number, transactionId: number): void {
+    this.chatService.undoTransaction(transactionId, messageId);
   }
 
   private initializePendingForms(state: ChatState): void {

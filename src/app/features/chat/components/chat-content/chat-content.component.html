@@ -142,7 +142,7 @@
                 <span class="transaction-card__category">{{ message.transactionCreated.categoryName }}</span>
                 <span class="transaction-card__date">{{ message.transactionCreated.date }}</span>
               </div>
-              <button class="transaction-card__undo" (click)="undoTransaction(message.transactionCreated.id)">
+              <button class="transaction-card__undo" (click)="undoTransaction(message.id, message.transactionCreated.id)">
                 Deshacer
               </button>
             </div>
