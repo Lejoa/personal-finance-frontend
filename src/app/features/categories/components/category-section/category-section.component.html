@@ -71,7 +71,7 @@
         class="modal__input"
         type="text"
         [(ngModel)]="categoryForm.description"
-        placeholder="Descripción (opcional)"
+        placeholder="Descripción de la categoría"
         autocomplete="off"
       />
     </div>
@@ -111,7 +111,7 @@
         <button
           class="modal__btn modal__btn--primary"
           (click)="submitCategoryForm()"
-          [disabled]="isSaving || !categoryForm.name.trim()"
+          [disabled]="isSaving || !categoryForm.name.trim() || !categoryForm.description.trim()"
           type="button">
           {{ isSaving ? 'Guardando...' : 'Guardar' }}
         </button>
