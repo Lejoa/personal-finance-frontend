@@ -101,7 +101,7 @@ export class BudgetCategoryCardComponent {
 
   private showInfoSnackBar(message: string): void {
     this.snackBar.open(message, 'Cerrar', {
-      duration: 5000,
+      duration: 10000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
       panelClass: ['snack-info']
@@ -110,7 +110,7 @@ export class BudgetCategoryCardComponent {
 
   private showErrorSnackBar(message: string): void {
     this.snackBar.open(message, 'Cerrar', {
-      duration: 3000,
+      duration: 10000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
       panelClass: ['snack-error']

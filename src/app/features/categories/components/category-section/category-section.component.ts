@@ -159,7 +159,7 @@ export class CategorySectionComponent implements OnInit {
 
   private showErrorSnackBar(message: string): void {
     this.snackBar.open(message, 'Cerrar', {
-      duration: 3000,
+      duration: 10000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
       panelClass: ['snack-error']
