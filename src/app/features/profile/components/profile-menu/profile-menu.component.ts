@@ -21,6 +21,9 @@ export class ProfileMenuComponent {
 
   currentUser$: Observable<User | null> = this.authService.currentUser$;
 
+  supportModalOpen = false;
+  aboutModalOpen = false;
+
   close(): void {
     this.menuClosed.emit();
   }
@@ -28,5 +31,26 @@ export class ProfileMenuComponent {
   openCategories(): void {
     this.categoriesClicked.emit();
     this.close();
+  }
+
+  openSupport(): void {
+    this.supportModalOpen = true;
+  }
+
+  closeSupport(): void {
+    this.supportModalOpen = false;
+  }
+
+  openAbout(): void {
+    this.aboutModalOpen = true;
+  }
+
+  closeAbout(): void {
+    this.aboutModalOpen = false;
+  }
+
+  logout(): void {
+    this.close();
+    this.authService.logout();
   }
 }

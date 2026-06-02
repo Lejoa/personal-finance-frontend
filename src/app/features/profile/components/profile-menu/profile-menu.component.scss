@@ -152,9 +152,137 @@
 }
 
 /* ============================================================
+    FOOTER DEL DRAWER (sección Salir)
+    ============================================================ */
+.profile-menu__footer {
+  flex-shrink: 0;
+  padding: $spacer-xs 0 $spacer-xs;
+}
+
+.profile-menu__item--danger {
+  &:hover {
+    background-color: rgba($danger-color, 0.06);
+  }
+
+  &:active {
+    background-color: rgba($danger-color, 0.12);
+  }
+}
+
+.profile-menu__item-icon--danger {
+  background-color: rgba($danger-color, 0.1);
+  color: $danger-color;
+}
+
+.profile-menu__item-label--danger {
+  color: $danger-color;
+}
+
+/* ============================================================
+    MODAL DE INFORMACIÓN (Soporte / Acerca de)
+    ============================================================ */
+.info-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 1200;
+  animation: profileMenuFadeIn 0.15s ease;
+}
+
+.info-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  max-width: calc(100vw - #{$spacer-lg * 2});
+  background-color: $card-bg;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow-lg;
+  z-index: 1205;
+  animation: modalSlideIn 0.2s ease;
+  overflow: hidden;
+}
+
+.info-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacer $spacer $spacer-sm;
+  border-bottom: 1px solid $gray-200;
+}
+
+.info-modal__title {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.info-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: $border-radius;
+  color: $gray-500;
+  cursor: pointer;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background-color: $gray-100;
+    color: $text-primary;
+  }
+}
+
+.info-modal__body {
+  padding: $spacer;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.6;
+
+  p {
+    margin: 0 0 $spacer-sm;
+  }
+}
+
+.info-modal__list {
+  list-style: none;
+  margin: 0 0 $spacer-sm;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-xs;
+
+  li {
+    color: $text-secondary;
+  }
+}
+
+.info-modal__note {
+  font-size: $font-size-xs;
+  color: $gray-500;
+  margin: 0 !important;
+}
+
+/* ============================================================
     ANIMACIONES
     ============================================================ */
 @keyframes profileMenuFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }
