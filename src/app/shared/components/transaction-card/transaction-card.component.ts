@@ -5,8 +5,8 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
-import { Transaction, TransactionAction } from '../../models/transaction.model';
+import { Observable, combineLatest, map, startWith } from 'rxjs';
+import { Transaction, TransactionAction, TransactionType } from '../../models/transaction.model';
 import { Category } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { TransactionService } from '../../services/transaction.service';
@@ -45,8 +45,15 @@ export class TransactionCardComponent {
   editAmount = 0;
   editDate = '';
 
+  selectedTransactionType = new FormControl<TransactionType>('gasto');
   selectedCategory = new FormControl<number | null>(null);
-  categories$: Observable<Category[]> = this.categoryService.categories$;
+
+  filteredCategories$: Observable<Category[]> = combineLatest([
+    this.categoryService.categories$,
+    this.selectedTransactionType.valueChanges.pipe(startWith(this.selectedTransactionType.value))
+  ]).pipe(
+    map(([categories, type]) => categories.filter(c => c.type === type))
+  );
 
   private actionConfig: ActionConfig | null = null;
 
@@ -92,6 +99,7 @@ export class TransactionCardComponent {
     this.editName = this.transaction.name;
     this.editAmount = this.transaction.amount;
     this.editDate = this.formatDateForInput(this.transaction.date);
+    this.selectedTransactionType.setValue(this.transaction.transactionType ?? 'gasto');
     this.selectedCategory.setValue(this.transaction.categoryId ?? null);
   }
 
@@ -103,6 +111,7 @@ export class TransactionCardComponent {
       name: this.editName,
       amount: this.editAmount,
       date: new Date(this.editDate),
+      transactionType: this.selectedTransactionType.value ?? 'gasto',
       categoryId: this.selectedCategory.value ?? undefined,
       status: this.transactionAction === 'Sincronize' ? 'done' : undefined
     };
@@ -141,6 +150,7 @@ export class TransactionCardComponent {
   cancelEdit(): void {
     this.isEditing = false;
     this.selectedCategory.reset();
+    this.selectedTransactionType.setValue('gasto');
   }
 
   private cancelSynchronization(): void {
