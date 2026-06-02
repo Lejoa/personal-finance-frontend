@@ -4,6 +4,7 @@ import { TabService } from '../../../core/services/tab/tab.service';
 
 interface Tab {
   name: string;
+  label: string;
   icon: string;
 }
 
@@ -21,11 +22,11 @@ export class FooterTabsComponent implements OnInit {
   @Output() tabChange = new EventEmitter<string>();
 
   tabs: Tab[] = [
-    { name: 'Home', icon: 'home' },
-    { name: 'Tracking', icon: 'pie_chart' },
-    { name: 'Budgets', icon: 'account_balance_wallet' },
-    { name: 'Aprende', icon: 'school' },
-    { name: 'Tools', icon: 'build' }
+    { name: 'Home',     label: 'Inicio',    icon: 'home' },
+    { name: 'Tracking', label: 'Finanzas',  icon: 'pie_chart' },
+    { name: 'Budgets',  label: 'Budgets',   icon: 'account_balance_wallet' },
+    { name: 'Learning', label: 'Aprende',   icon: 'school' },
+    { name: 'Tools',    label: 'Tools',     icon: 'build' }
   ];
 
   activeTab = 'Home';

@@ -28,6 +28,8 @@ export class LearningContentComponent implements OnInit {
   tips: FinancialTip[] = [];
   analyses: FinancialAnalysis[] = [];
   isLoading = true;
+  isLoadingAnalyses = true;
+  analysesError = false;
   selectedTip?: FinancialTip;
 
   ngOnInit(): void {
@@ -52,7 +54,11 @@ export class LearningContentComponent implements OnInit {
   markAnalysisAsRead(id: number): void {
     this.analysisService.markAsRead(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
+      .subscribe({
+        next: (updated) => {
+          this.analyses = this.analyses.map(a => a.id === updated.id ? updated : a);
+        }
+      });
   }
 
   private loadTips(): void {
@@ -65,11 +71,20 @@ export class LearningContentComponent implements OnInit {
   }
 
   private loadAnalyses(): void {
+    this.isLoadingAnalyses = true;
+    this.analysesError = false;
     this.analysisService.getAnalyses()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (analyses) => { this.analyses = analyses; },
-        error: () => { this.analyses = []; }
+        next: (analyses) => {
+          this.analyses = analyses;
+          this.isLoadingAnalyses = false;
+        },
+        error: () => {
+          this.analyses = [];
+          this.isLoadingAnalyses = false;
+          this.analysesError = true;
+        }
       });
   }
 }

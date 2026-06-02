@@ -29,7 +29,7 @@ export class AnalysisService {
   }
 
   markAsRead(id: number): Observable<FinancialAnalysis> {
-    return this.http.get<AnalysisShowResponse>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.patch<AnalysisShowResponse>(`${this.apiUrl}/${id}/read`, {}).pipe(
       map(response => response.analysis)
     );
   }

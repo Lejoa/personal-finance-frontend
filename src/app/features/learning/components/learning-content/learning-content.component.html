@@ -1,16 +1,22 @@
 <div class="block block--financial-literacy">
 
-  @if (analyses.length > 0) {
-    <div class="section-analyses">
-      <h3 class="section-title">Mis análisis</h3>
+  <div class="section-analyses">
+    <h3 class="section-title">Mis análisis</h3>
+    @if (isLoadingAnalyses) {
+      <p class="tips-loading">Cargando análisis...</p>
+    } @else if (analysesError) {
+      <p class="tips-empty">No se pudieron cargar los análisis. Intenta de nuevo más tarde.</p>
+    } @else if (analyses.length === 0) {
+      <p class="tips-empty">Aún no tienes análisis generados.</p>
+    } @else {
       @for (analysis of analyses; track analysis.id) {
         <app-analysis-card
           [analysis]="analysis"
           (read)="markAnalysisAsRead($event)">
         </app-analysis-card>
       }
-    </div>
-  }
+    }
+  </div>
 
   <h3 class="section-title">Consejos para ti</h3>
   @if (isLoading) {
