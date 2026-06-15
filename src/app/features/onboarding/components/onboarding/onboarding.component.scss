@@ -1,0 +1,789 @@
+@import '../../../../../styles.scss';
+
+/* ---- Host: full viewport ---- */
+:host {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: $card-bg;
+  font-family: $font-family-base;
+  overflow: hidden;
+  color: $text-primary;
+}
+
+/* ---- Top bar ---- */
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 $spacer;
+  z-index: 6;
+}
+
+.topbar__skip {
+  background: transparent;
+  border: none;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  font-family: $font-family-base;
+  cursor: pointer;
+  padding: $spacer-sm;
+  min-height: $touch-target;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  transition: opacity 0.25s ease;
+
+  &:active { color: $text-primary; }
+  &:focus { box-shadow: none; }
+
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* ---- Slides track ---- */
+.track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---- Individual slide ---- */
+.slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px $spacer-md 200px;
+  text-align: center;
+}
+
+/* ---- Illustration icon ---- */
+.art {
+  width: 128px;
+  height: 128px;
+  border-radius: 30px;
+  display: grid;
+  place-items: center;
+  margin-bottom: $spacer-lg;
+  position: relative;
+  flex-shrink: 0;
+
+  &--red {
+    background: rgba($primary-color, 0.06);
+    color: $primary-color;
+  }
+
+  &--green {
+    background: rgba($success-color, 0.06);
+    color: $success-color;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    border: 1.5px solid currentColor;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  svg {
+    width: 62px;
+    height: 62px;
+  }
+}
+
+/* ---- Slide text ---- */
+.slide__title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  margin: 0 0 $spacer-sm;
+  color: $text-primary;
+  max-width: 15ch;
+}
+
+.slide__desc {
+  font-size: $font-size-base;
+  line-height: 1.55;
+  color: $text-secondary;
+  margin: 0;
+  max-width: 30ch;
+}
+
+/* ---- Demo chip (slide 4) ---- */
+.demo-chip {
+  margin-top: $spacer-md;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacer-sm;
+  background: $card-bg;
+  border: 1.5px solid $gray-200;
+  border-radius: $border-radius-lg;
+  padding: $spacer-sm $spacer-sm $spacer-sm $spacer;
+  box-shadow: $box-shadow-md;
+}
+
+.demo-chip__term {
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+/* ---- ⓘ Info button ---- */
+.info-btn {
+  position: relative;
+  width: $touch-target;
+  height: $touch-target;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-family: $font-family-base;
+  flex-shrink: 0;
+
+  &:focus { box-shadow: none; }
+}
+
+.info-btn__glyph {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.7px solid $text-primary;
+  color: $text-primary;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: $font-weight-bold;
+  font-style: normal;
+  line-height: 1;
+  font-family: Georgia, 'Times New Roman', serif;
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.info-btn:active .info-btn__glyph,
+.info-btn--active .info-btn__glyph {
+  background: $text-primary;
+  color: $card-bg;
+  transform: scale(0.9);
+}
+
+.info-btn__pulse {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba($text-primary, 0.4);
+  pointer-events: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .info-btn:not(.info-btn--active) .info-btn__pulse {
+    animation: ob-pulse 1.7s ease-out infinite;
+  }
+}
+
+@keyframes ob-pulse {
+  0%   { opacity: 0.6; transform: scale(0.7); }
+  70%  { opacity: 0;   transform: scale(2); }
+  100% { opacity: 0;   transform: scale(2); }
+}
+
+/* ---- Demo hint ---- */
+.demo-hint {
+  margin-top: $spacer-sm;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 16px;
+  transition: opacity 0.3s ease;
+
+  &--gone { opacity: 0; }
+}
+
+.demo-hint__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $primary-color;
+  flex-shrink: 0;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: ob-tap-pulse 1.7s ease-out infinite;
+  }
+}
+
+@keyframes ob-tap-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba($primary-color, 0.45); }
+  70%  { box-shadow: 0 0 0 9px rgba($primary-color, 0); }
+  100% { box-shadow: 0 0 0 0 rgba($primary-color, 0); }
+}
+
+/* ---- Controls (bottom) ---- */
+.controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 $spacer $spacer-md;
+  z-index: 6;
+  background: linear-gradient(to top, $card-bg 62%, rgba(255, 255, 255, 0));
+}
+
+.controls__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacer-sm;
+  margin-bottom: $spacer;
+}
+
+.controls__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: $gray-300;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: width 0.3s ease, background 0.3s ease;
+  line-height: 1;
+
+  &--active {
+    width: 24px;
+    background: $primary-color;
+  }
+
+  &:focus { box-shadow: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.controls__cta-row {
+  display: flex;
+  align-items: center;
+  gap: $spacer-sm;
+}
+
+.controls__back {
+  flex-shrink: 0;
+  width: 52px;
+  height: 54px;
+  border: 1.5px solid $gray-200;
+  background: $card-bg;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: $text-secondary;
+  padding: 0;
+  font-family: $font-family-base;
+  transition: opacity 0.25s ease, width 0.25s ease, margin-left 0.25s ease, border-color 0.15s ease;
+  overflow: hidden;
+  min-height: unset;
+
+  svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  &:active {
+    background: $gray-100;
+    transform: translateY(1px);
+  }
+
+  &:focus { box-shadow: none; }
+
+  &.hidden {
+    opacity: 0;
+    width: 0;
+    border-color: transparent;
+    pointer-events: none;
+    margin-left: calc(-1 * $spacer-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.controls__next {
+  flex: 1;
+  border: none;
+  background: $primary-color;
+  color: $card-bg;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  padding: $spacer;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  font-family: $font-family-base;
+  box-shadow: 0 8px 20px -6px rgba($primary-color, 0.5);
+  min-height: $touch-target;
+  line-height: 1;
+  transition: background 0.15s ease, transform 0.1s ease;
+
+  &:active {
+    background: $primary-color-dark;
+    transform: translateY(1px);
+  }
+
+  &:focus { box-shadow: 0 8px 20px -6px rgba($primary-color, 0.5); }
+}
+
+/* ---- Bottom sheet scrim ---- */
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.28s ease;
+  pointer-events: none;
+  z-index: 20;
+
+  &--open {
+    background: rgba(0, 0, 0, 0.42);
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/* ---- Bottom sheet ---- */
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  background: $card-bg;
+  border-radius: $border-radius-lg $border-radius-lg 0 0;
+  transform: translateY(110%);
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18);
+  padding: $spacer-xs $spacer-sm $spacer;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+
+  &--open { transform: translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.sheet__grabber {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: $gray-300;
+  margin: 6px auto $spacer-xs;
+  flex-shrink: 0;
+}
+
+.sheet__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacer-sm;
+  margin: $spacer-xs 0;
+}
+
+.sheet__kicker {
+  margin-bottom: $spacer-xs;
+}
+
+.sheet__badge {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: $primary-color;
+  color: $card-bg;
+  font-size: 12px;
+  font-weight: $font-weight-bold;
+  font-family: Georgia, serif;
+}
+
+.sheet__title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+.sheet__close {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: $gray-100;
+  color: $gray-600;
+  font-size: $font-size-lg;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-family: $font-family-base;
+  padding: 0;
+  line-height: 1;
+  min-height: unset;
+
+  &:hover { background: $gray-200; }
+  &:focus { box-shadow: none; }
+}
+
+.sheet__layers {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-sm;
+  margin-top: $spacer-sm;
+}
+
+/* Layers start hidden; animate in when sheet opens */
+.sheet__layer {
+  border-radius: $border-radius-lg;
+  padding: $spacer-sm;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.sheet--open .sheet__layer {
+  opacity: 1;
+  transform: none;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: ob-rise 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.sheet--open .sheet__layer:nth-child(1) {
+  @media (prefers-reduced-motion: no-preference) {
+    animation-delay: 0.10s;
+  }
+}
+
+.sheet--open .sheet__layer:nth-child(2) {
+  @media (prefers-reduced-motion: no-preference) {
+    animation-delay: 0.19s;
+  }
+}
+
+@keyframes ob-rise {
+  to { opacity: 1; transform: none; }
+}
+
+.sheet__layer-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $text-secondary;
+  margin-bottom: $spacer-xs;
+}
+
+.sheet__layer p {
+  margin: 0;
+  font-size: $font-size-sm;
+  line-height: 1.45;
+  color: $gray-800;
+}
+
+.sheet__layer--def {
+  background: $gray-100;
+}
+
+.sheet__layer--ej {
+  background: rgba($primary-color, 0.04);
+  border: 1px solid rgba($primary-color, 0.12);
+}
+
+.sheet__data {
+  color: $primary-color;
+  font-weight: $font-weight-bold;
+}
+
+/* ---- Chat demo (slide 5) ---- */
+.chat-demo {
+  margin-top: $spacer-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacer-sm;
+  width: 100%;
+}
+
+.chat-fab {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: $primary-color;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px -6px rgba($primary-color, 0.6);
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.12s ease,
+              opacity 0.28s ease;
+  font-family: $font-family-base;
+  min-height: unset;
+  padding: 0;
+
+  &:active { background: $primary-color-dark; transform: scale(0.92); }
+
+  &--open {
+    opacity: 0;
+    transform: scale(0.55);
+    pointer-events: none;
+    box-shadow: none;
+  }
+
+  &:focus { box-shadow: 0 8px 20px -6px rgba($primary-color, 0.6); }
+}
+
+.chat-fab__icon {
+  color: $card-bg;
+  font-size: 28px;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  font-style: normal;
+}
+
+.chat-fab__ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba($primary-color, 0.4);
+  pointer-events: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chat-fab:not(.chat-fab--open) .chat-fab__ring {
+    animation: ob-pulse 1.7s ease-out infinite;
+  }
+}
+
+/* ---- Chat messages ---- */
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-xs;
+  width: 100%;
+  max-width: 268px;
+}
+
+/* Each bubble starts hidden; animate in per direction when visible */
+.chat-messages .chat-bubble { opacity: 0; }
+
+.chat-messages--visible .chat-bubble {
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chat-messages--visible .chat-bubble { transition: none; }
+
+  .chat-messages--visible .chat-bubble:nth-child(1) {
+    animation: ob-msg-bot 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  }
+
+  .chat-messages--visible .chat-bubble:nth-child(2) {
+    animation: ob-msg-user 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.65s both;
+  }
+
+  .chat-messages--visible .chat-bubble:nth-child(3) {
+    animation: ob-msg-bot 0.38s cubic-bezier(0.22, 1, 0.36, 1) 1.35s both;
+  }
+}
+
+@keyframes ob-msg-bot {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes ob-msg-user {
+  from { opacity: 0; transform: translateX(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- Chat bubbles ---- */
+.chat-bubble {
+  border-radius: $border-radius-lg;
+  padding: $spacer-sm $spacer;
+  max-width: 88%;
+
+  &--bot {
+    background: $gray-100;
+    border: 1px solid $gray-200;
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+  }
+
+  &--user {
+    background: rgba($primary-color, 0.08);
+    border: 1px solid rgba($primary-color, 0.15);
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    line-height: 1.45;
+    color: $text-primary;
+    text-align: left;
+  }
+}
+
+/* ---- Transaction confirmation card ---- */
+.chat-tx-card {
+  margin-top: $spacer-xs;
+  background: $card-bg;
+  border: 1px solid $gray-200;
+  border-radius: $border-radius;
+  overflow: hidden;
+}
+
+.chat-tx-card__header {
+  display: flex;
+  align-items: center;
+  gap: $spacer-xs;
+  padding: $spacer-xs $spacer-sm;
+  background: rgba($primary-color, 0.05);
+  border-bottom: 1px solid rgba($primary-color, 0.1);
+}
+
+.chat-tx-card__sign {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: $primary-color;
+  color: $card-bg;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: $font-weight-bold;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.chat-tx-card__name {
+  flex: 1;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-tx-card__amount {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.chat-tx-card__amount-value {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  line-height: 1.15;
+}
+
+.chat-tx-card__amount-currency {
+  display: block;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  line-height: 1.15;
+}
+
+.chat-tx-card__field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacer-sm;
+  padding: $spacer-xs $spacer-sm;
+
+  & + & { border-top: 1px solid $gray-100; }
+}
+
+.chat-tx-card__field-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+}
+
+.chat-tx-card__field-value {
+  font-size: $font-size-xs;
+  color: $text-primary;
+}
+
+.chat-tx-card__cat {
+  display: flex;
+  align-items: center;
+  gap: $spacer-xs;
+}
+
+.chat-tx-card__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px $spacer-sm;
+  border-radius: $border-radius;
+  background: $primary-color;
+  color: $card-bg;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  line-height: 1.6;
+}
+
+.chat-tx-card__suggested {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $primary-color;
+}

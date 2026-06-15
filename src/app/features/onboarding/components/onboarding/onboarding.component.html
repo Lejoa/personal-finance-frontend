@@ -1,0 +1,210 @@
+<!-- Top bar -->
+<div class="topbar">
+  <button
+    class="topbar__skip"
+    [class.hidden]="isLast()"
+    type="button"
+    (click)="skip()"
+  >
+    Saltar
+  </button>
+</div>
+
+<!-- Slides track -->
+<div class="track" #track>
+  @for (slide of slides; track slide.id) {
+    <section class="slide">
+      <div
+        class="art"
+        [class.art--red]="slide.tone === 'red'"
+        [class.art--green]="slide.tone === 'green'"
+      >
+        @switch (slide.icon) {
+          @case ('wallet') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2"/>
+              <path d="M3 8v9a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-2"/>
+              <path d="M21 11h-4a2 2 0 0 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1z"/>
+              <circle cx="17" cy="13" r=".6" fill="currentColor"/>
+            </svg>
+          }
+          @case ('arrows') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 4v11"/><path d="M3.5 11.5 7 15l3.5-3.5"/>
+              <path d="M17 20V9"/><path d="M20.5 12.5 17 9l-3.5 3.5"/>
+            </svg>
+          }
+          @case ('donut') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3a9 9 0 1 0 9 9"/>
+              <path d="M12 3v9h9a9 9 0 0 0-9-9z"/>
+              <path d="M12 12 5.5 18"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          }
+          @case ('bulb') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 18h6"/><path d="M10 21h4"/>
+              <path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.9 1 .9 1.7v.5h5.4v-.5c0-.7.4-1.3.9-1.7A6 6 0 0 0 12 3z"/>
+            </svg>
+          }
+          @case ('chat') {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          }
+        }
+      </div>
+
+      <h2 class="slide__title">{{ slide.title }}</h2>
+      <p class="slide__desc">{{ slide.description }}</p>
+
+      @if (slide.isDemo) {
+        <div class="demo-chip">
+          <span class="demo-chip__term">Gasto hormiga</span>
+          <button
+            class="info-btn"
+            [class.info-btn--active]="isInfoActive()"
+            type="button"
+            aria-label="¿Qué significa? Toca para aprender"
+            (click)="openSheet()"
+          >
+            <span class="info-btn__pulse" aria-hidden="true"></span>
+            <i class="info-btn__glyph" aria-hidden="true">i</i>
+          </button>
+        </div>
+        <div class="demo-hint" [class.demo-hint--gone]="isHintGone()">
+          <span class="demo-hint__dot" aria-hidden="true"></span>
+          Toca el ícono para probarlo
+        </div>
+      }
+
+      @if (slide.isChat) {
+        <div class="chat-demo">
+          <div class="chat-messages" [class.chat-messages--visible]="isChatOpen()" aria-live="polite">
+            <div class="chat-bubble chat-bubble--bot">
+              <p>¡Hola! Soy tu asistente financiero. Puedo ayudarte a registrar gastos e ingresos, y responder preguntas sobre tus finanzas. ¿En qué puedo ayudarte hoy?</p>
+            </div>
+            <div class="chat-bubble chat-bubble--user">
+              <p>Gaste 60000 en hamburguesas</p>
+            </div>
+            <div class="chat-bubble chat-bubble--bot">
+              <p>Registro de gasto de $60.000 en hamburguesas guardado.</p>
+              <div class="chat-tx-card">
+                <div class="chat-tx-card__header">
+                  <span class="chat-tx-card__sign" aria-hidden="true">−</span>
+                  <span class="chat-tx-card__name">Hamburguesas</span>
+                  <div class="chat-tx-card__amount" aria-label="60.000 COP">
+                    <span class="chat-tx-card__amount-value">60.000</span>
+                    <span class="chat-tx-card__amount-currency">COP</span>
+                  </div>
+                </div>
+                <div class="chat-tx-card__field">
+                  <span class="chat-tx-card__field-label">Fecha</span>
+                  <span class="chat-tx-card__field-value">Hoy</span>
+                </div>
+                <div class="chat-tx-card__field">
+                  <span class="chat-tx-card__field-label">Categoría</span>
+                  <div class="chat-tx-card__cat">
+                    <span class="chat-tx-card__chip">Alimentos</span>
+                    <span class="chat-tx-card__suggested">Sugerida</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="chat-fab"
+            [class.chat-fab--open]="isChatOpen()"
+            type="button"
+            aria-label="Abrir chat para registrar gasto"
+            (click)="openChat()"
+          >
+            <span class="chat-fab__ring" aria-hidden="true"></span>
+            <span class="chat-fab__icon" aria-hidden="true">+</span>
+          </button>
+        </div>
+        <div class="demo-hint" [class.demo-hint--gone]="isChatHintGone()">
+          <span class="demo-hint__dot" aria-hidden="true"></span>
+          Toca el botón para probarlo
+        </div>
+      }
+    </section>
+  }
+</div>
+
+<!-- Bottom controls -->
+<div class="controls">
+  <div class="controls__dots" role="tablist" aria-label="Navegación de pantallas">
+    @for (slide of slides; track slide.id; let i = $index) {
+      <button
+        class="controls__dot"
+        [class.controls__dot--active]="currentIndex() === i"
+        type="button"
+        role="tab"
+        [attr.aria-selected]="currentIndex() === i"
+        [attr.aria-label]="'Pantalla ' + (i + 1)"
+        (click)="goTo(i)"
+      ></button>
+    }
+  </div>
+  <div class="controls__cta-row">
+    <button
+      class="controls__back"
+      [class.hidden]="isFirst()"
+      type="button"
+      aria-label="Volver a la pantalla anterior"
+      (click)="back()"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <button class="controls__next" type="button" (click)="next()">
+      {{ isLast() ? 'Empezar' : 'Siguiente' }}
+    </button>
+  </div>
+</div>
+
+<!-- Bottom sheet scrim -->
+<div
+  class="sheet-scrim"
+  [class.sheet-scrim--open]="isSheetOpen()"
+  aria-hidden="true"
+  (click)="closeSheet()"
+></div>
+
+<!-- Bottom sheet -->
+<div
+  class="sheet"
+  [class.sheet--open]="isSheetOpen()"
+  role="dialog"
+  [attr.aria-modal]="isSheetOpen()"
+  aria-label="Gasto hormiga"
+>
+  <div class="sheet__grabber" aria-hidden="true"></div>
+  <div class="sheet__header">
+    <div>
+      <div class="sheet__kicker">
+        <span class="sheet__badge" aria-hidden="true">i</span>
+      </div>
+      <h2 class="sheet__title">¿Qué es? Gasto hormiga</h2>
+    </div>
+    <button
+      class="sheet__close"
+      type="button"
+      aria-label="Cerrar"
+      (click)="closeSheet()"
+    >✕</button>
+  </div>
+  <div class="sheet__layers">
+    <div class="sheet__layer sheet__layer--def">
+      <div class="sheet__layer-label">En simple</div>
+      <p>Son compras pequeñas y frecuentes que parecen insignificantes, pero sumadas afectan tu presupuesto.</p>
+    </div>
+    <div class="sheet__layer sheet__layer--ej">
+      <div class="sheet__layer-label">Así se ve en la app</div>
+      <p>Tocas el <span class="sheet__data">ⓘ</span> junto a cualquier término y aprendes el concepto en el momento.</p>
+    </div>
+  </div>
+</div>

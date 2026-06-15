@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './features/auth/guards/auth.guard';
+import { OnboardingGuard } from './features/onboarding/guards/onboarding.guard';
 
 export const routes: Routes = [
     // Public routes (no authentication required)
@@ -11,11 +12,15 @@ export const routes: Routes = [
         path: 'auth/callback',
         loadComponent: () => import('./features/auth/components/callback/callback.component').then( m => m.CallbackComponent)
     },
+    {
+        path: 'onboarding',
+        loadComponent: () => import('./features/onboarding/components/onboarding/onboarding.component').then( m => m.OnboardingComponent)
+    },
 
     // Protected routes (authentication required)
     {
         path: '',
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, OnboardingGuard],
         children: [
             {
                 path: '',
