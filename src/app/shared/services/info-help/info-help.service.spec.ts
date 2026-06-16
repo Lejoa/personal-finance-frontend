@@ -89,6 +89,6 @@ describe('InfoHelpService', () => {
 
   it('should expose activeConcept$ as an observable (not the subject itself)', () => {
     expect(typeof service.activeConcept$.subscribe).toBe('function');
-    expect((service as unknown as Record<string, unknown>)['_activeConcept$']).toBeUndefined();
+    expect((service.activeConcept$ as unknown as Record<string, unknown>)['next']).toBeUndefined();
   });
 });

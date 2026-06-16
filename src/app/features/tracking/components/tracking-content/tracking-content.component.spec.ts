@@ -8,6 +8,12 @@ import { ChartsSectionComponent } from '../charts-section/charts-section.compone
 class MockChartsSectionComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Input() transactions: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  @Input() allTransactions: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  @Input() prevMonthExpenses: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  @Input() prevMonthIncomes: any[] = [];
   @Input() selectedMonth: Date = new Date();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Output() transactionTypeChange = new EventEmitter<any>();
