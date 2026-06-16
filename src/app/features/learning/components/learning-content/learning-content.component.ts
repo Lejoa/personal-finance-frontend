@@ -7,18 +7,23 @@ import { TabService } from '../../../../core/services/tab/tab.service';
 import { ChatService } from '../../../chat/services/chat.service';
 import { AnalysisService } from '../../services/analysis.service';
 import { AnalysisCardComponent } from '../analysis-card/analysis-card.component';
+import { InfoIconComponent } from '../../../../shared/components/info-help/info-icon/info-icon.component';
+import { INFO_CONCEPTS } from '../../../../shared/data/info-concepts';
 
 @Component({
   selector: 'app-learning-content',
   standalone: true,
   imports: [
     FinancialTipsComponent,
-    AnalysisCardComponent
+    AnalysisCardComponent,
+    InfoIconComponent,
   ],
   templateUrl: './learning-content.component.html',
   styleUrl: './learning-content.component.scss'
 })
 export class LearningContentComponent implements OnInit {
+  protected readonly CONCEPTS = INFO_CONCEPTS;
+
   private tipService = inject(TipService);
   private tabService = inject(TabService);
   private chatService = inject(ChatService);

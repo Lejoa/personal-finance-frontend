@@ -1,5 +1,8 @@
 <section class="budget-section">
-  <h3 class="budget-section__title">Sin presupuestar este mes</h3>
+  <h3 class="budget-section__title">
+    Sin presupuestar este mes
+    <app-info-icon [concept]="CONCEPTS['dinero-sin-presupuestar']"></app-info-icon>
+  </h3>
 
   @for (cat of categories; track cat.categoryId) {
     <div class="unbudgeted-row">

@@ -1,7 +1,10 @@
 <div class="block block--financial-literacy">
 
   <div class="section-analyses">
-    <h3 class="section-title">Mis análisis</h3>
+    <h3 class="section-title">
+      Mis análisis
+      <app-info-icon [concept]="CONCEPTS['mis-analisis']"></app-info-icon>
+    </h3>
     @if (isLoadingAnalyses) {
       <p class="tips-loading">Cargando análisis...</p>
     } @else if (analysesError) {
@@ -18,7 +21,10 @@
     }
   </div>
 
-  <h3 class="section-title">Consejos para ti</h3>
+  <h3 class="section-title">
+    Consejos para ti
+    <app-info-icon [concept]="CONCEPTS['consejos-para-ti']"></app-info-icon>
+  </h3>
   @if (isLoading) {
     <p class="tips-loading">Cargando consejos...</p>
   }

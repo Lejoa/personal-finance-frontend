@@ -1,0 +1,89 @@
+@import '../../../../../styles.scss';
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.info-icon {
+  position: relative;
+  width: $touch-target;
+  height: $touch-target;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-family: $font-family-base;
+  min-height: unset;
+
+  &:focus { box-shadow: none; }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.4);
+    border-radius: 50%;
+  }
+}
+
+.info-icon__glyph {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid $text-primary;
+  color: $text-primary;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: $font-weight-bold;
+  font-style: normal;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1;
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.info-icon--light .info-icon__glyph {
+  border-color: $card-bg;
+  color: $card-bg;
+}
+
+.info-icon:active .info-icon__glyph {
+  background: $text-primary;
+  color: $card-bg;
+  transform: scale(0.88);
+}
+
+.info-icon--light:active .info-icon__glyph {
+  background: $card-bg;
+  color: $text-primary;
+}
+
+.info-icon__pulse {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba($text-primary, 0.35);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.info-icon--light .info-icon__pulse {
+  border-color: rgba($card-bg, 0.5);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .info-icon__pulse {
+    animation: info-pulse 2s ease-out infinite;
+  }
+}
+
+@keyframes info-pulse {
+  0%   { opacity: 0.5; transform: scale(0.7); }
+  70%  { opacity: 0;   transform: scale(1.9); }
+  100% { opacity: 0;   transform: scale(1.9); }
+}

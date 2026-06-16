@@ -1,0 +1,10 @@
+<button
+  class="info-icon"
+  [class.info-icon--light]="tone === 'light'"
+  type="button"
+  aria-label="¿Qué significa? Toca para aprender"
+  (click)="open($event)"
+>
+  <span class="info-icon__pulse" aria-hidden="true"></span>
+  <i class="info-icon__glyph" aria-hidden="true">i</i>
+</button>

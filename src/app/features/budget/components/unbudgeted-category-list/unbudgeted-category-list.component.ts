@@ -7,15 +7,19 @@ import { EMPTY, catchError, switchMap, take, timer } from 'rxjs';
 import { Budget } from '../../../../shared/models/budget.model';
 import { BudgetService } from '../../../../shared/services/budget.service';
 import { UnbudgetedCategory } from '../../interfaces';
+import { InfoIconComponent } from '../../../../shared/components/info-help/info-icon/info-icon.component';
+import { INFO_CONCEPTS } from '../../../../shared/data/info-concepts';
 
 @Component({
   selector: 'app-unbudgeted-category-list',
   standalone: true,
-  imports: [FormsModule, DatePipe, MatSnackBarModule],
+  imports: [FormsModule, DatePipe, MatSnackBarModule, InfoIconComponent],
   templateUrl: './unbudgeted-category-list.component.html',
   styleUrl: './unbudgeted-category-list.component.scss'
 })
 export class UnbudgetedCategoryListComponent {
+  protected readonly CONCEPTS = INFO_CONCEPTS;
+
   private budgetService = inject(BudgetService);
   private snackBar = inject(MatSnackBar);
   private destroyRef = inject(DestroyRef);

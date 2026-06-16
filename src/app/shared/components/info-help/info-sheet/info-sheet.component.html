@@ -1,0 +1,101 @@
+<!-- Scrim -->
+<div
+  class="info-scrim"
+  [class.info-scrim--open]="isOpen()"
+  aria-hidden="true"
+  (click)="close()"
+></div>
+
+<!-- Sheet panel -->
+<div
+  class="info-sheet"
+  [class.info-sheet--open]="isOpen()"
+  [class.info-sheet--green]="concept()?.accent === 'green'"
+  role="dialog"
+  [attr.aria-modal]="isOpen() || null"
+  [attr.aria-label]="concept()?.title"
+  [attr.aria-hidden]="!isOpen() || null"
+>
+  <div
+    class="info-sheet__grabber"
+    role="button"
+    tabindex="0"
+    aria-label="Cerrar"
+    (click)="close()"
+    (keydown.enter)="close()"
+    (keydown.space)="close()"
+  ></div>
+
+  <!-- Header: only render when a concept is active -->
+  @if (concept(); as c) {
+    <div class="info-sheet__header">
+      <div>
+        <div class="info-sheet__kicker">
+          <span class="info-sheet__badge" aria-hidden="true">i</span>
+        </div>
+        <h2 class="info-sheet__title">{{ c.title }}</h2>
+      </div>
+      <button
+        class="info-sheet__close"
+        type="button"
+        aria-label="Cerrar"
+        (click)="close()"
+      >✕</button>
+    </div>
+  }
+
+  <!-- Layers: always in DOM so CSS transition fires on class change -->
+  <div class="info-sheet__layers">
+
+    <!-- EN SIMPLE -->
+    <div class="info-sheet__layer info-sheet__layer--def">
+      <div class="info-sheet__layer-label">En simple</div>
+      <p>{{ concept()?.definition }}</p>
+    </div>
+
+    <!-- EN TU CASO -->
+    @if (concept()?.example) {
+      <div class="info-sheet__layer info-sheet__layer--ex">
+        <div class="info-sheet__layer-label">En tu caso</div>
+        <p [innerHTML]="safeExample()"></p>
+        @if (concept()?.exampleProgress !== undefined) {
+          <div class="info-sheet__progress" role="progressbar"
+            [attr.aria-valuenow]="concept()?.exampleProgress"
+            aria-valuemin="0" aria-valuemax="100">
+            <div class="info-sheet__progress-bar"
+              [style.width.%]="concept()?.exampleProgress">
+            </div>
+          </div>
+          <p class="info-sheet__stat">{{ concept()?.exampleStat }}</p>
+        }
+      </div>
+    }
+
+    <!-- MINI TIP -->
+    @if (concept()?.tip) {
+      <div class="info-sheet__layer info-sheet__layer--tip">
+        <div class="info-sheet__tip-row">
+          <svg class="info-sheet__tip-bulb" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" aria-hidden="true">
+            <path d="M12 2a7 7 0 0 1 7 7c0 2.71-1.52 5.07-3.75 6.32V17a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-1.68C6.52 14.07 5 11.71 5 9a7 7 0 0 1 7-7Z"
+              stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M9.5 21h5M10.5 18h3" stroke="currentColor" stroke-width="1.6"
+              stroke-linecap="round"/>
+          </svg>
+          <div class="info-sheet__tip-content">
+            <div class="info-sheet__layer-label">Mini tip</div>
+            <p>{{ concept()?.tip }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- CTA button -->
+  @if (isOpen()) {
+    <button class="info-sheet__cta" type="button" (click)="close()">
+      Entendido
+    </button>
+  }
+</div>

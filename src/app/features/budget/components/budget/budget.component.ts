@@ -14,6 +14,9 @@ import { BalanceComponent } from '../../../../shared/components/balance/balance.
 import { BudgetCategoryCardComponent } from '../budget-category-card/budget-category-card.component';
 import { UnbudgetedCategoryListComponent } from '../unbudgeted-category-list/unbudgeted-category-list.component';
 import { BudgetCategoryView, UnbudgetedCategory } from '../../interfaces';
+import { InfoIconComponent } from '../../../../shared/components/info-help/info-icon/info-icon.component';
+import { INFO_CONCEPTS } from '../../../../shared/data/info-concepts';
+import { InfoConcept } from '../../../../shared/interfaces/info-concept.interface';
 
 @Component({
   selector: 'app-budget',
@@ -25,11 +28,14 @@ import { BudgetCategoryView, UnbudgetedCategory } from '../../interfaces';
     BalanceComponent,
     BudgetCategoryCardComponent,
     UnbudgetedCategoryListComponent,
+    InfoIconComponent,
   ],
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.scss'
 })
 export class BudgetComponent implements OnInit {
+  protected readonly CONCEPTS = INFO_CONCEPTS;
+
   private categoryService = inject(CategoryService);
   private budgetService = inject(BudgetService);
   private transactionService = inject(TransactionService);
@@ -126,5 +132,33 @@ export class BudgetComponent implements OnInit {
 
   get isGlobalOverBudget(): boolean {
     return this.totalSpent > this.totalBudget;
+  }
+
+  get categoriasPresupuestadasConcept(): InfoConcept {
+    const first = this.budgetedCategories[0];
+    if (!first) return this.CONCEPTS['categorias-presupuestadas'];
+
+    const fmtLimit = this.formatCOP(first.limit);
+    const fmtSpent = this.formatCOP(first.spent);
+    const spentColor = first.isOverBudget ? '#E53935' : '#43A047';
+    const progress = first.limit
+      ? Math.min(Math.round((first.spent / first.limit) * 100), 100)
+      : 0;
+
+    const example =
+      `Tu categoría de <strong style="font-weight:700">${first.categoryName}</strong> ` +
+      `tiene un límite de <strong style="color:#E53935;font-weight:700">${fmtLimit}</strong> ` +
+      `y llevas gastados <strong style="color:${spentColor};font-weight:700">${fmtSpent}</strong>.`;
+
+    return {
+      ...this.CONCEPTS['categorias-presupuestadas'],
+      example,
+      exampleProgress: progress,
+      exampleStat: `${progress}% del presupuesto utilizado`
+    };
+  }
+
+  private formatCOP(amount: number): string {
+    return '$' + Math.round(amount).toLocaleString('es-CO');
   }
 }

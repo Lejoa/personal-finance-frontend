@@ -1,0 +1,245 @@
+@import '../../../../../styles.scss';
+
+// Default accent = red; overridden to green via .info-sheet--green
+:host {
+  --is-accent: #{$primary-color};
+}
+
+/* ---- Scrim ---- */
+.info-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.28s ease;
+  pointer-events: none;
+  z-index: 1040;
+
+  &--open {
+    background: rgba(0, 0, 0, 0.42);
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+/* ---- Sheet panel ---- */
+.info-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1050;
+  background: $card-bg;
+  border-radius: $border-radius-lg $border-radius-lg 0 0;
+  transform: translateY(110%);
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18);
+  padding: $spacer-xs $spacer-sm calc(#{$spacer} + env(safe-area-inset-bottom));
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  &--open { transform: translateY(0); }
+  &--green { --is-accent: #{$success-color}; }
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+/* ---- Grabber ---- */
+.info-sheet__grabber {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: $gray-300;
+  margin: 6px auto $spacer-xs;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:focus { outline: none; box-shadow: 0 0 0 2px rgba($primary-color, 0.3); }
+}
+
+/* ---- Header ---- */
+.info-sheet__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacer-sm;
+  margin: $spacer-xs 0;
+}
+
+.info-sheet__kicker { margin-bottom: $spacer-xs; }
+
+.info-sheet__badge {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--is-accent);
+  color: $card-bg;
+  font-size: 12px;
+  font-weight: $font-weight-bold;
+  font-family: Georgia, serif;
+}
+
+.info-sheet__title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+.info-sheet__close {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  min-height: unset;
+  border-radius: 50%;
+  border: none;
+  background: $gray-100;
+  color: $gray-600;
+  font-size: $font-size-base;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-family: $font-family-base;
+  padding: 0;
+  line-height: 1;
+
+  &:hover { background: $gray-200; }
+  &:focus { box-shadow: none; }
+}
+
+/* ---- Layers ---- */
+.info-sheet__layers {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-sm;
+  margin-top: $spacer-sm;
+}
+
+.info-sheet__layer {
+  border-radius: $border-radius-lg;
+  padding: $spacer-sm;
+
+  @media (prefers-reduced-motion: no-preference) {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.32s ease, transform 0.32s ease;
+    transition-delay: 0s; // no delay on exit (sheet slides away)
+  }
+}
+
+// Staggered entrance: delay only applies while panel is open
+.info-sheet--open .info-sheet__layer {
+  @media (prefers-reduced-motion: no-preference) {
+    opacity: 1;
+    transform: none;
+  }
+}
+.info-sheet--open .info-sheet__layer:nth-child(1) {
+  @media (prefers-reduced-motion: no-preference) { transition-delay: 0.10s; }
+}
+.info-sheet--open .info-sheet__layer:nth-child(2) {
+  @media (prefers-reduced-motion: no-preference) { transition-delay: 0.19s; }
+}
+.info-sheet--open .info-sheet__layer:nth-child(3) {
+  @media (prefers-reduced-motion: no-preference) { transition-delay: 0.28s; }
+}
+
+.info-sheet__layer-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $text-secondary;
+  margin-bottom: $spacer-xs;
+}
+
+.info-sheet__layer p {
+  margin: 0;
+  font-size: $font-size-sm;
+  line-height: 1.45;
+  color: $gray-800;
+}
+
+.info-sheet__layer--def { background: $gray-100; }
+
+.info-sheet__layer--ex,
+.info-sheet__layer--tip {
+  background: rgba($primary-color, 0.04);
+  border: 1px solid rgba($primary-color, 0.12);
+}
+
+.info-sheet--green .info-sheet__layer--ex,
+.info-sheet--green .info-sheet__layer--tip {
+  background: rgba($success-color, 0.04);
+  border: 1px solid rgba($success-color, 0.12);
+}
+
+/* ---- Progress bar (EN TU CASO) ---- */
+.info-sheet__progress {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  margin-top: $spacer-sm;
+  overflow: hidden;
+}
+
+.info-sheet__progress-bar {
+  height: 100%;
+  background: var(--is-accent);
+  border-radius: 2px;
+}
+
+.info-sheet__stat {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  margin: $spacer-xs 0 0;
+}
+
+/* ---- Tip row layout (MINI TIP) ---- */
+.info-sheet__tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacer-sm;
+}
+
+.info-sheet__tip-bulb {
+  flex-shrink: 0;
+  color: var(--is-accent);
+  margin-top: 2px;
+}
+
+.info-sheet__tip-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- CTA button ---- */
+.info-sheet__cta {
+  display: block;
+  width: 100%;
+  padding: $spacer-sm $spacer;
+  margin-top: $spacer;
+  background: var(--is-accent);
+  color: #fff;
+  border: none;
+  border-radius: $border-radius-lg;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  min-height: $touch-target;
+  flex-shrink: 0;
+  transition: filter 0.12s ease, transform 0.1s ease;
+
+  &:hover { filter: brightness(0.92); }
+  &:active { transform: scale(0.98); }
+  &:focus { box-shadow: 0 0 0 3px rgba($primary-color, 0.28); }
+}
+
+.info-sheet--green .info-sheet__cta:focus {
+  box-shadow: 0 0 0 3px rgba($success-color, 0.28);
+}

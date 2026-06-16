@@ -34,6 +34,8 @@ export class TrackingContentComponent implements OnInit {
 
   allMonthTransactions: Transaction[] = [];
   filteredTransactions: Transaction[] = [];
+  prevMonthExpenses: Transaction[] = [];
+  prevMonthIncomes: Transaction[] = [];
 
   get selectedMonth(): Date {
     return this.monthStateService.selectedMonth;
@@ -69,16 +71,22 @@ export class TrackingContentComponent implements OnInit {
     const month = this.monthStateService.selectedMonth;
     const start = new Date(month.getFullYear(), month.getMonth(), 1);
     const end = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+    const prevStart = new Date(month.getFullYear(), month.getMonth() - 1, 1);
+    const prevEnd = new Date(month.getFullYear(), month.getMonth(), 0);
 
     forkJoin({
       all: this.transactionService.getTransactionsByDateRange(start, end),
-      filtered: this.transactionService.getTransactionsByDateRange(start, end, this.currentTransactionType)
+      filtered: this.transactionService.getTransactionsByDateRange(start, end, this.currentTransactionType),
+      prevExpenses: this.transactionService.getTransactionsByDateRange(prevStart, prevEnd, 'gasto'),
+      prevIncomes: this.transactionService.getTransactionsByDateRange(prevStart, prevEnd, 'ingreso')
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ all, filtered }) => {
+        next: ({ all, filtered, prevExpenses, prevIncomes }) => {
           this.allMonthTransactions = all;
           this.filteredTransactions = filtered;
+          this.prevMonthExpenses = prevExpenses;
+          this.prevMonthIncomes = prevIncomes;
         },
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         error: () => {}

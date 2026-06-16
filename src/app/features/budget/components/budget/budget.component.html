@@ -35,6 +35,7 @@
         <h3 class="budget-section__title">
           Categorías presupuestadas
           <span class="budget-section__month">{{ selectedMonth | date:'MMM y' }}</span>
+          <app-info-icon [concept]="categoriasPresupuestadasConcept"></app-info-icon>
         </h3>
         @for (cat of budgetedCategories; track cat.categoryId) {
           <app-budget-category-card

@@ -29,6 +29,19 @@
   }
 }
 
+.btn-with-help {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  button { flex: 1; }
+
+  @media (min-width: $breakpoint-sm) {
+    width: auto;
+    button { flex: none; }
+  }
+}
+
 .button-group {
   display: flex;
   flex-direction: column;

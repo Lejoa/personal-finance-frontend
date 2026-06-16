@@ -3,6 +3,9 @@
   <app-balance [transactions]="allMonthTransactions"></app-balance>
   <app-charts-section
     [transactions]="filteredTransactions"
+    [allTransactions]="allMonthTransactions"
+    [prevMonthExpenses]="prevMonthExpenses"
+    [prevMonthIncomes]="prevMonthIncomes"
     [selectedMonth]="selectedMonth"
     (transactionTypeChange)="onTransactionTypeChange($event)">
   </app-charts-section>

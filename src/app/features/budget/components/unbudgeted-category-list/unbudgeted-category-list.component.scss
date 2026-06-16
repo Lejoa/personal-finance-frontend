@@ -12,6 +12,9 @@
   font-weight: $font-weight-semibold;
   color: $text-primary;
   padding: 0 $spacer-xs;
+  display: flex;
+  align-items: center;
+  gap: $spacer-xs;
 }
 
 /* ===== CATEGORY ICON ===== */

@@ -19,6 +19,7 @@ import { SmsSyncSheetComponent } from '../sms-sync/components/sms-sync-sheet/sms
 import { MonthNavigatorComponent } from '../../shared/components/month-navigator/month-navigator.component';
 import { Transaction } from '../../shared/models/transaction.model';
 import { ToolsContentComponent } from '../tools/components/tools-content/tools-content.component';
+import { InfoSheetComponent } from '../../shared/components/info-help/info-sheet/info-sheet.component';
 
 export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 'Categories' | 'Tools';
 
@@ -39,6 +40,7 @@ export type TabType = 'Home' | 'Tracking' | 'Create' | 'Budgets' | 'Learning' | 
     SmsSyncSheetComponent,
     MonthNavigatorComponent,
     ToolsContentComponent,
+    InfoSheetComponent,
   ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
