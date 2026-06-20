@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.tu-dominio.com', // Replace with the real production domain
+  apiUrl: 'https://uv-finance-api.duckdns.org',
   isNative: true,
   platform: 'android' as const
 };
