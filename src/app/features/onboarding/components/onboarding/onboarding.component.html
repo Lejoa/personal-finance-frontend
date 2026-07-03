@@ -13,7 +13,7 @@
 <!-- Slides track -->
 <div class="track" #track>
   @for (slide of slides; track slide.id) {
-    <section class="slide">
+    <section class="slide" [class.slide--chat-open]="slide.isChat && isChatOpen()">
       <div
         class="art"
         [class.art--red]="slide.tone === 'red'"
@@ -57,7 +57,9 @@
       </div>
 
       <h2 class="slide__title">{{ slide.title }}</h2>
-      <p class="slide__desc">{{ slide.description }}</p>
+      @if (slide.description) {
+        <p class="slide__desc">{{ slide.description }}</p>
+      }
 
       @if (slide.isDemo) {
         <div class="demo-chip">
@@ -81,38 +83,40 @@
 
       @if (slide.isChat) {
         <div class="chat-demo">
-          <div class="chat-messages" [class.chat-messages--visible]="isChatOpen()" aria-live="polite">
-            <div class="chat-bubble chat-bubble--bot">
-              <p>¡Hola! Soy tu asistente financiero. Puedo ayudarte a registrar gastos e ingresos, y responder preguntas sobre tus finanzas. ¿En qué puedo ayudarte hoy?</p>
-            </div>
-            <div class="chat-bubble chat-bubble--user">
-              <p>Gaste 60000 en hamburguesas</p>
-            </div>
-            <div class="chat-bubble chat-bubble--bot">
-              <p>Registro de gasto de $60.000 en hamburguesas guardado.</p>
-              <div class="chat-tx-card">
-                <div class="chat-tx-card__header">
-                  <span class="chat-tx-card__sign" aria-hidden="true">−</span>
-                  <span class="chat-tx-card__name">Hamburguesas</span>
-                  <div class="chat-tx-card__amount" aria-label="60.000 COP">
-                    <span class="chat-tx-card__amount-value">60.000</span>
-                    <span class="chat-tx-card__amount-currency">COP</span>
+          @if (isChatOpen()) {
+            <div class="chat-messages chat-messages--visible" aria-live="polite">
+              <div class="chat-bubble chat-bubble--bot">
+                <p>¡Hola! Soy tu asistente financiero. Puedo ayudarte a registrar gastos e ingresos, y responder preguntas sobre tus finanzas. ¿En qué puedo ayudarte hoy?</p>
+              </div>
+              <div class="chat-bubble chat-bubble--user">
+                <p>Gaste 60000 en hamburguesas</p>
+              </div>
+              <div class="chat-bubble chat-bubble--bot">
+                <p>Registro de gasto de $60.000 en hamburguesas guardado.</p>
+                <div class="chat-tx-card">
+                  <div class="chat-tx-card__header">
+                    <span class="chat-tx-card__sign" aria-hidden="true">−</span>
+                    <span class="chat-tx-card__name">Hamburguesas</span>
+                    <div class="chat-tx-card__amount" aria-label="60.000 COP">
+                      <span class="chat-tx-card__amount-value">60.000</span>
+                      <span class="chat-tx-card__amount-currency">COP</span>
+                    </div>
                   </div>
-                </div>
-                <div class="chat-tx-card__field">
-                  <span class="chat-tx-card__field-label">Fecha</span>
-                  <span class="chat-tx-card__field-value">Hoy</span>
-                </div>
-                <div class="chat-tx-card__field">
-                  <span class="chat-tx-card__field-label">Categoría</span>
-                  <div class="chat-tx-card__cat">
-                    <span class="chat-tx-card__chip">Alimentos</span>
-                    <span class="chat-tx-card__suggested">Sugerida</span>
+                  <div class="chat-tx-card__field">
+                    <span class="chat-tx-card__field-label">Fecha</span>
+                    <span class="chat-tx-card__field-value">Hoy</span>
+                  </div>
+                  <div class="chat-tx-card__field">
+                    <span class="chat-tx-card__field-label">Categoría</span>
+                    <div class="chat-tx-card__cat">
+                      <span class="chat-tx-card__chip">Alimentos</span>
+                      <span class="chat-tx-card__suggested">Sugerida</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          }
           <button
             class="chat-fab"
             [class.chat-fab--open]="isChatOpen()"
@@ -123,10 +127,10 @@
             <span class="chat-fab__ring" aria-hidden="true"></span>
             <span class="chat-fab__icon" aria-hidden="true">+</span>
           </button>
-        </div>
-        <div class="demo-hint" [class.demo-hint--gone]="isChatHintGone()">
-          <span class="demo-hint__dot" aria-hidden="true"></span>
-          Toca el botón para probarlo
+          <div class="demo-hint" [class.demo-hint--gone]="isChatHintGone()">
+            <span class="demo-hint__dot" aria-hidden="true"></span>
+            Toca el botón para probarlo
+          </div>
         </div>
       }
     </section>
