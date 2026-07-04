@@ -24,9 +24,9 @@ export class FooterTabsComponent implements OnInit {
   tabs: Tab[] = [
     { name: 'Home',     label: 'Inicio',    icon: 'home' },
     { name: 'Tracking', label: 'Finanzas',  icon: 'pie_chart' },
-    { name: 'Budgets',  label: 'Budgets',   icon: 'account_balance_wallet' },
+    { name: 'Budgets',  label: 'Presupuestos',   icon: 'account_balance_wallet' },
     { name: 'Learning', label: 'Aprende',   icon: 'school' },
-    { name: 'Tools',    label: 'Tools',     icon: 'build' }
+    { name: 'Tools',    label: 'Herramientas',     icon: 'build' }
   ];
 
   activeTab = 'Home';
