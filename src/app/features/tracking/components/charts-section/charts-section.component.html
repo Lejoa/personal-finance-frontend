@@ -1,23 +1,29 @@
 <div class="charts-container">
-  <div class="chart-section">
-
-    <div class="button-group">
-      <span class="btn-with-help">
-        <button (click)="setChartTransactionType('expenses')" type="button">Gastos</button>
-        <app-info-icon [concept]="gastoInfoConcept"></app-info-icon>
-      </span>
-      <span class="btn-with-help">
-        <button (click)="setChartTransactionType('income')" type="button">Ingresos</button>
-        <app-info-icon [concept]="ingresoInfoConcept"></app-info-icon>
-      </span>
+  @if (allTransactions.length === 0) {
+    <div class="empty-state">
+      No hay transacciones para mostrar
     </div>
+  } @else {
+    <div class="chart-section">
 
-    <canvas
-      baseChart
-      [data]="chartData"
-      [options]="chartOptions"
-      [type]="chartType">
-    </canvas>
+      <div class="button-group">
+        <span class="btn-with-help">
+          <button (click)="setChartTransactionType('expenses')" type="button">Gastos</button>
+          <app-info-icon [concept]="gastoInfoConcept"></app-info-icon>
+        </span>
+        <span class="btn-with-help">
+          <button (click)="setChartTransactionType('income')" type="button">Ingresos</button>
+          <app-info-icon [concept]="ingresoInfoConcept"></app-info-icon>
+        </span>
+      </div>
 
-  </div>
+      <canvas
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="chartType">
+      </canvas>
+
+    </div>
+  }
 </div>

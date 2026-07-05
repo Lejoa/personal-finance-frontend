@@ -90,9 +90,16 @@
   width: 100%;
 }
 
+/* ===== CARD ACTIONS ===== */
+.card-actions {
+  display: flex;
+  align-self: flex-end;
+  gap: $spacer-xs;
+  margin-bottom: $spacer-xs;
+}
+
 /* ===== EDIT BUTTON ===== */
 .edit-button {
-  align-self: flex-end;
   background-color: $gray-200;
   border: none;
   font-size: $font-size-sm;
@@ -102,11 +109,31 @@
   padding: $spacer-xs $spacer-sm;
   border-radius: $border-radius-sm;
   transition: $transition-fast;
-  margin-bottom: $spacer-xs;
 
   &:hover {
     background-color: $gray-300;
     color: $gray-900;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+/* ===== DELETE BUTTON ===== */
+.delete-button {
+  background-color: rgba($danger-color, 0.1);
+  border: none;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $danger-color;
+  cursor: pointer;
+  padding: $spacer-xs $spacer-sm;
+  border-radius: $border-radius-sm;
+  transition: $transition-fast;
+
+  &:hover {
+    background-color: rgba($danger-color, 0.2);
   }
 
   &:active {
@@ -182,6 +209,17 @@
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;
   color: $gray-800;
+  text-align: center;
+}
+
+.edit-modal--confirm {
+  max-width: 400px;
+}
+
+.confirm-message {
+  margin: 0;
+  font-size: $font-size-md;
+  color: $gray-700;
   text-align: center;
 }
 
@@ -271,6 +309,16 @@
 
     &:hover {
       background-color: $gray-400;
+    }
+  }
+
+  .btn-delete {
+    background-color: $danger-color;
+    color: white;
+
+    &:hover {
+      background-color: darken($danger-color, 10%);
+      box-shadow: $box-shadow-md;
     }
   }
 }

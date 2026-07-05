@@ -1,12 +1,21 @@
 <div class="transaction-card">
     @if (editable && !isEditing) {
-      <button
-              class="edit-button"
-              (click)="startEdit()"
-              title="Editar transacción"
-              type="button">
-              {{buttonTitle}}
-      </button>
+      <div class="card-actions">
+        <button
+                class="edit-button"
+                (click)="startEdit()"
+                title="Editar transacción"
+                type="button">
+                {{buttonTitle}}
+        </button>
+        <button
+                class="delete-button"
+                (click)="confirmDelete()"
+                title="Eliminar transacción"
+                type="button">
+                Eliminar
+        </button>
+      </div>
     }
     <!-- Read Mode -->
     <div class="transaction-header">
@@ -111,6 +120,43 @@
                       {{ cancelButtonText }}
                   </button>
               </div>
+          </div>
+      </div>
+  </div>
+}
+
+<!-- Modal Overlay for Delete Confirmation -->
+@if (isConfirmingDelete) {
+  <div class="edit-overlay">
+      <div class="edit-modal edit-modal--confirm">
+          <button
+              class="btn-close"
+              (click)="cancelDelete()"
+              [disabled]="isDeleting"
+              type="button"
+              title="Cerrar">
+              ✕
+          </button>
+          <h3 class="modal-title">Eliminar Transacción</h3>
+          <p class="confirm-message">
+              ¿Estás seguro de que deseas eliminar «{{ transaction.name }}»? Esta acción no se puede deshacer.
+          </p>
+
+          <div class="form-actions">
+              <button
+                  class="btn-delete"
+                  (click)="deleteTransaction()"
+                  [disabled]="isDeleting"
+                  type="button">
+                  {{ isDeleting ? 'Eliminando...' : 'Eliminar' }}
+              </button>
+              <button
+                  class="btn-cancel"
+                  (click)="cancelDelete()"
+                  [disabled]="isDeleting"
+                  type="button">
+                  Cancelar
+              </button>
           </div>
       </div>
   </div>

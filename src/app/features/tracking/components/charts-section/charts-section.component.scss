@@ -16,6 +16,13 @@
   width: 100%;
 }
 
+.empty-state {
+  text-align: center;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  padding: $spacer-lg;
+}
+
 .controls-section {
   display: flex;
   flex-direction: column;

@@ -37,9 +37,12 @@ export class TransactionCardComponent {
   @Input() editable = false;
   @Input() transactionAction!: TransactionAction;
   @Output() transactionUpdated = new EventEmitter<Transaction>();
+  @Output() transactionDeleted = new EventEmitter<string>();
 
   isEditing = false;
   isSaving = false;
+  isConfirmingDelete = false;
+  isDeleting = false;
 
   editName = '';
   editAmount = 0;
@@ -169,6 +172,44 @@ export class TransactionCardComponent {
         error: () => {
           this.isSaving = false;
           this.snackBar.open('No se pudo descartar la transacción. Intenta de nuevo.', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snack-error']
+          });
+        }
+      });
+  }
+
+  confirmDelete(): void {
+    this.isConfirmingDelete = true;
+  }
+
+  cancelDelete(): void {
+    this.isConfirmingDelete = false;
+  }
+
+  deleteTransaction(): void {
+    if (!this.transaction.id) return;
+
+    this.isDeleting = true;
+    this.transactionService.deleteTransaction(Number(this.transaction.id))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isDeleting = false;
+          this.isConfirmingDelete = false;
+          this.transactionDeleted.emit(this.transaction.id);
+          this.snackBar.open('Transacción eliminada correctamente', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snack-success']
+          });
+        },
+        error: () => {
+          this.isDeleting = false;
+          this.snackBar.open('No se pudo eliminar la transacción. Intenta de nuevo.', 'Cerrar', {
             duration: 3000,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
