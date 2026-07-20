@@ -121,13 +121,13 @@ describe('LoanCalculatorComponent', () => {
       expect(component.amortizationTable.length).toBeGreaterThan(0);
     }));
 
-    it('should set activeTab to progress after calculation', fakeAsync(() => {
+    it('should set activeTab to breakdown after calculation', fakeAsync(() => {
       component.amount = 10000000;
       component.annualRate = 12;
       component.termMonths = 24;
       component.calculate();
       tick(100);
-      expect(component.activeTab).toBe('progress');
+      expect(component.activeTab).toBe('breakdown');
     }));
   });
 
