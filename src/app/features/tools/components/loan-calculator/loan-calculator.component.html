@@ -34,7 +34,10 @@
         </div>
 
         <div class="export-field">
-          <label class="export-field__label" for="loan-rate">Tasa de interés anual (%)</label>
+          <label class="export-field__label" for="loan-rate">
+            Tasa de interés anual (%)
+            <app-info-icon [concept]="CONCEPTS['tasa-interes-prestamo']"></app-info-icon>
+          </label>
           <input id="loan-rate" type="number" class="export-field__input"
             [(ngModel)]="annualRate" placeholder="7" min="0" max="100" step="0.1" />
         </div>
@@ -55,8 +58,6 @@
           <label class="export-field__label" for="loan-freq">Frecuencia de pago</label>
           <select id="loan-freq" class="export-field__select" [(ngModel)]="frequency">
             <option value="monthly">Mensual</option>
-            <option value="biweekly">Quincenal</option>
-            <option value="weekly">Semanal</option>
           </select>
         </div>
 
@@ -164,7 +165,7 @@
           <div class="loan-results__summary">
             <div class="loan-results__row">
               <span class="loan-results__label">Monto del préstamo</span>
-              <span class="loan-results__value">{{ result.amount | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span class="loan-results__value">{{ result.amount | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
             <div class="loan-results__row">
               <span class="loan-results__label">Tasa de interés</span>
@@ -176,7 +177,7 @@
             </div>
             <div class="loan-results__row">
               <span class="loan-results__label">Pago extra</span>
-              <span class="loan-results__value">{{ result.extraPayment | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span class="loan-results__value">{{ result.extraPayment | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
             <div class="loan-results__row">
               <span class="loan-results__label">Frecuencia de pago</span>
@@ -184,17 +185,17 @@
             </div>
             <div class="loan-results__row">
               <span class="loan-results__label">Pago {{ result.frequency === 'monthly' ? 'mensual' : result.frequency === 'biweekly' ? 'quincenal' : 'semanal' }}</span>
-              <span class="loan-results__value loan-results__value--accent">{{ result.periodicPayment | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span class="loan-results__value loan-results__value--accent">{{ result.periodicPayment | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
             <div class="loan-results__row">
               <span class="loan-results__label">Interés total</span>
-              <span class="loan-results__value loan-results__value--danger">{{ result.totalInterest | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span class="loan-results__value loan-results__value--danger">{{ result.totalInterest | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
           </div>
 
           <div class="loan-results__total">
             <span class="loan-results__total-label">Total pagado</span>
-            <span class="loan-results__total-value">{{ result.totalPaid | currency:'USD':'symbol':'1.2-2' }}</span>
+            <span class="loan-results__total-value">{{ result.totalPaid | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
 
           <div class="loan-tabs">
@@ -226,9 +227,9 @@
                   @for (row of amortizationTable; track row.number) {
                     <tr>
                       <td>{{ row.number }}</td>
-                      <td>{{ row.principal | currency:'USD':'symbol':'1.2-2' }}</td>
-                      <td class="loan-table__interest">{{ row.interest | currency:'USD':'symbol':'1.2-2' }}</td>
-                      <td>{{ row.balance | currency:'USD':'symbol':'1.2-2' }}</td>
+                      <td>{{ row.principal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                      <td class="loan-table__interest">{{ row.interest | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                      <td>{{ row.balance | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                     </tr>
                   }
                 </tbody>

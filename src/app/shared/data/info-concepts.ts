@@ -46,5 +46,12 @@ export const INFO_CONCEPTS: Record<string, InfoConcept> = {
     title: 'Consejos para ti',
     accent: 'red',
     definition: 'Aquí explicamos conceptos financieros clave, como la tasa de ahorro. Entenderlos te da herramientas para tomar mejores decisiones con tu dinero.'
+  },
+  'tasa-interes-prestamo': {
+    id: 'tasa-interes-prestamo',
+    title: '¿Qué tasa de interés se usa?',
+    accent: 'red',
+    definition: 'La tasa que ingresas se trata como una tasa nominal anual vencida: se divide en partes iguales entre los periodos de pago y el interés se calcula cada periodo sobre el saldo pendiente (sistema de amortización francés), no una sola vez sobre el monto total inicial.',
+    tip: 'Si tu tasa es efectiva anual (E.A.), conviértela primero a nominal para que el cálculo sea exacto.'
   }
 };

@@ -139,10 +139,10 @@ export class SmsService {
    * Dates in the SMS body and sms.date are consistent with each other so that the
    * SHA-256 hash computed by SmsDeduplicationService is stable across calls.
    *
-   * Distribution by selector (reference date: 2026-04-10):
-   *   Last 1 day  (≤24 h):  SMS 1 (2026-04-09)
-   *   Last 3 days (≤72 h):  SMS 1-2 (2026-04-09, 2026-04-08)
-   *   Last 7 days (≤168 h): SMS 1-5 (2026-04-09 to 2026-04-04)
+   * Distribution by selector (reference date: 2026-07-20):
+   *   Last 1 day  (≤24 h):  SMS 1 (2026-07-19)
+   *   Last 3 days (≤72 h):  SMS 1-2 (2026-07-19, 2026-07-18)
+   *   Last 7 days (≤168 h): SMS 1-5 (2026-07-19 to 2026-07-14)
    *
    * To remove mocks when moving to real-device testing:
    * 1. Delete this private `getMockSms()` method.
@@ -154,28 +154,28 @@ export class SmsService {
     return [
       {
         address: '85540',
-        body: 'Bancolombia: Recibiste una transferencia por $431,991 de MARIA SOTO en tu cuenta **9514, el 09/04/2026 a las 18:51. Si tienes dudas, hablemos: 018000931987. Siempre a tu lado.',
-        date: 1744228260000,   // 2026-04-09 18:51 UTC (fixed)
+        body: 'Bancolombia: Recibiste una transferencia por $431,991 de MARIA SOTO en tu cuenta **9514, el 19/07/2026 a las 18:51. Si tienes dudas, hablemos: 018000931987. Siempre a tu lado.',
+        date: Date.UTC(2026, 6, 19, 18, 51),   // 2026-07-19 18:51 UTC — month is 0-indexed (6 = julio)
       },
       {
         address: '85540',
-        body: 'Bancolombia: Compraste COP40.900,00 en APPLE.COM/BILL, el 13:36 a las 08/04/2026. Esta compra esta asociada a T.Cred *8564. Si tienes dudas, encuentranos aqui: 01800931987. Siempre contigo.',
-        date: 1744118160000,   // 2026-04-08 13:36 UTC (fixed)
+        body: 'Bancolombia: Compraste COP40.900,00 en APPLE.COM/BILL, el 13:36 a las 18/07/2026. Esta compra esta asociada a T.Cred *8564. Si tienes dudas, encuentranos aqui: 01800931987. Siempre contigo.',
+        date: Date.UTC(2026, 6, 18, 13, 36),   // 2026-07-18 13:36 UTC
       },
       {
         address: '85540',
-        body: 'Bancolombia: Transferiste $2,500.00 por QR desde tu cuenta 9514 a la cuenta 0163, el 2026/04/06 15:03. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
-        date: 1743951780000,   // 2026-04-06 15:03 UTC (fixed)
+        body: 'Bancolombia: Transferiste $2,500.00 por QR desde tu cuenta 9514 a la cuenta 0163, el 2026/07/16 15:03. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+        date: Date.UTC(2026, 6, 16, 15, 3),    // 2026-07-16 15:03 UTC
       },
       {
         address: '85540',
-        body: 'Bancolombia: Pagaste $200,000.00 a CINE COLOMBIA S.A. desde tu producto *9514 el 05/04/2026 10:11:14. ¿Dudas? Llamanos al 6045109095. Estamos cerca',
-        date: 1743847874000,   // 2026-04-05 10:11 UTC (fixed)
+        body: 'Bancolombia: Pagaste $200,000.00 a CINE COLOMBIA S.A. desde tu producto *9514 el 15/07/2026 10:11:14. ¿Dudas? Llamanos al 6045109095. Estamos cerca',
+        date: Date.UTC(2026, 6, 15, 10, 11, 14), // 2026-07-15 10:11:14 UTC
       },
       {
         address: '85540',
-        body: 'Bancolombia: Transferiste $100,000.00 desde tu cuenta 9514 a la cuenta *3001230523 el 04/04/2026 a las 14:27. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
-        date: 1743774420000,   // 2026-04-04 14:27 UTC (fixed)
+        body: 'Bancolombia: Transferiste $100,000.00 desde tu cuenta 9514 a la cuenta *3001230523 el 14/07/2026 a las 14:27. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+        date: Date.UTC(2026, 6, 14, 14, 27),   // 2026-07-14 14:27 UTC
       },
     ];
   }

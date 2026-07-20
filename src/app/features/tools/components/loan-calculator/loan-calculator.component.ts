@@ -20,13 +20,15 @@ import {
   LoanResult,
   SavedLoanCalculation,
 } from '../../../../shared/models/loan.model';
+import { InfoIconComponent } from '../../../../shared/components/info-help/info-icon/info-icon.component';
+import { INFO_CONCEPTS } from '../../../../shared/data/info-concepts';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-loan-calculator',
   standalone: true,
-  imports: [FormsModule, CommonModule, CurrencyPipe, DecimalPipe, MatSnackBarModule],
+  imports: [FormsModule, CommonModule, CurrencyPipe, DecimalPipe, MatSnackBarModule, InfoIconComponent],
   templateUrl: './loan-calculator.component.html',
   styleUrl: './loan-calculator.component.scss',
 })
@@ -36,12 +38,14 @@ export class LoanCalculatorComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private snackBar = inject(MatSnackBar);
 
+  protected readonly CONCEPTS = INFO_CONCEPTS;
+
   @ViewChild('lineChartCanvas') lineChartCanvas?: ElementRef<HTMLCanvasElement>;
   @ViewChild('doughnutChartCanvas') doughnutChartCanvas?: ElementRef<HTMLCanvasElement>;
 
   isPanelOpen = false;
   showResults = false;
-  activeTab: 'progress' | 'breakdown' | 'table' = 'progress';
+  activeTab: 'progress' | 'breakdown' | 'table' = 'breakdown';
 
   amount: number | null = null;
   annualRate: number | null = null;
@@ -144,7 +148,7 @@ export class LoanCalculatorComponent implements OnInit, OnDestroy {
     };
 
     this.showResults = true;
-    this.activeTab = 'progress';
+    this.activeTab = 'breakdown';
 
     this.cdr.detectChanges();
     setTimeout(() => this.renderCharts(), 50);
