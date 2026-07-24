@@ -510,27 +510,34 @@
   transform: translateY(10px);
 }
 
+/*
+ * animation is intentionally unconditional (not nested inside the media query below).
+ * Angular's production build renames component-scoped @keyframes (e.g. "ob-rise" becomes
+ * "_ngcontent-%COMP%_ob-rise") but only rewrites the matching `animation:` reference when
+ * that property sits at the top level of a rule — a reference nested inside a @media block
+ * is left pointing at the old, unscoped name, so the animation silently never runs and the
+ * layer stays stuck at opacity:0. Keeping `animation` unconditional and instead *cancelling*
+ * it under `prefers-reduced-motion: reduce` avoids that bug while preserving the same
+ * reduced-motion behavior (immediate, unanimated final state).
+ */
 .sheet--open .sheet__layer {
-  opacity: 1;
-  transform: none;
+  animation: ob-rise 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  transform: translateY(10px);
 
-  @media (prefers-reduced-motion: no-preference) {
-    animation: ob-rise 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    opacity: 0;
-    transform: translateY(10px);
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
 .sheet--open .sheet__layer:nth-child(1) {
-  @media (prefers-reduced-motion: no-preference) {
-    animation-delay: 0.10s;
-  }
+  animation-delay: 0.10s;
 }
 
 .sheet--open .sheet__layer:nth-child(2) {
-  @media (prefers-reduced-motion: no-preference) {
-    animation-delay: 0.19s;
-  }
+  animation-delay: 0.19s;
 }
 
 @keyframes ob-rise {
