@@ -78,20 +78,39 @@ export class SmsDeduplicationService {
   }
 
   /**
-   * Computes the SHA-256 hash of (address + body + date) using the Web Crypto API.
+   * Computes a hash of (address + body + date) identifying the SMS.
    *
    * Web Crypto API (window.crypto.subtle) is available in:
    * - Modern browsers running in an HTTPS context
-   * - Android WebView with androidScheme: 'https' — our case
+   * - Android WebView with androidScheme: 'https' — our case, always secure,
+   *   so the native build always takes the SHA-256 branch below.
    *
-   * Returns a 64-character hex string.
+   * When crypto.subtle is unavailable (e.g. the web build opened over plain
+   * HTTP, outside a secure context) this falls back to a non-cryptographic
+   * FNV-1a hash. That's fine here: the hash only identifies duplicate SMS
+   * locally, it isn't a security boundary.
    */
   private async computeHash(address: string, body: string, date: number): Promise<string> {
     const input = `${address}|${body}|${date}`;
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    if (window.crypto?.subtle) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(input);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    return this.fnv1aHash(input);
+  }
+
+  /** Non-cryptographic fallback hash — see computeHash() for when this applies. */
+  private fnv1aHash(input: string): string {
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < input.length; i++) {
+      hash ^= input.charCodeAt(i);
+      hash = Math.imul(hash, 0x01000193);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
   }
 }
